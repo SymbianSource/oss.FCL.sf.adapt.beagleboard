@@ -1,0 +1,36 @@
+// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+///bld.inf" rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+// Single bld.inf for all of the Beagleboard baseport
+//
+
+#include "assp/bld.inf"
+#include "beagleboard/bld.inf"
+#include "beagle_drivers/hal/bld.inf"
+#include "beagle_drivers/keytran/bld.inf"
+#include "beagle_drivers/lcd/bld.inf"
+#include "beagle_drivers/led/bld.inf"
+// #include "beagle_drivers/prm/bld.inf"
+#include "beagle_drivers/serialmouse/bld.inf"
+#include "beagle_drivers/usbv/bld.inf"
+#include "kernel/bld.inf"
+#include "omap3530_drivers/gpio/bld.inf"
+#include "omap3530_drivers/i2c/bld.inf"
+#include "omap3530_drivers/prcm/bld.inf"
+// #include "omap3530_drivers/prm/bld.inf"
+#include "omap3530_drivers/uart/bld.inf"
+#include "omap3530_drivers/usbcc/bld.inf"
+#include "shared/monitor/bld.inf"
+#include "shared/mstick/bld.inf"
+#include "shared/serialkeyb/bld.inf"
+#include "shared/tps65950/bld.inf"
