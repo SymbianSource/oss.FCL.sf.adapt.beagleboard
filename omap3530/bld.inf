@@ -11,11 +11,10 @@
 // Contributors:
 //
 // Description:
-// Single bld.inf for all of the Beagleboard baseport
-//
+// Single bld.inf for most of the Beagleboard baseport
+// kernel & beagleboard subdirectories have distinct variant.mmh files, and must be processed separately
 
 #include "assp/bld.inf"
-#include "beagleboard/bld.inf"
 #include "beagle_drivers/hal/bld.inf"
 #include "beagle_drivers/keytran/bld.inf"
 #include "beagle_drivers/lcd/bld.inf"
@@ -23,7 +22,6 @@
 // #include "beagle_drivers/prm/bld.inf"
 #include "beagle_drivers/serialmouse/bld.inf"
 #include "beagle_drivers/usbv/bld.inf"
-#include "kernel/bld.inf"
 #include "omap3530_drivers/gpio/bld.inf"
 #include "omap3530_drivers/i2c/bld.inf"
 #include "omap3530_drivers/prcm/bld.inf"
