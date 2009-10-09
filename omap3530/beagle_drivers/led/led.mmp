@@ -35,7 +35,7 @@ source				led.cpp
 
 library				VariantTarget(ecust,lib) 
 library				AsspTarget(gpio,lib)
-library             		AsspTarget(prcm, lib)
+library             		AsspTarget(prcm,lib)
 
 VENDORID 0x70000001
 

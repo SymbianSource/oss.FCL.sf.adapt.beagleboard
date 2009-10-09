@@ -17,7 +17,7 @@
 #include <assp/omap3530_assp/assp.mmh>
 #include "kernel/kern_ext.mmh"
 
-TARGET           AsspTarget(prcm, dll)
+TARGET           AsspTarget(prcm,dll)
 TARGETTYPE       kext
 LINKAS           prcm.dll
 DEFFILE          ./def/~/prcm.def
@@ -29,7 +29,7 @@ SOURCE           prcm.cpp
 USERINCLUDE      .
 SYSTEMINCLUDE    +\include\assp\omap3530_assp\ 
 
-LIBRARY          AsspTarget(kaomap3530, lib)
+LIBRARY          AsspTarget(kaomap3530,lib)
 
 EPOCALLOWDLLDATA
 

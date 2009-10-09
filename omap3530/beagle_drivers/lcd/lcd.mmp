@@ -36,9 +36,9 @@ source				lcd.cpp
 userinclude			.
 
 library			VariantTarget(ecust,lib)
-LIBRARY             	AsspTarget(prcm, lib)
-//LIBRARY          	AsspTarget(i2c, lib)
-//LIBRARY	         	AsspTarget(kaomap3530, lib)
+LIBRARY             	AsspTarget(prcm,lib)
+//LIBRARY          	AsspTarget(i2c,lib)
+//LIBRARY	         	AsspTarget(kaomap3530,lib)
 
 noexportlibrary
 

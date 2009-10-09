@@ -36,9 +36,9 @@ sourcepath			.
 source				variant.cpp
 source				variant.cia
 
-library				AsspTarget(i2c, lib)
-library				AsspTarget(uart, lib)
-library				AsspTarget(gpio, lib)
+library				AsspTarget(i2c,lib)
+library				AsspTarget(uart,lib)
+library				AsspTarget(gpio,lib)
 library				tps65950.lib
 library				_omap3XXX_mstick.lib
 

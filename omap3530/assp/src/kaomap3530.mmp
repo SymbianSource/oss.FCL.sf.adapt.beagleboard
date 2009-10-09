@@ -28,7 +28,7 @@ source			omap3530_assp.cia
 
 deffile			../def/~/kaomap3530.def
 
-LIBRARY             	AsspTarget(prcm, lib)
+LIBRARY             	AsspTarget(prcm,lib)
 LIBRARY			_omap3XXX_mstick.lib
 
 nostrictdef

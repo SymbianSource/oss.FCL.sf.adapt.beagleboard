@@ -17,7 +17,7 @@
 #include <assp/omap3530_assp/assp.mmh>
 #include <kernel/kern_ext.mmh>
 
-TARGET           AsspTarget(i2c, dll)
+TARGET           AsspTarget(i2c,dll)
 TARGETTYPE       kext
 LINKAS           i2c.dll
 DEFFILE          ./def/~/i2c.def
@@ -30,7 +30,7 @@ USERINCLUDE      .
 SYSTEMINCLUDE    +\include\assp\omap3530_assp\ 
 SYSTEMINCLUDE 	 +\include\drivers 
 
-LIBRARY          AsspTarget(kaomap3530, lib)
+LIBRARY          AsspTarget(kaomap3530,lib)
 //library				resman.lib
 
 EPOCALLOWDLLDATA

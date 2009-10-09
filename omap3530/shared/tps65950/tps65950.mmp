@@ -36,9 +36,9 @@ SYSTEMINCLUDE	+/include/assp/omap3530_assp
 NOSTRICTDEF
 DEFFILE		~/tps65950.def
 
-LIBRARY		AsspTarget( kaomap3530, lib )
-LIBRARY		AsspTarget( prcm, lib )
-LIBRARY		AsspTarget( i2c, lib )
+LIBRARY		AsspTarget(kaomap3530,lib)
+LIBRARY		AsspTarget(prcm,lib)
+LIBRARY		AsspTarget(i2c,lib)
 
 EPOCALLOWDLLDATA
 CAPABILITY       all

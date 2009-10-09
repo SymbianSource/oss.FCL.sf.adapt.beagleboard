@@ -23,8 +23,8 @@ TARGETTYPE       kext
 SOURCEPATH       .
 SOURCE           t_i2c.cpp
 
-LIBRARY          AsspTarget(i2c, lib)
-LIBRARY	         AsspTarget(kaomap3530, lib)
+LIBRARY          AsspTarget(i2c,lib)
+LIBRARY	         AsspTarget(kaomap3530,lib)
 
 EPOCALLOWDLLDATA
 

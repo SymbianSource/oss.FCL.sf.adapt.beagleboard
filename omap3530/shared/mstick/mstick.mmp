@@ -37,8 +37,8 @@ SYSTEMINCLUDE	+/include/assp/omap3530_assp
 NOSTRICTDEF
 DEFFILE		def/~/mstick.def
 
-LIBRARY		AsspTarget( kaomap3530, lib )
-LIBRARY		AsspTarget( prcm, lib )
+LIBRARY		AsspTarget(kaomap3530,lib)
+LIBRARY		AsspTarget(prcm,lib)
 
 EPOCALLOWDLLDATA
 CAPABILITY       all
