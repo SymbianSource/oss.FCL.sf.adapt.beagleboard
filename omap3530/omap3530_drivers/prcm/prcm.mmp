@@ -27,7 +27,7 @@ SOURCEPATH       .
 SOURCE           prcm.cpp
 
 USERINCLUDE      .
-SYSTEMINCLUDE    +\include\assp\omap3530_assp\ 
+SYSTEMINCLUDE    +\include\assp\omap3530_assp
 
 LIBRARY          AsspTarget(kaomap3530,lib)
 

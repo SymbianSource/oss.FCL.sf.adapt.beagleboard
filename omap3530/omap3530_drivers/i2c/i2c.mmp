@@ -27,7 +27,7 @@ SOURCEPATH       .
 SOURCE           i2c.cpp
 
 USERINCLUDE      .
-SYSTEMINCLUDE    +\include\assp\omap3530_assp\ 
+SYSTEMINCLUDE    +\include\assp\omap3530_assp 
 SYSTEMINCLUDE 	 +\include\drivers 
 
 LIBRARY          AsspTarget(kaomap3530,lib)
