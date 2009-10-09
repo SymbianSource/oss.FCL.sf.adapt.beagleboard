@@ -13,6 +13,8 @@
 // Description:
 //
 
+#if 0 // not needed for Symbian^3
+
 #ifndef __ASSPREG_H__
 #define __ASSPREG_H__
 
@@ -155,4 +157,5 @@ public:
 	IMPORT_C static void Modify64(TLinAddr aAddr, TUint64 aClearMask, TUint64 aSetMask);
 	};
 
+#endif
 #endif

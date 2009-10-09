@@ -537,7 +537,7 @@ __KTRACE_OPT(KI2C, Kern::Printf("I2C:..CNT[%d]: 0x%04x", unitI, AsspRegister::Re
 	}
 
 TUnitControl::TUnitControl() :
-	iLock(/*TSpinLock::EOrderGenericIrqLow1*/),
+	iLock(TSpinLock::EOrderGenericIrqLow1),
 	iDfc(TheDfc, 0, 1),
 	iNumDevices(0),
 	iTransferQ(0)
