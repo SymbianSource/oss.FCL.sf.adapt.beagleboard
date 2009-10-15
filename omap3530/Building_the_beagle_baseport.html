@@ -1,0 +1,92 @@
+﻿<html>
+
+	<head>
+	<title>Symbian^2 on the Beagle Board</title>
+	</head>
+
+	<body>
+
+		<h1>Symbian^2 on the Beagle Board</h1>
+
+		<h2>Purpose and Scope</h2>
+
+		This document is a guide to running the the Symbian^2 on the Beagle board.
+
+		<h2>Getting the Symbian^2 release</h2>
+
+		<p>The beagle board base port will only work in conjuntion with the SOSCO patched version of Symbian^2. This assumes the following release <code>opps_baseline sf_2.0.b_003_SOSCO_OPPS_003_TMP</code>. This release must be installed acording to the by following the <a href="Notes:///802575210038D821/FF4EAD1C2A2A563580256A1C00306169/F2BBFBA8A95E5F19802575EE004BF976">steps on the OPP database</a>.</p>
+		
+		<p>Ensure that the Syborg rom builds and boots before proceeding.</p>
+
+
+		<h2>Getting the Beagle board baseport</h2>
+
+		<p>At the time of writing the Beagle board baseport is only available in the SOSCO perforce repositary. The source is located at:</p>
+
+		<pre>//LPD/development/baseporting/clean/beagleboard/personal/andrewps/foundation_latest/src/cedar/generic/base/omap3530/</pre>
+		
+		<p>There should be a CBR release coming soon.</p>
+		
+
+		<h2>Compiling the Beagle board baseport</h2>
+		
+		<p>Get the base source code by calling <code>getsource</code> on all components found using <code>envinfo | findstr base_</code>.</p>
+
+		<p>To compile the beagle board baseport use the metabld script <code>omap3530/buildscripts/reallycleanbuild.mbc</code>:</p>
+
+		<pre>metabld reallycleanbuild.mbc</pre>
+		
+		<p>I usually collect a log by doing something like</p>
+		
+		<pre>metabld reallycleanbuild.mbc 2>&1 | tee 20090714_1641_build_the_beagle_bsp.txt</pre>
+
+
+		<h2>Building a Beagle board textshell image</h2>
+
+		<p>To build a textshell rom the following lines have to be commented out of <code>\epoc32\include\bldvariant.hrh</code>.</p>
+
+		<pre>
+#include &lt;bldcodeline.hrh&gt;		
+#include &lt;bldprivate.hrh&gt;
+#include &lt;bldpublic.hrh&gt;
+#include &lt;bldregional.hrh&gt; 
+		</pre>
+
+		<p>Note that these lines must be put back to build a GUI image.</p>
+
+		<p>Use the standard textshell build comand:</p>
+
+		<pre>rom -v=beagle -i=armv5</pre>
+
+		<pre>rombuild rom.oby</pre>
+
+
+		<h2>Booting a Beagle board ROM</h2>
+
+		<p>Copy your image to an MMC or SD card and call it <code>BEAGLEARMV5D.IMG</code>. If your Beagle board is not setup to autoboot from removable media then you must connect to the bootloader configuration shell over the beagle boards serial connection and type the following:</p>
+
+		<pre>set bootcmd 'mmcinit ; fatload mmc 0:1 0x81000000 BEAGLEARMV5D.IMG ; go 0x81000000'; saveenv</pre>
+
+		<p>When you reboot the beagle board the textshell rom should be automatically loaded.</p>
+		
+		
+		<h2>Building a Beagle board S60 image</h2>
+		
+		<p>Ensure that <code>\epoc32\include\bldvariant.hrh</code> is clean.</p>
+		
+		<p>Update <code>\epoc32\rom\lpd_override\base.iby</code> to include the Beagle baseport:</p>
+		
+		<pre>
+#elif defined(__BEAGLE__)
+#include &lt;base_beagle.iby&gt;
+		</pre>
+		
+		<p>Copy the files <code>beagle.oby</code> and <code>base_beagle.iby</code> from <code>\epoc32\rom\include</code> into <code>\epoc32\rom\lpd_override\</code>.</p>
+		
+		<p>Build the s60 image using the following command:</p>
+		
+		<pre>call \epoc32\tools\buildrom_lpd.cmd beagle Symbian2.oby -D_EABI=ARMV5 -DCOLOR  -DSYMBIAN_EXCLUDE_IPSEC -D_PORTRAIT_ -es60ibymacros -nosymbols -D__LOCALES_01_IBY__</pre>
+		
+	</body>
+	
+</html>
