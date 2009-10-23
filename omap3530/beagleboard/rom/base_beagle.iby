@@ -130,9 +130,5 @@ device[VARID]=	KERNEL_DIR\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd
 extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\usbv.DLL
 #endif
 
-#ifdef SYNAPTICS_TOUCH_PAD
-extension[VARID]= \epoc32\release\ARMV5\BUILD_DIR\synapticsclearpad.dll		\sys\bin\synapticsclearpad.dll 
-#endif
-
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
