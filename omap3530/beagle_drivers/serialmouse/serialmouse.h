@@ -39,6 +39,9 @@ private:
 	void Clip(TInt& aX, TInt& aY);
 	void GetScreenInfo();
 
+	// AndyS support for sending keyboard events
+	void AddKey( TUint aKey );
+	
 	enum TState	{ ENormal, EEscapingStart, EEscapingType1, EEscapingType2 };
 private:
 	TDfc    iKeyDfc;
@@ -61,7 +64,7 @@ private:
 	TInt iLastY;
 	TBool iLastLeftButtonDown;
 	TBool iLastRightButtonDown;
-	
+
 #ifdef _FRAME_BUFFER_CURSOR_
 	void DrawCursor(TInt x, TInt y);
 	void Blit(TInt x, TInt y, TUint16 aColour);
