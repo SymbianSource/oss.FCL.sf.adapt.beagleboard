@@ -36,6 +36,9 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONDEBUG.DLL      
 extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL            	\sys\bin\gpio.dll
 
 //extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL		\sys\bin\led.dll
+// Uncommnet to include West Bridge Astoria Symbian Storage driver 
+//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_WB.DLL		\sys\bin\wb.dll
+//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\wb.dll		\sys\bin\wb.dll
 
 //extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_resman.pdd		\sys\bin\resman.pdd
 //extension[VARID]=	\Epoc32\Release\##KMAIN##\##BUILD##\resman.ldd				\sys\bin\resman.ldd
@@ -64,6 +67,7 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL             
 file[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL				\sys\bin\ekdata.dll
 extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\ELOCD.LDD							\sys\bin\elocd.ldd
 extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDINT.PDD				\sys\bin\medint.pdd
+// Uncommnet to include West Bridge Astoria Symbian Storage driver //extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD				\sys\bin\medwb.pdd
 device[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\PIPELIB.LDD							\sys\bin\pipelib.ldd
 extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\EXSTART.DLL							\sys\bin\exstart.dll
 
