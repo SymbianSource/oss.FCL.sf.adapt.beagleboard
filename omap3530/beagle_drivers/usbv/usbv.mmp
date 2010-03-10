@@ -23,6 +23,7 @@ linkas				usbv.dll
 noexportlibrary
 
 systeminclude			+/include/drivers
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 
 sourcepath			.
 source				usbv.cpp

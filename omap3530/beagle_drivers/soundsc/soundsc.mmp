@@ -19,6 +19,7 @@
 #include			"kernel/kern_ext.mmh"
 
 SYSTEMINCLUDE		/epoc32/include/drivers
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 
 
 TARGET			VariantTarget(soundsc,pdd)
