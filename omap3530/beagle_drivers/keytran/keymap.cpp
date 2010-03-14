@@ -143,6 +143,7 @@ LOCAL_D const SScanCodeBlock scanCodeBlock_base[]=
 	{'0', '9'},								// scancode range 2
 	{'A', 'Z'},								// scancode range 3
 	{EStdKeyF1, EStdKeyDictaphoneRecord},	// scancode range 4
+	{EStdKeyDevice0,EStdKeyDeviceF},
 	};
 
 LOCAL_D const TUint16 convKeyCodes_base[]=
@@ -263,7 +264,47 @@ LOCAL_D const TUint16 convKeyCodes_base[]=
 	EKeySliderUp,
 	EKeyDictaphonePlay,
 	EKeyDictaphoneStop,
-	EKeyDictaphoneRecord
+	EKeyDictaphoneRecord,
+	
+	
+	EKeyDevice0,
+	EKeyDevice1,
+	EKeyDevice2,
+	EKeyDevice3,
+	EKeyDevice4,
+	EKeyDevice5,
+	EKeyDevice6,
+	EKeyDevice7,
+	EKeyDevice8,
+	EKeyDevice9,
+	EKeyDeviceA,
+	EKeyDeviceB,
+	EKeyDeviceC,
+	EKeyDeviceE,
+	EKeyDeviceE,
+	EKeyDeviceF,
+	
+	
+	EKeyApplication0,
+	EKeyApplication1,
+	EKeyApplication2,
+	EKeyApplication3,
+	EKeyApplication4,
+	EKeyApplication5,
+	EKeyApplication6,
+	EKeyApplication7,
+	EKeyApplication8,
+	EKeyApplication9,
+	EKeyApplicationA,
+	EKeyApplicationB,
+	EKeyApplicationC,
+	EKeyApplicationD,
+	EKeyApplicationE,
+	EKeyApplicationF,
+	
+	EKeyYes,
+	EKeyNo,
+	
 	};
 
 

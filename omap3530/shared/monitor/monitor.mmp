@@ -24,6 +24,7 @@
 target				AsspTarget(exmondebug,dll)
 
 systeminclude			+/include
+OS_LAYER_SYSTEMINCLUDE
 sourcepath			.
 source				monitor.cpp
 

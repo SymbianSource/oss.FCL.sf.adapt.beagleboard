@@ -154,7 +154,7 @@ static const TDividerInfo KDividerInfo[] =
 
 		{ KCM_CLKSEL1_PLL_MPU,		KBit19 | KBit20 | KBit21,		EDivCore_1_2_4,		19 },	// EClkMpuPll_Bypass,	///< DPLL1 bypass frequency
 		{ KCM_CLKSEL1_PLL_IVA2,		KBit19 | KBit20 | KBit21,		EDivCore_1_2_4,		19 },	// EClkIva2Pll_Bypass,	///< DPLL2 bypass frequency
-		{ KCM_CLKSEL_WKUP,			KBit1 | KBit2,					EDiv_1_2,			1 },	// EClkRM_F,	///< Reset manager functional clock	
+		{ KCM_CLKSEL_WKUP,			KBit1 | KBit2,					EDiv_1_2,			1 },	// EClkRM_F,	///< Reset manager functional clock
 		{ KCM_CLKSEL3_PLL,			0x1F,							EDivPll_1_To_16,	0 },	// EClk96M		///< 96MHz clock
 		{ KCM_CLKSEL5_PLL,			0x1F,							EDivPll_1_To_16,	0 },	// EClk120M		///< 120MHz clock
 		{ KCM_CLKOUT_CTRL,			KBit3 | KBit4 | KBit5,			EDivClkOut_1_2_4_8_16,	3 },	// EClkSysOut
@@ -362,7 +362,7 @@ static const TClockEnableAutoInfo KClockControlTable[] =
 
 		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkMpuPll_Bypass,	///< DPLL1 bypass frequency
 		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkIva2Pll_Bypass,	///< DPLL2 bypass frequency
-		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkRM_F,			///< Reset manager functional clock	
+		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkRM_F,			///< Reset manager functional clock
 		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClk96M,			///< 96MHz clock
 		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClk120M,			///< 120MHz clock
 		{ { KDummy, 0, 0, 0 },							{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkSysOut,
@@ -386,8 +386,8 @@ static const TClockEnableAutoInfo KClockControlTable[] =
 		{ { KCM_FCLKEN1_CORE, KBit10, KBit10, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkMcBSP5_F,
 		{ { KCM_FCLKEN1_CORE, KBit18, KBit18, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkMcSpi1_F,
 		{ { KCM_FCLKEN1_CORE, KBit19, KBit19, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkMcSpi2_F,
-		{ { KCM_FCLKEN1_CORE, KBit20, KBit20, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkMcSpi3_F,
-		{ { KCM_FCLKEN1_CORE, KBit21, KBit21, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkMcSpi4_F,
+		{ { KCM_FCLKEN1_CORE, KBit20, KBit20, 0 },	{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkMcSpi3_F,
+		{ { KCM_FCLKEN1_CORE, KBit21, KBit21, 0 },	{ KDummy, 0, KDummyReadAsEnabled, 0 } },		// EClkMcSpi4_F,
 		{ { KCM_FCLKEN1_CORE, KBit15, KBit15, 0},	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkI2c1_F,
 		{ { KCM_FCLKEN1_CORE, KBit16, KBit16, 0},	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkI2c2_F,
 		{ { KCM_FCLKEN1_CORE, KBit17, KBit17, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },		// EClkI2c3_F,
@@ -520,7 +520,7 @@ static const TRegisterBitDef KClockWakeupTable[] =
 
 		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClkMpuPll_Bypass,	///< DPLL1 bypass frequency
 		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClkIva2Pll_Bypass,	///< DPLL2 bypass frequency
-		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClkRM_F,			///< Reset manager functional clock	
+		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClkRM_F,			///< Reset manager functional clock
 		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClk96M,			///< 96MHz clock
 		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClk120M,			///< 120MHz clock
 		{ KDummy, 0, KDummyReadAsDisabled, 0 },	// EClkSysOut,
@@ -684,7 +684,7 @@ static const TRegisterBitDef KClockWakeupGroupTable[ Prcm::KSupportedClockCount 
 
 		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClkMpuPll_Bypass,	///< DPLL1 bypass frequency
 		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClkIva2Pll_Bypass,	///< DPLL2 bypass frequency
-		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClkRM_F,			///< Reset manager functional clock	
+		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClkRM_F,			///< Reset manager functional clock
 		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClk96M,			///< 96MHz clock
 		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClk120M,			///< 120MHz clock
 		{ { KDummy, 0, KDummyReadAsDisabled, 0 },	{ KDummy, 0, KDummyReadAsDisabled, 0 } },			// EClkSysOut,
@@ -860,7 +860,7 @@ static const TWakeupDomainInfo KClockWakeupDomainTable[ Prcm::KSupportedClockCou
 
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkMpuPll_Bypass,	///< DPLL1 bypass frequency
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkIva2Pll_Bypass,	///< DPLL2 bypass frequency
-		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkRM_F,			///< Reset manager functional clock	
+		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkRM_F,			///< Reset manager functional clock
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClk96M,			///< 96MHz clock
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClk120M,			///< 120MHz clock
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkSysOut,
@@ -993,7 +993,7 @@ static const TWakeupDomainInfo KClockWakeupDomainTable[ Prcm::KSupportedClockCou
 
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClk48M
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClk12M
-		
+
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkSysClk
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkAltClk
 		{ KDummy,		{-1,		-1,		-1,		-1,		-1,		-1 } },		// EClkSysClk32k
@@ -1045,7 +1045,7 @@ static const TGptClkSelInfo KGptClockSourceInfo[ Prcm::KSupportedGptCount ] =
 		{ KCM_CLKSEL_PER, KBit4 },	//	EGpt6,
 		{ KCM_CLKSEL_PER, KBit5 },	//	EGpt7,
 		{ KCM_CLKSEL_PER, KBit6 },	//	EGpt8,
-		{ KCM_CLKSEL_PER, KBit7 },	//	EGpt9, 
+		{ KCM_CLKSEL_PER, KBit7 },	//	EGpt9,
 		{ KCM_CLKSEL_CORE, KBit6 },	//	EGpt10,
 		{ KCM_CLKSEL_CORE, KBit7 },	//	EGpt11,
 		{ KDummy, 0 },			//	EGpt12	- clocked from security block
@@ -1152,7 +1152,7 @@ static const TClockSourceInfo KClockSourceInfo[] =
 		{ EDuplicate,	Prcm::EClkSysClk32k },					// EClkGpio5_F,
 		{ EDuplicate,	Prcm::EClkSysClk32k },					// EClkGpio6_F,
 		{ EDuplicate,	Prcm::EClk120M },		// EClkUsb120_F,
-		{ EDuplicate,	Prcm::EClk48M },		// EClkUsb48_F,	
+		{ EDuplicate,	Prcm::EClk48M },		// EClkUsb48_F,
 
 	// Interface clocks
 		{ EDuplicate,	Prcm::EClkL4Domain },		// EClkDss_I,
@@ -1692,7 +1692,7 @@ EXPORT_C void SetPllMode( TPll aPll, TPllMode aPllMode )
 		}
 
 	TInt irq = __SPIN_LOCK_IRQSAVE(iLock);
-	
+
 	_BitClearSet(	KPllMode[ aPll ].iModeRegister,
 					KPllModeMask << KPllMode[ aPll ].iModeShift,
 					newMode << KPllMode[ aPll ].iModeShift );
@@ -1700,7 +1700,7 @@ EXPORT_C void SetPllMode( TPll aPll, TPllMode aPllMode )
 	_BitClearSet(	KPllMode[ aPll ].iAutoRegister,
 					KPllAutoMask << KPllMode[ aPll ].iAutoShift,
 					newAuto << KPllMode[ aPll ].iAutoShift );
-	
+
 	__SPIN_UNLOCK_IRQRESTORE(iLock, irq);
 	}
 
@@ -1713,7 +1713,7 @@ EXPORT_C TPllMode PllMode( TPll aPll )
 	TUint32 mode = (AsspRegister::Read32( KPllMode[ aPll ].iModeRegister ) >> KPllMode[ aPll ].iModeShift) bitand KPllModeMask;
 	TUint32 autoSet = (AsspRegister::Read32( KPllMode[ aPll ].iAutoRegister ) >> KPllMode[ aPll ].iAutoShift) bitand KPllAutoMask;
 
-	static const TPllMode modeTable[8][2] = 
+	static const TPllMode modeTable[8][2] =
 		{	// auto disabled	auto enabled
 			{ EPllStop,			EPllStop },	// not possible
 			{ EPllStop,			EPllStop },
@@ -1879,7 +1879,7 @@ EXPORT_C TBypassDivider PllBypassDivider( TPll aPll )
 	{
 	__KTRACE_OPT( KPRCM, Kern::Printf( "Prcm::PllBypassDivider(%x)", aPll ) );
 	__ASSERT_DEBUG( (TUint)aPll <= EDpll5, Panic( EPllBypassDividerBadPll ) );
-	
+
 	TUint div = 1;
 
 	switch( aPll )
@@ -1917,7 +1917,7 @@ EXPORT_C void SetDivider( TClock aClock, TUint aDivide )
 	__ASSERT_DEBUG( (TUint)aClock < KSupportedClockCount, Panic( ESetDividerBadClock ) );
 
 	const TDividerInfo&	inf = KDividerInfo[ aClock ];
-	
+
 	TUint32 div = aDivide;	// most common case, special cases handled below
 
 	switch( inf.iDivType )
@@ -2026,7 +2026,7 @@ EXPORT_C void SetDivider( TClock aClock, TUint aDivide )
 		}
 
 	// if we get here, we have a valid divider value
-	
+
 	_LockedBitClearSet( inf.iRegister, inf.iMask, div << inf.iShift );
 	}
 
@@ -2037,7 +2037,7 @@ EXPORT_C TUint Divider( TClock aClock )
 	__ASSERT_DEBUG( (TUint)aClock < KSupportedClockCount, Panic( EGetDividerBadClock ) );
 
 	const TDividerInfo&	inf = KDividerInfo[ aClock ];
-	
+
 	TUint32 div = ( AsspRegister::Read32( inf.iRegister ) bitand inf.iMask ) >> inf.iShift;
 	TUint result = div;	// most common case
 
@@ -2127,7 +2127,7 @@ EXPORT_C void SetPowerDomainMode( TPowerDomain aDomain, TPowerDomainMode aMode )
 	__ASSERT_DEBUG( (TUint)aMode <= EPowerOn, Panic( ESetDomainModeBadMode ) );
 
 	__ASSERT_DEBUG( 0 != (KPowerDomainControl[ aDomain ].iAllowedMask bitand (1 << aMode)), Panic( ESetDomainModeUnsupportedMode ) );
-	
+
 	TUint shift = KPowerDomainControl[ aDomain ].iShift;
 
 	_LockedBitClearSet( KPowerDomainControl[ aDomain ].iRegister,
@@ -2316,7 +2316,7 @@ EXPORT_C void AddToWakeupDomain( TClock aClock, TWakeupDomain aDomain )
 
 	const TWakeupDomainInfo& inf = KClockWakeupDomainTable[ aClock ];
 	TUint32 mask = 1 << (TUint)inf.iBitNumber[ aDomain ];	// unsupported bit numbers will result in a mask of 0x00000000
-	
+
 	_LockedBitClearSet( inf.iRegister, KClearNone, mask );
 	}
 
@@ -2329,7 +2329,7 @@ EXPORT_C void RemoveFromWakeupDomain( TClock aClock, TWakeupDomain aDomain )
 
 	const TWakeupDomainInfo& inf = KClockWakeupDomainTable[ aClock ];
 	TUint32 mask = 1 << (TUint)inf.iBitNumber[ aDomain ];	// unsupported bit numbers will result in a mask of 0x00000000
-	
+
 	_LockedBitClearSet( inf.iRegister, mask, KSetNone );
 	}
 
@@ -2776,12 +2776,12 @@ EXPORT_C TUint ClockFrequency( TClock aClock )
 				div *= 4;
 				break;
 			}
-		
+
 		currentClock = prevClock;
 		}	// end do
 
 	// When we reach here we have worked back to the origin clock
-	
+
 	TUint64 fSrc;
 	const Omap3530Assp* variant = (Omap3530Assp*)Arch::TheAsic();
 
@@ -2828,7 +2828,7 @@ EXPORT_C void SetSysClkFrequency( TSysClkFrequency aFrequency )
 /** Get the currently configured SysClk frequency */
 EXPORT_C TSysClkFrequency SysClkFrequency()
 	{
-	
+
 	switch( AsspRegister::Read32( KPRM_CLKSEL ) bitand (KBit0 | KBit1 | KBit2) )
 		{
 		case 0:
@@ -2945,13 +2945,19 @@ EXPORT_C void Init3()
 	r = AsspRegister::Read32(KMCSPI3_SYSCONFIG);
 	__NK_ASSERT_ALWAYS((r & 1 << 3) == 0);
 	__NK_ASSERT_ALWAYS((r & 1 << 8) == 0);
+	/* nxz enable SPI 3
 	SetClockState( EClkMcSpi3_F, EClkOff );
-	SetClockState( EClkMcSpi3_I, EClkOff );
+	SetClockState( EClkMcSpi3_I, EClkOff );*/
+	SetClockState( EClkMcSpi3_F, EClkOn );
+	SetClockState( EClkMcSpi3_I, EClkOn );
 	r = AsspRegister::Read32(KMCSPI4_SYSCONFIG);
 	__NK_ASSERT_ALWAYS((r & 1 << 3) == 0);
 	__NK_ASSERT_ALWAYS((r & 1 << 8) == 0);
+	/* nxz enable SPI 4
 	SetClockState( EClkMcSpi4_F, EClkOff );
-	SetClockState( EClkMcSpi4_I, EClkOff );
+	SetClockState( EClkMcSpi4_I, EClkOff );*/
+	SetClockState( EClkMcSpi4_F, EClkOn );
+	SetClockState( EClkMcSpi4_I, EClkOn );
 
 	// UART
 	TInt debugport = Kern::SuperPage().iDebugPort;
@@ -3070,7 +3076,7 @@ EXPORT_C void Init3()
 	__NK_ASSERT_ALWAYS((r & 1 << 8) == 0);
 	_BitClearSet(KCM_FCLKEN_WKUP, 1 << 3, 0);
 	_BitClearSet(KCM_ICLKEN_WKUP, 1 << 3, 0);
-	
+
 	//r = AsspRegister::Read32(KGPIO2_SYSCONFIG);
 	//__NK_ASSERT_ALWAYS((r & 1 << 3) == 0);
 	//__NK_ASSERT_ALWAYS((r & 1 << 8) == 0);

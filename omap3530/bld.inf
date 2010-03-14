@@ -19,6 +19,10 @@
 #include "beagle_drivers/keytran/bld.inf"
 #include "beagle_drivers/lcd/bld.inf"
 #include "beagle_drivers/led/bld.inf"
+//nxz
+#include "beagle_drivers/wb/bld.inf"
+//skkm
+#include "beagle_drivers/medwb/bld.inf"
 // #include "beagle_drivers/prm/bld.inf"
 #include "beagle_drivers/serialmouse/bld.inf"
 #include "beagle_drivers/usbv/bld.inf"

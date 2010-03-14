@@ -22,9 +22,11 @@ epocallowdlldata
 library				VariantTarget(ecust,lib)
 library				AsspTarget(kaomap3530,lib)
 library				AsspTarget(uart,lib)
+library				AsspTarget(prcm,lib)
 //library				resman.lib
 
 systeminclude		+/include/drivers
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 
 targettype			kext
 
