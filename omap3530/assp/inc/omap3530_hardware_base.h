@@ -483,11 +483,12 @@ namespace TexasInstruments
 		template <int aBiTpOsItIoN, int aBiTwIdTh>
 		class TBitField : public TBitFieldBase<aBiTpOsItIoN, aBiTwIdTh>
 			{
+		  public :
 			using TBitFieldBase<aBiTpOsItIoN, aBiTwIdTh>::KShift ;
 			using TBitFieldBase<aBiTpOsItIoN, aBiTwIdTh>::KValueMask ;
 			using TBitFieldBase<aBiTpOsItIoN, aBiTwIdTh>::KFieldMask ;
 			using TBitFieldBase<aBiTpOsItIoN, aBiTwIdTh>::KValueMax ;
-		  public :
+
 			template <int aVaLuE>
 			class	TConstVal : public TBitFieldValue<aBiTpOsItIoN, aBiTwIdTh, aVaLuE>
 				{
