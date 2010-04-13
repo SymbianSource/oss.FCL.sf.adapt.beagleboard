@@ -23,9 +23,10 @@ noexportlibrary
 sourcepath		../../../../../../../sf/os/kernelhwsrv/halservices/hal/src
 source			hal_main.cpp userhal.cpp
 
-systeminclude		+/include ../../../../../../../sf/os/kernelhwsrv/halservices/hal/inc
 sourcepath		+/build/generatedcpp/hal
 source			VariantTarget(values,cpp) VariantTarget(config,cpp)
+
+OS_LAYER_SYSTEMINCLUDE
 
 library			euser.lib
 
