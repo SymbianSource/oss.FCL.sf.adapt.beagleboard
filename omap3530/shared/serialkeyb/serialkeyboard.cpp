@@ -99,10 +99,10 @@ static const TUint16 KScanCode[] =
 	/*3e*/	SHIFTED(EStdKeyFullStop),	// >
 	/*3f*/	SHIFTED(EStdKeyForwardSlash),	// ?
 	/*40*/	SHIFTED(EStdKeySingleQuote),	// @
-	/*41*/	SHIFTED('A'),
-	/*42*/	SHIFTED('B'),
-	/*43*/	SHIFTED('C'),
-	/*44*/	SHIFTED('D'),
+	/*41*/	EStdKeyUpArrow,
+	/*42*/	EStdKeyDownArrow,
+	/*43*/	EStdKeyRightArrow,
+	/*44*/	EStdKeyLeftArrow,
 	/*45*/	SHIFTED('E'),
 	/*46*/	SHIFTED('F'),
 	/*47*/	SHIFTED('G'),
@@ -131,11 +131,11 @@ static const TUint16 KScanCode[] =
 	/*5e*/	SHIFTED('6'),			// ^
 	/*5f*/	SHIFTED(EStdKeyMinus),	// _
 	/*60*/	EStdKeyBacklightToggle,	// Actually `
-	/*61*/	'A',
+	/*61*/	EStdKeyYes,
 	/*62*/	'B',
 	/*63*/	'C',
-	/*64*/	'D',
-	/*65*/	'E',
+	/*64*/	EStdKeyNo,
+	/*65*/	EStdKeyDevice1,
 	/*66*/	'F',
 	/*67*/	'G',
 	/*68*/	'H',
@@ -147,13 +147,13 @@ static const TUint16 KScanCode[] =
 	/*6e*/	'N',
 	/*6f*/	'O',
 	/*70*/	'P',
-	/*71*/	'Q',
+	/*71*/	EStdKeyDevice0,
 	/*72*/	'R',
-	/*73*/	'S',
+	/*73*/	EStdKeyApplication0,
 	/*74*/	'T',
 	/*75*/	'U',
 	/*76*/	'V',
-	/*77*/	'W',
+	/*77*/	EStdKeyDevice3,
 	/*78*/	'X',
 	/*79*/	'Y',
 	/*7a*/	'Z',
@@ -231,12 +231,18 @@ TInt TSerialKeyboard::Create()
 		__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x", iPrmClientId )) ;
 		Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x", iPrmClientId );
 
+		Prcm::SetClockState(iUart.PrcmInterfaceClk(), Prcm::EClkOn);
+		Prcm::SetClockState(iUart.PrcmFunctionClk(), Prcm::EClkOn);
+		
  		r = Interrupt::Bind( iUart.InterruptId(), UartIsr, this );
 		if ( r < 0 )
  			{
+ 			Kern::Printf("TSerialKeyboard Bind r=%d", r);
 			return r;
  			}
 
+		Kern::Printf("+TSerialKeyboard::Create bound to interrupt" );
+		
 		// Ask power resource manager to turn on clocks to the UART
 		// (this could take some time but we're not in any hurry)
 		/*r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmFunctionClk(), Prcm::EClkOn );
@@ -304,6 +310,7 @@ void TSerialKeyboard::AddKeyDfc( TAny* aParam )
 			}
 		else
 			{
+			Kern::Printf("Key received: %d %d", self->iKey, KScanCode[self->iKey]);
 			self->AddKey( KScanCode[ self->iKey ] );
 			}
 		break;
@@ -355,6 +362,8 @@ void TSerialKeyboard::AddKey( TUint aKey )
 
 	TRawEvent e;
 
+	Kern::Printf("AddKey %d %d %d %d", shifted, ctrl, func, stdKey);
+	
 	if ( func )
 		{
 		e.Set( TRawEvent::EKeyDown, EStdKeyRightFunc, 0 );

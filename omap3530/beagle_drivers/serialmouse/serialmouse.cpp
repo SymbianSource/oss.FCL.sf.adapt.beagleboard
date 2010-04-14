@@ -40,6 +40,8 @@ _LIT( KName, "SERMOUSE" );
 #	define CURSOR_SIZE 5
 #endif
 
+// AndyS Add support for sending keyboard events
+#define STDKEY(x)    (0x1FFF&(x))
 
 LOCAL_C TInt halFunction(TAny* aPtr, TInt aFunction, TAny* a1, TAny* a2)
 	{
@@ -75,10 +77,13 @@ TInt TSerialMouse::Create()
 	if (r!=KErrNone)
 		return r;
 	
+	Kern::Printf("TSerialMouse initialising");
 	
 	__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialMouse::Init")) ;
-
+/*
 	iDebugPort = Kern::SuperPage().iDebugPort; // Get the debug port number
+	Kern::Printf("Debugport=%d", iDebugPort);
+	
 	if( Arm::EDebugPortJTAG == iDebugPort )
 		{
 		__KTRACE_OPT(KBOOT,Kern::Printf("-TSerialMouse::Init: JTAG not supported"));
@@ -91,7 +96,7 @@ TInt TSerialMouse::Create()
 		// We don't want to return an error here, just don't bother to initialize
 		return KErrNone;
 		}
-
+*/
 
 	// Register with the power resource manager
 	//r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
@@ -102,6 +107,9 @@ TInt TSerialMouse::Create()
 
 	//__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialMouse::Init:PRM client ID=%x", iPrmClientId )) ;
 
+	Prcm::SetClockState(iUart.PrcmInterfaceClk(), Prcm::EClkOn);
+	Prcm::SetClockState(iUart.PrcmFunctionClk(), Prcm::EClkOn);
+	
  	r =Interrupt::Bind( iUart.InterruptId(),Isr,this);
 	if ( r < 0 )
  		{
@@ -132,7 +140,9 @@ TInt TSerialMouse::Create()
 	iUart.Enable();
 
 	Interrupt::Enable(iUart.InterruptId());
-    
+
+	Kern::Printf("TSerialMouse initialised ID=%d", iUart.InterruptId());
+	
 	return KErrNone;
 	}
 
@@ -180,7 +190,6 @@ inline void TSerialMouse::KeyDfc()
 	{	
 	
 	const TUint8 b = iKey;
-	
 	if ( b & 1<<6 )
 		{
 		// Beginning of a new frame
@@ -201,6 +210,8 @@ inline void TSerialMouse::KeyDfc()
 		const TInt8 y_increment = (iB0 & 0xC)<<4 | (iB2 & 0x3f);
 		const TBool isLeftButtonDown	= iB0& 1<<5;
 		const TBool isRightButtonDown	= iB0& 1<<4;
+		
+		Kern::Printf("Mouse dx=%d  dy=%d lmb=%d", x_increment, y_increment, isLeftButtonDown);
 		
 #		ifdef _FRAME_BUFFER_CURSOR_
 		iLastX = iX;
@@ -223,8 +234,15 @@ inline void TSerialMouse::KeyDfc()
 		
 		if ( rightButtonEvent )
 			{
-			e.Set( isRightButtonDown ? TRawEvent::EButton2Down : TRawEvent::EButton2Up, iX, iY );
-			Kern::AddEvent(e);	
+			if(isRightButtonDown)
+				{
+				e.Set( isRightButtonDown ? TRawEvent::EButton2Down : TRawEvent::EButton2Up, iX, iY );
+				Kern::AddEvent(e);					
+				}
+			else
+				{
+				AddKey(EStdKeyApplication0);
+				}
 			//DBG_PRINT1(_L(" right:%S"), isRightButtonDown?&_L("down"):&_L("up") );
 			}
 		
@@ -407,6 +425,21 @@ void DoCreate( TAny* aParam )
 	TInt r = reinterpret_cast< TSerialMouse* >( aParam )->Create();
 	__ASSERT_ALWAYS( r == KErrNone, Kern::Fault( "SERKEY-Cr", r ) );	
 	}
+
+// AndyS support for sending keypresses
+void TSerialMouse::AddKey( TUint aKey )
+	{
+	const TUint8 stdKey = STDKEY(aKey);
+	
+	TRawEvent e;
+	
+	Kern::Printf("AddKey %d", stdKey);
+	
+	e.Set( TRawEvent::EKeyDown, stdKey, 0 );
+	Kern::AddEvent( e );
+	e.Set( TRawEvent::EKeyUp, stdKey, 0 );
+	Kern::AddEvent( e );
+}
 
 
 //

@@ -30,6 +30,7 @@ targettype			dll
 linkas				ekdata.dll
 
 systeminclude		+/include
+OS_LAYER_SYSTEMINCLUDE
 
 sourcepath			.
 source				keymap.cpp

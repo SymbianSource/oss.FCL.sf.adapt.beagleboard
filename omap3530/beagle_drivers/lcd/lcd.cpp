@@ -138,8 +138,19 @@ const TInt KConfigLcdMaxDisplayBrightness	= 255;
 // TO DO: (mandatory)
 // define the physical screen dimensions
 // This is only example code... you need to modify it for your hardware
+
+
+/*
+Modified to scale up the display size to a 640x640 , which could be used for VGA layouts as well
+
 const TUint	KConfigLcdWidth					= 360;//640;		// 640 pixels per line
 const TUint	KConfigLcdHeight				= 640;//480;		// 480 lines per panel
+*/
+
+const TUint	KConfigLcdWidth					= 640;		// 640 pixels per line
+const TUint	KConfigLcdHeight				= 640;		// 640 lines per panel
+
+
 
 // TO DO: (mandatory)
 // define the characteristics of the LCD display
@@ -155,8 +166,13 @@ const TInt	KConfigLcdMaxDisplayColors		= 65536;	//24bit: 16777216;
 // A TWIP is a 20th of a point.  A point is a 72nd of an inch
 // Therefore a TWIP is a 1440th of an inch
 // This is only example code... you need to modify it for your hardware
-const TInt	KConfigLcdWidthInTwips			= 9638;//10800;		// = 6.69 inches	//15*1440;
-const TInt	KConfigLcdHeightInTwips			= 7370;//11232;//5616;		// = 5.11 inches	//12*1440;
+//const TInt	KConfigLcdWidthInTwips			= 9638;//10800;		// = 6.69 inches	//15*1440;
+//const TInt	KConfigLcdHeightInTwips			= 7370;//11232;//5616;		// = 5.11 inches	//12*1440;
+
+// Modified Twips in accordance with VGA changes - Not sure if it helps or is needed
+
+const TInt	KConfigLcdWidthInTwips			= 2670;		// = 6.69 inches	//15*1440;
+const TInt	KConfigLcdHeightInTwips			= 3550;		//5616;		// = 5.11 inches	//12*1440;
 
 // TO DO: (mandatory)
 // define the available display modes

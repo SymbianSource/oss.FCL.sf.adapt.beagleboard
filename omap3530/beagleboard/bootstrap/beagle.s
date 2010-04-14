@@ -25,8 +25,8 @@
 ;
 ; Platform specific constant definitions
 
-DRamBankBase		EQU		0x80000000 ; 128M of DRAM
-DRamBankMaxSize		EQU		0x08000000
+DRamBankBase		EQU		0x80000000 ; 256M of DRAM 
+DRamBankMaxSize		EQU		0x10000000
 
 ; HW used by bootstrap
 Serial0PhysBase		EQU		0x4806A000
@@ -37,8 +37,9 @@ Serial0LinBase		EQU		PrimaryIOBase + 0x0006A000
 Serial1LinBase		EQU		PrimaryIOBase + 0x0006C000
 Serial2LinBase		EQU		PrimaryIOBase + 0x00420000
 
-SuperPageAddr		EQU		0x85000000 ; boot stack goes just after this
+SuperPageAddr		EQU		0x8c000000 ; boot stack goes just after this
 TheHwvd             EQU     0x09080001 ; this is arbitary 0908 are CPU and ASSP 01 is variant
+
 
 ;
 ;*******************************************************************************
