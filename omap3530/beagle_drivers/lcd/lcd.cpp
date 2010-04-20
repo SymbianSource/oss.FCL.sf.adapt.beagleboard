@@ -9,7 +9,8 @@
 // Nokia Corporation - initial contribution.
 //
 // Contributors:
-//
+// iwanj@users.sourceforge.net added NGA support based on Syborg display PDD
+
 // Description:
 // omap3530/beagle_drivers/lcd/lcd.cpp
 // Implementation of an LCD driver. 
@@ -17,10 +18,6 @@
 // N.B. This sample code assumes that the display supports setting the backlight on or off, 
 // as well as adjusting the contrast and the brightness.
 //
-
-
-
-
 
 #include <videodriver.h>
 #include <platform.h>
@@ -31,6 +28,9 @@
 #include <assp/omap3530_assp/omap3530_assp_priv.h>
 #include <assp/omap3530_assp/omap3530_hardware_base.h>
 #include <assp/omap3530_assp/omap3530_prcm.h>
+
+//#undef __KTRACE_OPT
+//#define __KTRACE_OPT(c,p)	p
 
 #define DSS_SYSCONFIG				0x48050010
 #define DISPC_SYSSTATUS				0x48050414
@@ -66,6 +66,7 @@
 
 #define _MODE_1280x1024_
 //#define _MODE_1024x768_
+
 #ifdef _MODE_800x600_
 // ModeLine       "800x600@60" 40.0 800 840 968 1056 600 601 605 628 +hsync +vsync
 // Decoded by: http://www.tkk.fi/Misc/Electronics/faq/vga2rgb/calc.html
@@ -138,19 +139,8 @@ const TInt KConfigLcdMaxDisplayBrightness	= 255;
 // TO DO: (mandatory)
 // define the physical screen dimensions
 // This is only example code... you need to modify it for your hardware
-
-
-/*
-Modified to scale up the display size to a 640x640 , which could be used for VGA layouts as well
-
 const TUint	KConfigLcdWidth					= 360;//640;		// 640 pixels per line
 const TUint	KConfigLcdHeight				= 640;//480;		// 480 lines per panel
-*/
-
-const TUint	KConfigLcdWidth					= 640;		// 640 pixels per line
-const TUint	KConfigLcdHeight				= 640;		// 640 lines per panel
-
-
 
 // TO DO: (mandatory)
 // define the characteristics of the LCD display
@@ -158,7 +148,7 @@ const TUint	KConfigLcdHeight				= 640;		// 640 lines per panel
 const TBool	KConfigLcdIsMono				= EFalse;
 const TBool	KConfigLcdPixelOrderLandscape	= ETrue;
 const TBool	KConfigLcdPixelOrderRGB			= ETrue;
-const TInt	KConfigLcdMaxDisplayColors		= 65536;	//24bit: 16777216;
+const TInt	KConfigLcdMaxDisplayColors		= 16777216;//65536;	//24bit: 16777216;
 
 
 // TO DO: (mandatory)
@@ -166,11 +156,6 @@ const TInt	KConfigLcdMaxDisplayColors		= 65536;	//24bit: 16777216;
 // A TWIP is a 20th of a point.  A point is a 72nd of an inch
 // Therefore a TWIP is a 1440th of an inch
 // This is only example code... you need to modify it for your hardware
-//const TInt	KConfigLcdWidthInTwips			= 9638;//10800;		// = 6.69 inches	//15*1440;
-//const TInt	KConfigLcdHeightInTwips			= 7370;//11232;//5616;		// = 5.11 inches	//12*1440;
-
-// Modified Twips in accordance with VGA changes - Not sure if it helps or is needed
-
 const TInt	KConfigLcdWidthInTwips			= 2670;		// = 6.69 inches	//15*1440;
 const TInt	KConfigLcdHeightInTwips			= 3550;		//5616;		// = 5.11 inches	//12*1440;
 
@@ -193,10 +178,10 @@ static const SLcdConfig Lcd_Mode_Config[KConfigLcdNumberOfDisplayModes]=
 		{
 		0,								// iMode
 		0,								// iOffsetToFirstVideoBuffer
-		FRAME_BUFFER_SIZE(16, KConfigLcdWidth, KConfigLcdHeight),	// iLenghtOfVideoBufferInBytes
-		KConfigLcdWidth*2,				// iOffsetBetweenLines
+		FRAME_BUFFER_SIZE(32/*16*/, KConfigLcdWidth, KConfigLcdHeight),	// iLenghtOfVideoBufferInBytes
+		KConfigLcdWidth*4,//2,				// iOffsetBetweenLines
 		EFalse,							// iIsPalettized
-		16								// iBitsPerPixel
+		32,//16								// iBitsPerPixel
 		}
 	};	
 
@@ -241,6 +226,10 @@ public:
 	TInt SetContrast(TInt aContrast);
 	TInt SetBrightness(TInt aBrightness);
 
+#ifdef ENABLE_GCE_MODE
+	void ChangeFrameBufferAddress(TUint32 aFbAddr);
+#endif
+
 private:
 	TInt SetPaletteEntry(TInt aEntry, TInt aColor);
 	TInt GetPaletteEntry(TInt aEntry, TInt* aColor);
@@ -251,6 +240,16 @@ private:
 	void SplashScreen();
 	TInt GetDisplayColors(TInt* aColors);
 
+#ifdef ENABLE_GCE_MODE
+public:
+	static DLcdPowerHandler* pLcd;
+	TInt iSize;
+	TPhysAddr iCompositionPhysical;
+	TVideoInfoV01 iVideoInfo;
+	TDfcQue* iDfcQ;
+	TPhysAddr ivRamPhys;
+#endif
+
 private:
 	TBool iIsPalettized;
 	TBool iDisplayOn;				// to prevent a race condition with WServer trying to power up/down at the same time
@@ -258,14 +257,18 @@ private:
 	DPlatChunkHw* iSecureChunk;
 	TBool iWsSwitchOnScreen;
  	TBool iSecureDisplay;
-	TDfcQue* iDfcQ;
 	TMessageQue iMsgQ;
 	TDfc iPowerUpDfc;
 	TDfc iPowerDownDfc;	
+
+#ifndef ENABLE_GCE_MODE
+	TDfcQue* iDfcQ;
 	TVideoInfoV01 iVideoInfo;
+	TPhysAddr ivRamPhys;
+#endif
+
 	TVideoInfoV01 iSecureVideoInfo;
 	NFastMutex iLock;				// protects against being preempted whilst manipulating iVideoInfo/iSecureVideoInfo
-	TPhysAddr ivRamPhys;
 	TPhysAddr iSecurevRamPhys;
 	
 	TBool iBacklightOn;
@@ -341,6 +344,10 @@ Called by factory function at ordinal 0
 */
 TInt DLcdPowerHandler::Create()
 	{
+#ifdef ENABLE_GCE_MODE
+	pLcd = this;
+#endif
+
 	iDfcQ=Kern::DfcQue0();	// use low priority DFC queue for this driver 
 
 	// map the video RAM
@@ -404,6 +411,21 @@ TInt DLcdPowerHandler::Create()
 
 	iDisplayOn = EFalse;
 	iSecureDisplay = EFalse;
+
+#ifdef ENABLE_GCE_MODE
+	// Alloc Physical RAM for the Composition Buffers used by the GCE
+	iSize = Lcd_Mode_Config[KConfigLcdInitialDisplayMode].iLenghtOfVideoBufferInBytes;
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DLcdPowerHandler.iSize  = %d", iSize));
+
+	// double and round the page size
+	TUint round = 2*Kern::RoundToPageSize(iSize);
+	r = Epoc::AllocPhysicalRam(round , iCompositionPhysical);
+	if(r != KErrNone)
+		{
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Failed to allocate physical RAM for composition buffer %d", r));
+		return r;
+		}
+#endif
 
 	// install the HAL function
 	r=Kern::AddHalEntry(EHalGroupDisplay, halFunction, this);
@@ -641,7 +663,7 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	TInt8 GFXCHANNELOUT			= 0x0;
 	TInt8 GFXBURSTSIZE			= 0x2;	// 16x32bit bursts
 	TInt8 GFXREPLICATIONENABLE	= 0x0;	// Disable Graphics replication logic
-	TInt8 GFXFORMAT				= 0x6;	// RGB16=0x6, RGB24-unpacked=0x8, RGB24-packed=0x9
+	TInt8 GFXFORMAT				= 0x8;//0x6;	// RGB16=0x6, RGB24-unpacked=0x8, RGB24-packed=0x9
 	TInt8 GFXENABLE				= 0x1;	// Graphics enabled
 	l = GFXSELFREFRESH<<15 | GFXARBITRATION<<14 | GFXROTATION<<12 | GFXFIFOPRELOAD<<11 | GFXENDIANNESS<<10 | GFXNIBBLEMODE<<9 | GFXCHANNELOUT<8 | GFXBURSTSIZE<<6 | GFXREPLICATIONENABLE<<5 | GFXFORMAT<<1 | GFXENABLE;
 	SET_REGISTER( DISPC_GFX_ATTRIBUTES, l );
@@ -1241,17 +1263,484 @@ TInt DLcdPowerHandler::HalFunction(TInt aFunction, TAny* a1, TAny* a2)
 	}
 
 
+#ifdef ENABLE_GCE_MODE
+DLcdPowerHandler* DLcdPowerHandler::pLcd = NULL;
+
+void DLcdPowerHandler::ChangeFrameBufferAddress(TUint32 aFbAddr)
+	{
+	//TODO: this is guess work
+	//find out the correct sequence to change LCD DMA address
+	//
+	const TInt8 DISPC_GODIGITAL_BITSHIFT = 6;
+	const TInt8 DISPC_GOLCD_BITSHIFT = 5;
+	const TUint32 goFlags = (1 << DISPC_GODIGITAL_BITSHIFT) | (1 << DISPC_GOLCD_BITSHIFT);
+
+	const TUint32 ctl = GET_REGISTER(DISPC_CONTROL);
+	SET_REGISTER(DISPC_GFX_BA1, aFbAddr);
+	SET_REGISTER(DISPC_CONTROL, ctl | goFlags);
+	}
+
+#include <display.h>
+
+class DDisplayPddBeagle : public DDisplayPdd
+	{
+public:
+	DDisplayPddBeagle();
+	~DDisplayPddBeagle();
+    virtual TInt  SetLegacyMode();
+    virtual TInt  SetGceMode();
+    virtual TInt  SetRotation(RDisplayChannel::TDisplayRotation aRotation);
+	virtual TInt  PostUserBuffer(TBufferNode* aNode);
+	virtual TInt  PostCompositionBuffer(TBufferNode* aNode);
+    virtual TInt  PostLegacyBuffer();
+    virtual TInt  CloseMsg();
+    virtual TInt  CreateChannelSetup(TInt aUnit);
+   	virtual TBool  PostPending();
+    virtual TDfcQue* DfcQ(TInt  aUnit);    
+            
+public:
+	static void VSyncDfcFn(TAny* aChannel);
+
+private:
+	TDfcQue* 			iDfcQ;
+	TVideoInfoV01    	iScreenInfo;
+    TBufferNode*     	iPendingBuffer;
+    TBufferNode*     	iActiveBuffer;
+    DChunk* 		 	iChunk;
+
+public:
+	TDfc 		     	iVSyncDfc;
+	};
+
+class DDisplayPddFactory : public DPhysicalDevice
+	{
+public:
+	DDisplayPddFactory();
+
+	virtual TInt Install();
+	virtual void GetCaps(TDes8& aDes) const;
+	virtual TInt Create(DBase*& aChannel, TInt aUnit, const TDesC8* aInfo, const TVersion& aVer);
+	virtual TInt Validate(TInt aDeviceType, const TDesC8* anInfo, const TVersion& aVer);
+	};
+
+const TInt KVSyncDfcPriority = 7 ;   //priority of DFC within the queue (0 to 7, where 7 is highest)
+
+DDisplayPddBeagle::DDisplayPddBeagle():
+	iPendingBuffer(NULL),
+	iActiveBuffer(NULL),
+	iChunk(NULL),
+	iVSyncDfc(&VSyncDfcFn, this, KVSyncDfcPriority)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::DDisplayPddBeagle"));
+
+	iPostFlag = EFalse;
+	}
+
+DDisplayPddBeagle::~DDisplayPddBeagle()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::~DDisplayPddBeagle()"));
+
+	//The DFC Queue is owned by DLcdPowerHandler so we shouldn't call Destroy() at this point.
+	if (iDfcQ)
+		{
+		iDfcQ=NULL;
+		}
+
+	DChunk* chunk = (DChunk*) __e32_atomic_swp_ord_ptr(&iChunk, 0);
+
+	if(chunk)
+		{
+		Kern::ChunkClose(chunk);
+		}
+
+	}
+
+TInt DDisplayPddBeagle::SetLegacyMode()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::SetLegacyMode()"));
+    return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::SetGceMode()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::SetGceMode()"));
+    PostCompositionBuffer(&iLdd->iCompositionBuffer[0]);
+    return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::SetRotation(RDisplayChannel::TDisplayRotation aDegOfRot)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::SetRotation()"));
+	return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::PostUserBuffer(TBufferNode* aNode)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::PostUserBuffer :  aNode->iAddress = %08x\n", aNode->iAddress));
+	if(iPendingBuffer)
+		{
+		iPendingBuffer->iState = EBufferFree;
+		if (!(iPendingBuffer->iType == EBufferTypeUser) )
+			{
+			iPendingBuffer->iFree  = ETrue;
+			}
+		}
+	aNode->iState   = EBufferPending;
+	iPendingBuffer	= aNode;
+	iPostFlag		= ETrue;
+	
+  	// Activate the posted buffer
+	TUint32 physicalAddress = Epoc::LinearToPhysical( aNode->iAddress );
+	DLcdPowerHandler::pLcd->ChangeFrameBufferAddress(physicalAddress);
+
+	/* Queue a DFC to complete the request*/
+	iVSyncDfc.Enque();
+
+	return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::PostCompositionBuffer(TBufferNode* aNode)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::PostCompositionBuffer :  aNode->iAddress = %08x\n", aNode->iAddress));
+
+	if(iPendingBuffer)
+		{
+		iPendingBuffer->iState = EBufferFree;
+		if (iPendingBuffer->iType == EBufferTypeUser)
+			{
+			RequestComplete(RDisplayChannel::EReqPostUserBuffer, KErrCancel);
+			}
+		else
+			{
+			iPendingBuffer->iFree  = ETrue;
+			}
+		}
+
+	aNode->iState	= EBufferPending;
+	aNode->iFree	= EFalse;
+	iPendingBuffer	= aNode;
+	iPostFlag		= ETrue;
+
+  	// Activate the posted buffer
+	TUint32 physicalAddress = Epoc::LinearToPhysical( aNode->iAddress );
+	DLcdPowerHandler::pLcd->ChangeFrameBufferAddress(physicalAddress);
+	
+	/* Queue a DFC to complete the request*/
+	iVSyncDfc.Enque();
+
+	return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::PostLegacyBuffer()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::PostLegacyBuffer()"));
+
+	if(iPendingBuffer)
+		{
+		iPendingBuffer->iState = EBufferFree;
+		if (iPendingBuffer->iType == EBufferTypeUser)
+			{
+
+			RequestComplete(RDisplayChannel::EReqPostUserBuffer, KErrCancel);
+			}
+		else
+			{
+			iPendingBuffer->iFree  = ETrue;
+			}
+		}
+
+	iLdd->iLegacyBuffer[0].iState		= EBufferPending;
+	iLdd->iLegacyBuffer[0].iFree		= EFalse;
+	iPendingBuffer						= &iLdd->iLegacyBuffer[0];
+	iPostFlag		= ETrue;
+
+  	// Activate the posted buffer
+	DLcdPowerHandler::pLcd->ChangeFrameBufferAddress(DLcdPowerHandler::pLcd->ivRamPhys);
+
+	/* Queue a DFC to complete the request*/
+	iVSyncDfc.Enque();
+
+	return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::CloseMsg()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::CloseMsg()"));
+
+	iPendingBuffer  = NULL;
+	iActiveBuffer	= NULL;
+	iVSyncDfc.Cancel();
+    return KErrNone;
+	}
+
+TInt DDisplayPddBeagle::CreateChannelSetup(TInt aUnit)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::CreateChannelSetup()"));
+
+	iScreenInfo = DLcdPowerHandler::pLcd->iVideoInfo;
+	iLdd->iUnit = aUnit;
+
+	iLdd->iDisplayInfo.iAvailableRotations			= RDisplayChannel::ERotationNormal;
+	iLdd->iDisplayInfo.iNormal.iOffsetBetweenLines	= iScreenInfo.iOffsetBetweenLines;
+	iLdd->iDisplayInfo.iNormal.iHeight				= iScreenInfo.iSizeInPixels.iHeight;
+	iLdd->iDisplayInfo.iNormal.iWidth				= iScreenInfo.iSizeInPixels.iWidth;
+	iLdd->iDisplayInfo.iNumCompositionBuffers		= KDisplayCBMax;
+	iLdd->iDisplayInfo.iBitsPerPixel				= iScreenInfo.iBitsPerPixel;
+    iLdd->iDisplayInfo.iRefreshRateHz = 60;
+
+
+	switch (iScreenInfo.iBitsPerPixel)
+		{
+		case 16:
+			iLdd->iDisplayInfo.iPixelFormat = EUidPixelFormatRGB_565;
+			break;
+		case 24:
+			iLdd->iDisplayInfo.iPixelFormat = EUidPixelFormatRGB_888;
+			break;
+		case 32:
+			iLdd->iDisplayInfo.iPixelFormat = EUidPixelFormatARGB_8888;
+			break;
+		default:
+			iLdd->iDisplayInfo.iPixelFormat = EUidPixelFormatUnknown;
+			break;
+		}
+
+	iLdd->iCurrentRotation = RDisplayChannel::ERotationNormal;
+
+	// Open shared chunk to the composition framebuffer
+
+	DChunk* chunk = 0;
+	TLinAddr chunkKernelAddr  = 0;
+	TUint32 chunkMapAttr = 0;
+
+	// round to twice the page size
+	TUint round  =  2*Kern::RoundToPageSize(DLcdPowerHandler::pLcd->iSize);
+
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::CreateChannelSetup DLcdPowerHandler::pLcd->iSize  = %d\n", DLcdPowerHandler::pLcd->iSize));
+
+	TChunkCreateInfo info;
+	info.iType					 = TChunkCreateInfo::ESharedKernelMultiple;
+	info.iMaxSize				 = round;
+	info.iMapAttr				 = EMapAttrFullyBlocking;
+	info.iOwnsMemory			 = EFalse;
+	info.iDestroyedDfc			 = 0;
+
+	TInt r = Kern::ChunkCreate(info, chunk, chunkKernelAddr, chunkMapAttr);
+
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("CreateChannelSetup:ChunkCreate called for composition chunk. Set iChunkKernelAddr  = %08x\n", chunkKernelAddr));
+
+	if( r == KErrNone)
+		{
+		// map our chunk
+		r = Kern::ChunkCommitPhysical(chunk, 0,round , DLcdPowerHandler::pLcd->iCompositionPhysical);
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Mapping chunk %d", r));
+		if(r != KErrNone)
+			{
+			Kern::ChunkClose(chunk);
+			}
+		}
+
+	if ( r!= KErrNone)
+		{
+		return r;
+		}
+
+	iChunk	= chunk;
+
+	// init CB 0
+	iLdd->iCompositionBuffer[0].iType			= EBufferTypeComposition;
+	iLdd->iCompositionBuffer[0].iBufferId		= 0;
+	iLdd->iCompositionBuffer[0].iFree			= ETrue;
+	iLdd->iCompositionBuffer[0].iState			= EBufferFree;
+	iLdd->iCompositionBuffer[0].iAddress		= chunkKernelAddr;
+	iLdd->iCompositionBuffer[0].iPhysicalAddress = Epoc::LinearToPhysical(chunkKernelAddr);
+	iLdd->iCompositionBuffer[0].iChunk			= chunk;
+	iLdd->iCompositionBuffer[0].iHandle			= 0;
+	iLdd->iCompositionBuffer[0].iOffset			= 0;
+	iLdd->iCompositionBuffer[0].iSize			= DLcdPowerHandler::pLcd->iSize;
+	iLdd->iCompositionBuffer[0].iPendingRequest = 0;
+
+	// init CB 1
+	iLdd->iCompositionBuffer[1].iType			= EBufferTypeComposition;
+	iLdd->iCompositionBuffer[1].iBufferId		= 1;
+	iLdd->iCompositionBuffer[1].iFree			= ETrue;
+	iLdd->iCompositionBuffer[1].iState			= EBufferFree;
+	iLdd->iCompositionBuffer[1].iAddress		= chunkKernelAddr + DLcdPowerHandler::pLcd->iSize;
+	iLdd->iCompositionBuffer[1].iPhysicalAddress = Epoc::LinearToPhysical(chunkKernelAddr + DLcdPowerHandler::pLcd->iSize);
+	iLdd->iCompositionBuffer[1].iChunk			= chunk;
+	iLdd->iCompositionBuffer[1].iHandle			= 0;
+	iLdd->iCompositionBuffer[1].iOffset			= DLcdPowerHandler::pLcd->iSize;
+	iLdd->iCompositionBuffer[1].iSize			= DLcdPowerHandler::pLcd->iSize;
+	iLdd->iCompositionBuffer[1].iPendingRequest = 0;
+
+	iLdd->iCompositionBuffIdx					= 0;
+	//Use the same DFC queue created by the DLcdPowerHandler so all hardware accesses are executed under the same DFC thread.
+	iDfcQ= DLcdPowerHandler::pLcd->iDfcQ;
+
+	// Set the Post DFC.
+	iVSyncDfc.SetDfcQ(iDfcQ);
+
+
+	return KErrNone;
+	}
+
+TBool DDisplayPddBeagle::PostPending()
+	{
+	return (iPendingBuffer != NULL);
+	}
+
+TDfcQue * DDisplayPddBeagle::DfcQ(TInt aUnit)
+	{
+	return iDfcQ;
+	}
+
+void DDisplayPddBeagle::VSyncDfcFn(TAny* aChannel)
+	{
+	DDisplayPddBeagle * channel =(DDisplayPddBeagle*)aChannel;
+
+	if (channel->iPostFlag)
+		{
+		 channel->iPostFlag = EFalse;
+
+		if (channel->iActiveBuffer)
+			{
+			//When a User buffer is registered its iFree member becomes EFalse and Deregister sets it
+			//back to ETrue. Composition and Legacy buffers are not free when they are in the pending or
+			//active state.
+			if (channel->iActiveBuffer->iType == EBufferTypeUser)
+				{
+				channel->RequestComplete(RDisplayChannel::EReqPostUserBuffer, KErrNone);
+				}
+			else
+				{
+				channel->iActiveBuffer->iFree	= ETrue;
+				}
+
+			channel->iActiveBuffer->iState		= EBufferFree;
+
+
+			//If no buffer was available during a call to GetCompositionBuffer the active buffer has
+			//been returned as the next available one, so we must set the buffer to the proper state before we
+			//send the notification.
+			TInt pendingIndex = channel->iLdd->iPendingIndex[RDisplayChannel::EReqGetCompositionBuffer];
+			if(channel->iLdd->iPendingReq[RDisplayChannel::EReqGetCompositionBuffer][pendingIndex].iTClientReq)
+				{
+				if(channel->iLdd->iPendingReq[RDisplayChannel::EReqGetCompositionBuffer][pendingIndex].iTClientReq->IsReady())
+					{
+					channel->iActiveBuffer->iState = EBufferCompose;
+				    channel->RequestComplete(RDisplayChannel::EReqGetCompositionBuffer,KErrNone);
+				    }
+			    }
+
+			channel->iActiveBuffer				= NULL;
+			}
+
+		if (channel->iPendingBuffer)
+			{
+			__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddBeagle::VSyncDfcFn moving pending buffer at address %08x to the active state\n", channel->iPendingBuffer->iAddress));
+			channel->iActiveBuffer			= channel->iPendingBuffer;
+			channel->iActiveBuffer->iState	= EBufferActive;
+			channel->iPendingBuffer			= NULL;
+
+			channel->RequestComplete(RDisplayChannel::EReqWaitForPost,  KErrNone);
+			}
+		}
+	}
+
+DDisplayPddFactory::DDisplayPddFactory()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddFactory::DDisplayPddFactory()"));
+
+	iVersion		= TVersion(KDisplayChMajorVersionNumber,
+                      KDisplayChMinorVersionNumber,
+                      KDisplayChBuildVersionNumber);
+	}
+
+TInt DDisplayPddFactory::Create(DBase*& aChannel, TInt aUnit, const TDesC8* aInfo, const TVersion& aVer)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddFactory::Create()"));
+
+	DDisplayPddBeagle *device= new DDisplayPddBeagle() ;
+	aChannel=device;
+	if (!device)
+		{
+		return KErrNoMemory;
+		}
+	return KErrNone;
+	}
+
+TInt DDisplayPddFactory::Install()
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddFactory::Install()"));
+
+	TBuf<32> name(RDisplayChannel::Name());
+	_LIT(KPddExtension,".pdd");
+	name.Append(KPddExtension);
+	return SetName(&name);
+	}
+
+
+void DDisplayPddFactory::GetCaps(TDes8& /*aDes*/) const
+	{
+	//Not supported
+	}
+
+TInt DDisplayPddFactory::Validate(TInt aUnit, const TDesC8* /*anInfo*/, const TVersion& aVer)
+	{
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("DDisplayPddFactory::Validate()"));
+
+	if (!Kern::QueryVersionSupported(iVersion,aVer))
+		{
+		return KErrNotSupported;
+		}
+
+	if (aUnit != 0)
+		{
+		return KErrNotSupported;
+		}
+
+	return KErrNone;
+	}
+
+#endif //ENABLE_GCE_MODE
+
 DECLARE_STANDARD_EXTENSION()
 	{
-	__KTRACE_OPT(KPOWER,Kern::Printf("Starting LCD power manager"));
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("Creating DLcdPowerHandler"));
 
-	// create LCD power handler
-	TInt r=KErrNoMemory;
+	TInt r = KErrNoMemory;
 	DLcdPowerHandler* pH=new DLcdPowerHandler;
-	if (pH)
-		r=pH->Create();
+	if (!pH)
+		{
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Failed to create DLcdPowerHandler %d", r));
+		return r;
+		}
 
-	__KTRACE_OPT(KPOWER,Kern::Printf("Returns %d",r));
+	r = pH->Create();
+	if (r != KErrNone)
+		{
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Failed to create DLcdPowerHandler %d", r));
+		return r;
+		}
+
+#ifdef ENABLE_GCE_MODE
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("Creating DDisplayPddFactory"));
+	r = KErrNoMemory;
+	DDisplayPddFactory * device = new DDisplayPddFactory;
+	if (!device)
+		{
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Failed to create DLcdPowerHandler %d", r));
+		return r;
+		}
+
+	__KTRACE_OPT(KEXTENSION, Kern::Printf("Installing DDisplayPddFactory"));
+	r = Kern::InstallPhysicalDevice(device);
+	if (r != KErrNone)
+		{
+		__KTRACE_OPT(KEXTENSION, Kern::Printf("Failed to install DDisplayPddFactory %d", r));
+		}
+#endif
+
 	return r;
 	}
 

@@ -26,19 +26,26 @@
 #include			"beagle/variant.mmh"
 #include			"kernel/kern_ext.mmh"
 
+//Need to define NGA_BUILD for a NGA compliant Display PDD
+//#define NGA_BUILD
+#ifdef NGA_BUILD
+MACRO ENABLE_GCE_MODE
+target				VariantTarget(lcd_gce,dll)
+#else
 target				VariantTarget(lcd,dll)
+#endif
+
 targettype			kext
 romtarget			lcd.dll
 
 sourcepath			.
 source				lcd.cpp
 
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 userinclude			.
 
 library			VariantTarget(ecust,lib)
-LIBRARY             	AsspTarget(prcm,lib)
-//LIBRARY          	AsspTarget(i2c,lib)
-//LIBRARY	         	AsspTarget(kaomap3530,lib)
+LIBRARY         AsspTarget(prcm,lib)
 
 noexportlibrary
 
