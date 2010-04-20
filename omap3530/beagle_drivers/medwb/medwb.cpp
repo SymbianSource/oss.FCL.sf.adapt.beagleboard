@@ -930,7 +930,7 @@ TInt DMediaDriverWB::Caps(TLocDrv& aDrive, TLocalDriveCapsV6& aInfo)
 	#endif
 	// Fill buffer with current media caps.
 	aInfo.iType = EMediaHardDisk;
-	aInfo.iBattery = EBatNotSupported;
+	//aInfo.iBattery = EBatNotSupported;
 	aInfo.iDriveAtt = KDriveAttLocal;
 	aInfo.iMediaAtt	= KMediaAttFormattable;
 
