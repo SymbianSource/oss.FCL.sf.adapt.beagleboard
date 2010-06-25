@@ -676,7 +676,7 @@ LOCAL_C void SecondsToYMD( const TInt aTime, TUint8& aYear, TUint8& aMonth, TUin
 }
 
 
-EXPORT_C TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
+TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
 	{
 	
 	if(!TPS65950::Initialized())
@@ -718,7 +718,7 @@ EXPORT_C TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
 	return KErrNone;
 	}
 
-EXPORT_C TInt Beagle::SetSystemTimeInSecondsFrom2000(TInt aTime)
+TInt Beagle::SetSystemTimeInSecondsFrom2000(TInt aTime)
 	{
 	if(!TPS65950::Initialized())
 		{

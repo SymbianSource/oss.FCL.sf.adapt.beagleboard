@@ -1,7 +1,7 @@
 EXPORTS
 	_Z17VariantInitialisev @ 1 NONAME
-	_ZN6Beagle27SystemTimeInSecondsFrom2000ERi @ 2 NONAME
-	_ZN6Beagle30SetSystemTimeInSecondsFrom2000Ei @ 3 NONAME
+	_ZN6Beagle27SystemTimeInSecondsFrom2000ERi @ 2 NONAME ABSENT
+	_ZN6Beagle30SetSystemTimeInSecondsFrom2000Ei @ 3 NONAME ABSENT
 	_ZN7Variant10PowerResetEv @ 4 NONAME
 	_ZN7Variant14BaseLinAddressEv @ 5 NONAME
 	_ZN7Variant15GetMsTickPeriodEv @ 6 NONAME
