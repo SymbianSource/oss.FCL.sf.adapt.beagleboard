@@ -32,6 +32,7 @@ const TInt KMagicCrashValue = 15;
 #define ISFUNC(x)  (0x4000&(x))
 #define STDKEY(x)    (0x1FFF&(x))
 
+#if _UI_SOFTKEYS_ENABLED_
 static const TUint16 KScanCode[] =
 	{
 	/*00*/	EStdKeyNull,
@@ -163,6 +164,141 @@ static const TUint16 KScanCode[] =
 	/*7e*/	SHIFTED(EStdKeyHash),
 	/*7f*/	EKeyDelete
 	};
+
+#else
+static const TUint16 KScanCode[] =
+	{
+	/*00*/	EStdKeyNull,
+	/*01*/	EStdKeyHome,				// ^A
+	/*02*/	EStdKeyLeftArrow,			// ^B
+	/*03*/	EStdKeyEscape,				// ^C
+	/*04*/	SHIFTED(EStdKeyDownArrow),	// ^D - move window down
+	/*05*/	EStdKeyEnd,					// ^E
+	/*06*/	EStdKeyRightArrow,			// ^F
+	/*07*/	EStdKeyNull,
+	/*08*/	EStdKeyBackspace,			// ^H - Reserved!
+	/*09*/	EStdKeyTab,					// ^I - Reserved!
+	/*0a*/	EStdKeyNull,
+	/*0b*/	EStdKeyIncContrast,			// ^K
+	/*0c*/	EStdKeyDecContrast,			// ^L
+	/*0d*/	EStdKeyEnter,				// ^M - Reserved!
+	/*0e*/	EStdKeyDownArrow,			// ^N
+	/*0f*/	EStdKeyNull,				// ^O = instant death
+	/*10*/	EStdKeyUpArrow,				// ^P
+	/*11*/	CTRLED(EStdKeyLeftArrow),	// ^Q - make window narrower
+	/*12*/	CTRLED(FUNCED('5')),		// ^R - rotate windows in text window server
+	/*13*/	EStdKeyNull,
+	/*14*/	CTRLED(EStdKeyDownArrow),	// ^T - make window taller
+	/*15*/	SHIFTED(EStdKeyUpArrow),	// ^U - move window up
+	/*16*/	EStdKeyNull,
+	/*17*/	CTRLED(EStdKeyRightArrow),	// ^W - make window wider
+	/*18*/	SHIFTED(EStdKeyRightArrow),	// ^X - move window right
+	/*19*/	CTRLED(EStdKeyUpArrow),		// ^Y - make window shorter
+	/*1a*/	SHIFTED(EStdKeyLeftArrow),	// ^Z - move window left
+	/*1b*/	EStdKeyEscape,				// ^[ - Reserved!
+	/*1c*/	EStdKeyNull,
+	/*1d*/	EStdKeyNull,
+	/*1e*/	EStdKeyNull,
+	/*1f*/	EStdKeyNull,
+	/*20*/	EStdKeySpace,
+	/*21*/	SHIFTED('1'),		// !
+	/*22*/	SHIFTED('2'),		// "
+	/*23*/	EStdKeyHash,		// #
+	/*24*/	SHIFTED('4'),		// $
+	/*25*/	SHIFTED('5'),		// %
+	/*26*/	SHIFTED('7'),		// &
+	/*27*/	EStdKeySingleQuote,
+	/*28*/	SHIFTED('9'),		// (
+	/*29*/	SHIFTED('0'),		// )
+	/*2a*/	SHIFTED('8'),		// *
+	/*2b*/	SHIFTED(EStdKeyEquals),	// +
+	/*2c*/	EStdKeyComma,
+	/*2d*/	EStdKeyMinus,
+	/*2e*/	EStdKeyFullStop,
+	/*2f*/	EStdKeyForwardSlash,
+	/*30*/	'0',
+	/*31*/	'1',
+	/*32*/	'2',
+	/*33*/	'3',
+	/*34*/	'4',
+	/*35*/	'5',
+	/*36*/	'6',
+	/*37*/	'7',
+	/*38*/	'8',
+	/*39*/	'9',
+	/*3a*/	SHIFTED(EStdKeySemiColon),	// :
+	/*3b*/	EStdKeySemiColon,
+	/*3c*/	SHIFTED(EStdKeyComma),		// <
+	/*3d*/	EStdKeyEquals,
+	/*3e*/	SHIFTED(EStdKeyFullStop),	// >
+	/*3f*/	SHIFTED(EStdKeyForwardSlash),	// ?
+	/*40*/	SHIFTED(EStdKeySingleQuote),	// @
+	/*41*/	SHIFTED('A'),
+	/*42*/	SHIFTED('B'),
+	/*43*/	SHIFTED('C'),
+	/*44*/	SHIFTED('D'),
+	/*45*/	SHIFTED('E'),
+	/*46*/	SHIFTED('F'),
+	/*47*/	SHIFTED('G'),
+	/*48*/	SHIFTED('H'),
+	/*49*/	SHIFTED('I'),
+	/*4a*/	SHIFTED('J'),
+	/*4b*/	SHIFTED('K'),
+	/*4c*/	SHIFTED('L'),
+	/*4d*/	SHIFTED('M'),
+	/*4e*/	SHIFTED('N'),
+	/*4f*/	SHIFTED('O'),
+	/*50*/	SHIFTED('P'),
+	/*51*/	SHIFTED('Q'),
+	/*52*/	SHIFTED('R'),
+	/*53*/	SHIFTED('S'),
+	/*54*/	SHIFTED('T'),
+	/*55*/	SHIFTED('U'),
+	/*56*/	SHIFTED('V'),
+	/*57*/	SHIFTED('W'),
+	/*58*/	SHIFTED('X'),
+	/*59*/	SHIFTED('Y'),
+	/*5a*/	SHIFTED('Z'),
+	/*5b*/	EStdKeySquareBracketLeft,
+	/*5c*/	EStdKeyBackSlash,
+	/*5d*/	EStdKeySquareBracketRight,
+	/*5e*/	SHIFTED('6'),			// ^
+	/*5f*/	SHIFTED(EStdKeyMinus),	// _
+	/*60*/	EStdKeyBacklightToggle,	// Actually `
+	/*61*/	'A',
+	/*62*/	'B',
+	/*63*/	'C',
+	/*64*/	'D',
+	/*65*/	'E',
+	/*66*/	'F',
+	/*67*/	'G',
+	/*68*/	'H',
+	/*69*/	'I',
+	/*6a*/	'J',
+	/*6b*/	'K',
+	/*6c*/	'L',
+	/*6d*/	'M',
+	/*6e*/	'N',
+	/*6f*/	'O',
+	/*70*/	'P',
+	/*71*/	'Q',
+	/*72*/	'R',
+	/*73*/	'S',
+	/*74*/	'T',
+	/*75*/	'U',
+	/*76*/	'V',
+	/*77*/	'W',
+	/*78*/	'X',
+	/*79*/	'Y',
+	/*7a*/	'Z',
+	/*7b*/	SHIFTED(EStdKeySquareBracketLeft),
+	/*7c*/	SHIFTED(EStdKeyBackSlash),
+	/*7d*/	SHIFTED(EStdKeySquareBracketRight),
+	/*7e*/	SHIFTED(EStdKeyHash),
+	/*7f*/	EKeyDelete
+	};
+
+#endif
 
 static const TUint16 KEscapedScanCode[] =
 	{
@@ -310,7 +446,6 @@ void TSerialKeyboard::AddKeyDfc( TAny* aParam )
 			}
 		else
 			{
-			Kern::Printf("Key received: %d %d", self->iKey, KScanCode[self->iKey]);
 			self->AddKey( KScanCode[ self->iKey ] );
 			}
 		break;
@@ -362,7 +497,6 @@ void TSerialKeyboard::AddKey( TUint aKey )
 
 	TRawEvent e;
 
-	Kern::Printf("AddKey %d %d %d %d", shifted, ctrl, func, stdKey);
 	
 	if ( func )
 		{
