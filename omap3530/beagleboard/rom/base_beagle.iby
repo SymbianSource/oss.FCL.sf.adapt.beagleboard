@@ -105,6 +105,11 @@ extension[VARID]=KERNEL_DIR\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 #include <../omapshared/tps65950.iby>
 
+#ifdef SYMBIAN_BASE_USE_GCE
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
+device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
+#file=ABI_DIR\DEBUG_DIR\_beagle_ekdata.dll				\sys\bin\ekdata.dll
+#else
 #ifdef TSHELL_SERIAL
 	//Use VT100 Over Serial
 #	define EDISP_DRV	\EDISP_VT100.DLL
@@ -129,6 +134,7 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_usbcc.dll					\sys\bi
 device[VARID]=	KERNEL_DIR\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd
 extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\usbv.DLL
 #endif
+#endif //SYMBIAN_BASE_USE_GCE
 
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
