@@ -86,7 +86,10 @@ romchecksum=0x12345678
 
 primary[VARID]	=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_ekern.exe			\sys\bin\ekern.exe
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_kaomap3530.dll		\sys\bin\kaomap3530.dll
+
 #include <..\omapshared\mstick.iby>
+
+// Removing BTRACEX
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_BTRACEX.LDD			\sys\bin\btracex.ldd
 
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_prcm.dll				\sys\bin\prcm.dll
@@ -105,19 +108,27 @@ extension[VARID]=KERNEL_DIR\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 #include <../omapshared/tps65950.iby>
 
-#ifdef TSHELL_SERIAL
-	//Use VT100 Over Serial
-#	define EDISP_DRV	\EDISP_VT100.DLL
-	device[VARID]=KERNEL_DIR\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
-	device[VARID]=KERNEL_DIR\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
+#ifdef SYMBIAN_BASE_USE_GCE
+	// Use the new GCE compliant display driver  
+	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
+	device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
+	#file=ABI_DIR\DEBUG_DIR\_beagle_ekdata.dll				\sys\bin\ekdata.dll
+	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard_uisoftkeys.dll	\sys\bin\ekeyb.dll
 #else
-	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd.dll				\sys\bin\lcd.dll
-#	ifdef TSHELL_SERIALMOUSE
-		extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_serialmouse.DLL	\sys\bin\eserialmouse.dll
-#	else
-//		extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
-#	endif
-#endif
+	#ifdef TSHELL_SERIAL
+		//Use VT100 Over Serial
+		#define EDISP_DRV	\EDISP_VT100.DLL
+		device[VARID]=KERNEL_DIR\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
+		device[VARID]=KERNEL_DIR\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
+	#else
+		extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd.dll				\sys\bin\lcd.dll
+		#ifdef TSHELL_SERIALMOUSE
+			extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_serialmouse.DLL	\sys\bin\eserialmouse.dll
+		#else
+			extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
+		#endif
+	#endif
+
 extension[VARID]=KERNEL_DIR\BUILD_DIR\elocd.ldd								\sys\bin\elocd.ldd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_medint.pdd					\sys\bin\medint.pdd
 device[VARID]	=KERNEL_DIR\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd
@@ -129,6 +140,7 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_usbcc.dll					\sys\bi
 device[VARID]=	KERNEL_DIR\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd
 extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\usbv.DLL
 #endif
+#endif //SYMBIAN_BASE_USE_GCE
 
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
-extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
+//extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
