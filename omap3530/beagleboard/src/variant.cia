@@ -56,7 +56,7 @@ __NAKED__ void XIntDispatch(TAny*)
 __NAKED__ void ArmWaitForInterrupt()
 	{
 	//ARM_WFI;
-	asm(".word %a0" : : "i" ((TInt)(0x0320f003 | ((14)<<28) )) )
+	asm(".word %a0" : : "i" ((TInt)(0x0320f003 | ((14)<<28) )) );
 	asm("	bx		lr");
 	}
 
