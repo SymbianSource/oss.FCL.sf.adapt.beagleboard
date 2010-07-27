@@ -102,14 +102,19 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_gpio.dll					\sys\bin
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_resman.pdd					\sys\bin\resman.pdd
 extension[VARID]=KERNEL_DIR\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
 
+extension[VARID]=	KERNEL_DIR\DEBUG_DIR\_PLATFORM_NAME_medstaticrd.pdd		\sys\bin\medstaticrd.pdd
+
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 #include <../omapshared/tps65950.iby>
 
+#ifdef SYMBIAN_BASE_USE_GCE
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
+device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
+#file=ABI_DIR\DEBUG_DIR\_beagle_ekdata.dll				\sys\bin\ekdata.dll
+#else
 #ifdef TSHELL_SERIAL
 	//Use VT100 Over Serial
 #	define EDISP_DRV	\EDISP_VT100.DLL
-	device[VARID]=KERNEL_DIR\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
-	device[VARID]=KERNEL_DIR\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
 #else
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd.dll				\sys\bin\lcd.dll
 #	ifdef TSHELL_SERIALMOUSE
@@ -118,9 +123,13 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 //		extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
 #	endif
 #endif
+#endif //SYMBIAN_BASE_USE_GCE
+
+device[VARID]=KERNEL_DIR\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
+device[VARID]=KERNEL_DIR\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
 extension[VARID]=KERNEL_DIR\BUILD_DIR\elocd.ldd								\sys\bin\elocd.ldd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_medint.pdd					\sys\bin\medint.pdd
-device[VARID]	=KERNEL_DIR\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd
+//device[VARID]	=KERNEL_DIR\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd // Removed for clash in 3.0.0
 //device[VARID]	=KERNEL_DIR\BUILD_DIR\minkda.ldd							\sys\bin\minkda.ldd
 extension[VARID]=KERNEL_DIR\BUILD_DIR\exstart.dll							\sys\bin\exstart.dll
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_led.dll						\sys\bin\led.dll
