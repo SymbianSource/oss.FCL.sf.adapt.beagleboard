@@ -31,6 +31,8 @@ rom/base_beagle.iby		../rom/include/
 rom/header.iby		../rom/beagle/
 rom/kernel.iby		../rom/beagle/
 rom/test.iby			../rom/beagle/
+rom/estart.txt		../rom/beagle/
+rom/drive_c.img		../../nvmemory/
 
 PRJ_MMPFILES
 src/vbeagle

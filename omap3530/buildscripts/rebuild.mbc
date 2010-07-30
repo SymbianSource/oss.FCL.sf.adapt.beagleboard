@@ -33,6 +33,7 @@ SECTION_DIRS
 //.\beagle_drivers\prm
 ..\beagle_drivers\serialmouse
 ..\beagle_drivers\usbv
+..\beagle_drivers\medstaticrd
 ..\kernel
 
 
