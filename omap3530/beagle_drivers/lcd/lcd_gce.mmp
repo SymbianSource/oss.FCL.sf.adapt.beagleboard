@@ -15,44 +15,6 @@
 // lcd.dll Beagle LCD driver
 //
 
-
-
-/**
- @file
-*/
-#define __USING_ASSP_REGISTER_API__
-#define __USING_ASSP_INTERRUPT_API__
-
-#include			"beagle/variant.mmh"
-#include			"kernel/kern_ext.mmh"
-
 //Need to define NGA_BUILD for a NGA compliant Display PDD
 #define NGA_BUILD
-#ifdef NGA_BUILD
-MACRO ENABLE_GCE_MODE
-target				VariantTarget(lcd_gce,dll)
-#else
-target				VariantTarget(lcd,dll)
-#endif
-
-targettype			kext
-romtarget			lcd.dll
-
-sourcepath			.
-source				lcd.cpp
-
-SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
-userinclude			.
-
-library			VariantTarget(ecust,lib)
-LIBRARY         AsspTarget(prcm,lib)
-
-noexportlibrary
-
-epocallowdlldata
-
-uid					0x1000008d 0x100039e8
-
-VENDORID 0x70000001
-
-capability			all
+#include "lcd.mmp"
