@@ -18,12 +18,13 @@
 #include <e32cmn.h>
 #include <assp/omap3530_assp/omap3530_uart.h>
 
-
+#ifdef _DEBUG
 LOCAL_C void ClientPanic( TInt aLine )
 	{
 	_LIT( KString, "uart.cpp" );
 	Kern::PanicCurrentThread( KString, aLine );
 	}
+#endif
 
 
 namespace Omap3530Uart

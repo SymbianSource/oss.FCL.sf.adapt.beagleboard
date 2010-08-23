@@ -495,9 +495,9 @@ TInt DMediaDriverWB::DoFormat(TLocDrvRequest& iCurrentReq)
 	{
 	Int64 pos = iCurrentReq.Pos();
 	Int64 length = iCurrentReq.Length();
-	TInt r;
+	TInt r = KErrGeneral;
 	if (length<0 || pos<0 || (pos+length)>KMaxTInt)
-		return KErrGeneral;
+		return r;
 	TInt p=(TInt)pos;
 	TInt l=(TInt)length;
 

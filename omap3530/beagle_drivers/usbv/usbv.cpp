@@ -182,8 +182,8 @@ EXPORT_C MOmap3530UsbPhy* MOmap3530UsbPhy::New()
 		return NULL;
 		}
 
-	TInt r;
-	if ((r = phy->Construct()) != KErrNone)
+	TInt r = phy->Construct();
+	if (r != KErrNone)
 		{
 		__KTRACE_OPT(KPANIC, Kern::Printf("  Error: Construction of TBeagleUsbPhy failed (%d)", r));
 		delete phy;

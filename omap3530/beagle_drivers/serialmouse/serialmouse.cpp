@@ -34,7 +34,9 @@
 
 #include "serialmouse.h"
 
+#ifdef USE_SYMBIAN_PRM
 _LIT( KName, "SERMOUSE" );
+#endif
 
 #ifdef _FRAME_BUFFER_CURSOR_
 #	define CURSOR_SIZE 5
@@ -98,14 +100,15 @@ TInt TSerialMouse::Create()
 		}
 */
 
+#ifdef USE_SYMBIAN_PRM
 	// Register with the power resource manager
-	//r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
-	//if( r != KErrNone )
-	//	{
-	//	return r;
-	//	}
-
-	//__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialMouse::Init:PRM client ID=%x", iPrmClientId )) ;
+	r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
+	__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialMouse::Init:PRM client ID=%x, r=%d", iPrmClientId, r )) ;
+	if( r != KErrNone )
+		{
+		return r;
+		}
+#endif
 
 	Prcm::SetClockState(iUart.PrcmInterfaceClk(), Prcm::EClkOn);
 	Prcm::SetClockState(iUart.PrcmFunctionClk(), Prcm::EClkOn);
@@ -117,19 +120,21 @@ TInt TSerialMouse::Create()
 		return r;
  		}
 
+#ifdef USE_SYMBIAN_PRM
 	// Ask power resource manager to turn on clocks to the UART
 	// (this could take some time but we're not in any hurry)
-	//r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmFunctionClk(), Prcm::EClkAuto );
-	//if( KErrNone != r )
-	//	{
-	//	return r;
-	//	}
-		
-	//r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmInterfaceClk(), Prcm::EClkAuto );
-	//if( KErrNone != r )
-	//	{
-	//	return r;
-	//	}
+	r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmFunctionClk(), Prcm::EClkAuto );
+	if( r = KErrNone )
+		{
+		r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmInterfaceClk(), Prcm::EClkAuto );
+		}
+
+	if( r != KErrNone )
+		{
+		__KTRACE_OPT(KBOOT, Kern::Printf("+TSerialMouse:PRM ChangeResourceState(clock(s)) failed, client ID=%x, err=%d", iPrmClientId, r));
+		return r;
+		}
+#endif
 
 	iUart.Init();
 	iUart.DefineMode( Omap3530Uart::TUart::EUart );
