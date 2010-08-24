@@ -2959,6 +2959,7 @@ EXPORT_C void Init3()
 	SetClockState( EClkMcSpi4_F, EClkOn );
 	SetClockState( EClkMcSpi4_I, EClkOn );
 
+    /* BUG 3612 - We do not want to dissable all other UARTS
 	// UART
 	TInt debugport = Kern::SuperPage().iDebugPort;
 	if( debugport != 0 )
@@ -2982,6 +2983,7 @@ EXPORT_C void Init3()
 		SetClockState( EClkUart3_F, EClkOff );
 		SetClockState( EClkUart3_I, EClkOff );
 		}
+     */
 
 	// I2C KI2C1_SYSC
 	r = AsspRegister::Read32(KI2C1_SYSC);
