@@ -109,7 +109,6 @@ extension[VARID]=	KERNEL_DIR\DEBUG_DIR\_PLATFORM_NAME_medstaticrd.pdd		\sys\bin\
 
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 
-#include <rom/omap3530/spi.iby>
 #include <../omapshared/tps65950.iby>
 
 #ifdef SYMBIAN_BASE_USE_GCE

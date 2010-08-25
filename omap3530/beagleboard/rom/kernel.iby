@@ -45,7 +45,6 @@ extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL		\sys\bin
 
 extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL                \sys\bin\I2C.DLL
 
-#include <rom/omap3530/spi.iby>
 #include <rom/omapshared/tps65950.iby>
 
 #ifdef TSHELL_SERIAL
