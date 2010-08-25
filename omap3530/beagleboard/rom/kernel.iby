@@ -35,7 +35,7 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONDEBUG.DLL      
 
 extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL            	\sys\bin\gpio.dll
 
-//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL		\sys\bin\led.dll
+extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL		\sys\bin\led.dll
 // Uncommnet to include West Bridge Astoria Symbian Storage driver 
 //extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_WB.DLL		\sys\bin\wb.dll
 //extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\wb.dll		\sys\bin\wb.dll
@@ -45,10 +45,9 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL            
 
 extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL                \sys\bin\I2C.DLL
 
+#include <rom/omap3530/spi.iby>
 #include <rom/omapshared/tps65950.iby>
 
-device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD				\sys\bin\euart.pdd
-device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
 #ifdef TSHELL_SERIAL
 	//Use VT100 Over Serial
 #	define EDISP_DRV	\EDISP_VT100.DLL

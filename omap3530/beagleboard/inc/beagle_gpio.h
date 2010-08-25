@@ -20,13 +20,13 @@
 #include <assp/omap3530_assp/omap3530_gpio.h>
 
 const TUint KGPIOINT_UserButton = EGPIOIRQ_PIN_7;
-const TUint KGPIOINT_LED0 = EGPIOIRQ_PIN_149;
-const TUint KGPIOINT_LED1 = EGPIOIRQ_PIN_150;
+const TUint KGPIOINT_LED0 = EGPIOIRQ_PIN_150;
+const TUint KGPIOINT_LED1 = EGPIOIRQ_PIN_149;
 const TUint KGPIOINT_TFP410_POWERDOWN = EGPIOIRQ_PIN_170;//DVI_PUP Controls the DVI-D interface. A Hi = DVI-D enabled.
-const TUint KGPIOINT_MMC1_WP = EGPIOIRQ_PIN_29; // I MMC1_WP SD/MMC card slot Write protect 
+const TUint KGPIOINT_MMC1_WP = EGPIOIRQ_PIN_29; // I MMC1_WP SD/MMC card slot Write protect
 
 const TUint KGPIO_UserButton = 7;
-const TUint KGPIO_LED0 = 149;
-const TUint KGPIO_LED1 = 150;
+const TUint KGPIO_LED0 = 150;
+const TUint KGPIO_LED1 = 149;
 
 #endif //__BEAGLE_GPIO_H__
