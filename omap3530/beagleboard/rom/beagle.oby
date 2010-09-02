@@ -35,7 +35,7 @@ define VARID			0x09080001
 define ASSP_DIR			EPOCROOT##epoc32\release\mbeagle
 define ROMMEGS			80		/* !! HEX !! */
 define PLATFORM_NAME	beagle
-
+#define BASEPORT_DRV	<base_beagle.iby>
 
 #define COLOR
 
