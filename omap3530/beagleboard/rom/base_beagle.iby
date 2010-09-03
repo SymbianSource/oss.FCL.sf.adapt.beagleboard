@@ -108,12 +108,14 @@ extension[VARID]=KERNEL_DIR\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
 extension[VARID]=	KERNEL_DIR\DEBUG_DIR\_PLATFORM_NAME_medstaticrd.pdd		\sys\bin\medstaticrd.pdd
 
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
+
 #include <../omapshared/tps65950.iby>
 
 #ifdef SYMBIAN_BASE_USE_GCE
 	// Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
 	device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
+	#file=ABI_DIR\DEBUG_DIR\_beagle_ekdata.dll				\sys\bin\ekdata.dll
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard_uisoftkeys.dll	\sys\bin\ekeyb.dll
 #else
 	#ifdef TSHELL_SERIAL
@@ -136,7 +138,7 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_medint.pdd					\sys\bin
 //device[VARID]	=KERNEL_DIR\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd // Removed for clash in 3.0.0
 //device[VARID]	=KERNEL_DIR\BUILD_DIR\minkda.ldd							\sys\bin\minkda.ldd
 extension[VARID]=KERNEL_DIR\BUILD_DIR\exstart.dll							\sys\bin\exstart.dll
-//extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_led.dll						\sys\bin\led.dll
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_led.dll						\sys\bin\led.dll
 #ifdef INCLUDE_USB
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_usbcc.dll					\sys\bin\usbcc.dll
 device[VARID]=	KERNEL_DIR\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd

@@ -30,6 +30,11 @@ target				VariantTarget(led,dll)
 targettype			kext
 romtarget			led.dll
 
+
+// comment the following macro out - if you don't wan to..
+// ..use USER button to enter the crash debugger
+macro USER_BUTTON_ENTERS_CRASH_DEBUGGER
+
 sourcepath			.
 source				led.cpp
 
