@@ -37,13 +37,16 @@ LedHeartBeat::LedHeartBeat() :
 TInt LedHeartBeat::DoCreate()
 	{
 	TInt r = GPIO::SetPinDirection(KGPIO_LED0, GPIO::EOutput);
-	if (r != KErrNone)
+	if (r == KErrNone)
+		{
+		GPIO::SetPinMode(KGPIO_LED0, GPIO::EEnabled);
+		GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
+		iTimer.OneShot(NKern::TimerTicks(KBeatTimeInSeconds * 1000));		
+		}
+	else
 		{
 		Kern::Printf("LedHeartBeat: SetPinDirection for LED failed, r %d", r);
 		}
-	GPIO::SetPinMode(KGPIO_LED0, GPIO::EEnabled);
-	GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
-	iTimer.OneShot(NKern::TimerTicks(KBeatTimeInSeconds * 1000));
 	return r;
 	}
 
