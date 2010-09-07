@@ -28,6 +28,9 @@ void CrashDebugger::InitUart()
 		{
 		Omap3530Uart::TUart uart( portNumber );
 
+		// wait for uart to fihish any transmission that could be started (i.e. crash info)
+		while(!uart.TxFifoEmpty());
+
 		// Ensure UART clocks are running
 		Prcm::SetClockState( uart.PrcmInterfaceClk(),Prcm::EClkOn );
 		Prcm::SetClockState( uart.PrcmFunctionClk(), Prcm::EClkOn );
@@ -50,7 +53,7 @@ void CrashDebugger::UartOut(TUint aChar)
 		Omap3530Uart::TUart uart( portNumber );
 
 		TUint c=0;
-
+			
 		while ( !uart.RxFifoEmpty() )
 			{ 
 			if ( CheckPower() )
