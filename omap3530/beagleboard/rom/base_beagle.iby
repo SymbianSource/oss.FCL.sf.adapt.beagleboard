@@ -115,7 +115,6 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 	// Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
 	device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
-	#file=ABI_DIR\DEBUG_DIR\_beagle_ekdata.dll				\sys\bin\ekdata.dll
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard_uisoftkeys.dll	\sys\bin\ekeyb.dll
 #else
 	#ifdef TSHELL_SERIAL
