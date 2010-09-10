@@ -83,4 +83,8 @@ extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL				\sys\
 #	include <rom\##VARIANT##\test.iby>
 #endif
 
+#ifdef USE_VT100_DISPLAY
+#include <rom/omapshared/edisp_vt100.iby>
+#endif
+
 
