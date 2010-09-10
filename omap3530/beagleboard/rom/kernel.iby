@@ -47,6 +47,8 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL             
 
 #include <rom/omapshared/tps65950.iby>
 
+device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD				\sys\bin\euart.pdd
+device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
 #ifdef TSHELL_SERIAL
 	//Use VT100 Over Serial
 #	define EDISP_DRV	\EDISP_VT100.DLL
