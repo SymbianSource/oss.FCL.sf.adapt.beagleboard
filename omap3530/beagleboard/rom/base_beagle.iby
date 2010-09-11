@@ -145,8 +145,3 @@ extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\
 #endif
 
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
-
-#ifdef USE_VT100_DISPLAY
-#include <../omapshared/edisp_vt100.iby>
-#endif
-
