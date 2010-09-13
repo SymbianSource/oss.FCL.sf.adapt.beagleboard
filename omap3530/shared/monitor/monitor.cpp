@@ -28,13 +28,15 @@ void CrashDebugger::InitUart()
 		{
 		Omap3530Uart::TUart uart( portNumber );
 
-		// wait for uart to fihish any transmission that could be started (i.e. crash info)
-		while(!uart.TxFifoEmpty());
-
 		// Ensure UART clocks are running
 		Prcm::SetClockState( uart.PrcmInterfaceClk(),Prcm::EClkOn );
 		Prcm::SetClockState( uart.PrcmFunctionClk(), Prcm::EClkOn );
 	
+		// Add new line and wait for uart to fihish any transmission (i.e. crash info from fifo)
+		uart.Write('\r');
+		uart.Write('\n');
+		while(!uart.TxFifoEmpty());
+		
 		// We don't know what state the UART is in, so reinitialize it
 		uart.Init();
 		uart.DefineMode( Omap3530Uart::TUart::EUart );
