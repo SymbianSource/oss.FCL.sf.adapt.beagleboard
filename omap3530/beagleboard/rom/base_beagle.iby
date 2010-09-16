@@ -94,19 +94,12 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_kaomap3530.dll		\sys\
 
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_prcm.dll				\sys\bin\prcm.dll
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_uart.dll			\sys\bin\uart.dll
-
 variant[VARID]	=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ecust.dll			\sys\bin\ecust.dll
-
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_exmoncommon.dll				\sys\bin\exmoncommon.dll
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_exmondebug.dll   				\sys\bin\exmondebug.dll
-
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_gpio.dll					\sys\bin\gpio.dll
-
-//extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_resman.pdd					\sys\bin\resman.pdd
-extension[VARID]=KERNEL_DIR\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
-
-extension[VARID]=	KERNEL_DIR\DEBUG_DIR\_PLATFORM_NAME_medstaticrd.pdd		\sys\bin\medstaticrd.pdd
-
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\resman.ldd							\sys\bin\resman.ldd
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_PLATFORM_NAME_medstaticrd.pdd		\sys\bin\medstaticrd.pdd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 
 #include <../omapshared/tps65950.iby>
@@ -114,7 +107,7 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 #ifdef SYMBIAN_BASE_USE_GCE
 	// Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
-	device[VARID]=KERNEL_DIR\DEBUG_DIR\display.ldd			\sys\bin\display0.ldd
+	device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\display.ldd			\sys\bin\display0.ldd
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard_uisoftkeys.dll	\sys\bin\ekeyb.dll
 #else
 	#ifdef TSHELL_SERIAL
@@ -130,17 +123,21 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 	#endif
 #endif //SYMBIAN_BASE_USE_GCE
 
-device[VARID]=KERNEL_DIR\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
-device[VARID]=KERNEL_DIR\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
-extension[VARID]=KERNEL_DIR\BUILD_DIR\elocd.ldd								\sys\bin\elocd.ldd
+device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
+device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\ECOMM.LDD						\sys\bin\ecomm.ldd
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\elocd.ldd								\sys\bin\elocd.ldd
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_medint.pdd					\sys\bin\medint.pdd
-//device[VARID]	=KERNEL_DIR\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd // Removed for clash in 3.0.0
-//device[VARID]	=KERNEL_DIR\BUILD_DIR\minkda.ldd							\sys\bin\minkda.ldd
-extension[VARID]=KERNEL_DIR\BUILD_DIR\exstart.dll							\sys\bin\exstart.dll
+
+//Commented out
+//device[VARID]	=\epoc32\release\ARMV5\BUILD_DIR\pipelib.ldd							\sys\bin\pipelib.ldd // Removed for clash in 3.0.0
+//device[VARID]	=\epoc32\release\ARMV5\BUILD_DIR\minkda.ldd							\sys\bin\minkda.ldd
+
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\exstart.dll							\sys\bin\exstart.dll
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_led.dll						\sys\bin\led.dll
+
 #ifdef INCLUDE_USB
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_usbcc.dll					\sys\bin\usbcc.dll
-device[VARID]=	KERNEL_DIR\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd
+device[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\usbc.ldd							\sys\bin\eusbc.ldd
 extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\usbv.DLL
 #endif
 
