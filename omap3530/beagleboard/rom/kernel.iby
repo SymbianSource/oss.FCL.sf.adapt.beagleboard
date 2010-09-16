@@ -48,19 +48,19 @@ device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD				\sys\bin\eu
 device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
 
 #ifdef TSHELL_SERIAL
-	//Use VT100 Over Serial
-	#	define EDISP_DRV	\EDISP_VT100.DLL
+//Use VT100 Over Serial
+#define EDISP_DRV	\EDISP_VT100.DLL
 #else
 	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_lcd.dll				\sys\bin\lcd.dll
-	#ifdef SERIALMOUSE
-		#ifdef BASE_ROM
-			extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse_tshell.DLL	\sys\bin\eserialmouse.dll
-		#else
-		extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL		\sys\bin\eserialmouse.dll
-		#endif
-	#else
-		extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
-	#endif
+#ifdef SERIALMOUSE
+#ifdef BASE_ROM
+	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse_tshell.DLL	\sys\bin\eserialmouse.dll
+#else
+	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL		\sys\bin\eserialmouse.dll
+#endif
+#else
+	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
+#endif
 #endif
 
 file[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL				\sys\bin\ekdata.dll
@@ -81,5 +81,5 @@ extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL				\sys\
 #define	EUSER_DLL	../../ARMV5/##BUILD##/_omap3530_euser.dll
 
 #ifdef TEST_ROM
-#	include <rom\##VARIANT##\test.iby>
+#include <rom\##VARIANT##\test.iby>
 #endif
