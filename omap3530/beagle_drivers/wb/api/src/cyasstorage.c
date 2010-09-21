@@ -755,7 +755,7 @@ CyAsStorageClaim(CyAsDeviceHandle handle,
 {
     CyAsDevice *dev_p = (CyAsDevice *)handle ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     return MyStorageClaim(dev_p, NULL, bus, device, CY_AS_REQUEST_RESPONSE_MS, cb, client) ;
@@ -875,7 +875,7 @@ CyAsStorageRelease(CyAsDeviceHandle handle,
 {
     CyAsDevice *dev_p = (CyAsDevice *)handle ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     return MyStorageRelease(dev_p, NULL, bus, device, CY_AS_REQUEST_RESPONSE_MS, cb, client) ;
@@ -1482,7 +1482,7 @@ MyStorageDeviceControl(
     if (CyAsDeviceIsInSuspendMode(dev_p))
         return CY_AS_ERROR_IN_SUSPEND ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)
@@ -1691,7 +1691,7 @@ CyAsStorageAsyncOper(CyAsDevice *dev_p, CyAsEndPointNumber_t ep, uint8_t reqtype
     if (ret != CY_AS_ERROR_SUCCESS)
         return ret ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)
@@ -1858,7 +1858,7 @@ CyAsStorageSyncOper(CyAsDevice *dev_p, CyAsEndPointNumber_t ep, uint8_t reqtype,
     if (ret != CY_AS_ERROR_SUCCESS)
         return ret ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)
@@ -2161,7 +2161,7 @@ MyHandleResponseSDRegRead(
 
     CyAsLLDestroyResponse(dev_p, reply_p) ;
     CyAsLLDestroyRequest(dev_p, req_p) ;
-
+    (void)resp_len;
     return ret ;
 }
 
@@ -2534,7 +2534,7 @@ CyAsStorageErase(
     if (ret != CY_AS_ERROR_SUCCESS)
         return ret ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)
@@ -2626,7 +2626,7 @@ CyAsStorageFuncCallback(CyAsDevice *dev_p,
     CyAsHalAssert(dev_p->func_cbs_stor->type == CYAS_FUNC_CB) ;
     (void) exRequest;
     (void) msRequest;
-
+    (void)cntxt;
     (void)context ;
 
     cntxt = CyAsLLRequestResponse_GetContext(rqt) ;
@@ -2756,7 +2756,7 @@ CyAsSdioDeviceCheck(
     if (!dev_p ||(dev_p->sig != CY_AS_DEVICE_HANDLE_SIGNATURE))
         return CY_AS_ERROR_INVALID_HANDLE ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)

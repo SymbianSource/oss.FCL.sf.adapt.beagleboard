@@ -21,6 +21,7 @@ systeminclude		+/include/drivers
 systeminclude		+/include/assp/omap3530_assp
 SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 
+USERINCLUDE         ./
 target				AsspTarget(usbcc,dll)
 targettype			kext
 linkas				usbcc.dll

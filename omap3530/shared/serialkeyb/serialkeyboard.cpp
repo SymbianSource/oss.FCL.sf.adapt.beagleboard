@@ -353,23 +353,23 @@ TInt TSerialKeyboard::Create()
 	TInt r = KErrNone;
 
 	const Omap3530Uart::TUartNumber portNumber( Omap3530Assp::DebugPortNumber() );
-	
+
 	if( portNumber >= 0 )
 		{
+#ifdef USE_SYMBIAN_PRM
 		// Register with the power resource manager
 		_LIT( KName, "serkey" );
-		/*r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
+		r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
+		__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x, err=%d", iPrmClientId, r));
 		if( r != KErrNone )
 			{
 			return r;
-			}*/
-
-		__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x", iPrmClientId )) ;
-		Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x", iPrmClientId );
+			}
+#endif
 
 		Prcm::SetClockState(iUart.PrcmInterfaceClk(), Prcm::EClkOn);
 		Prcm::SetClockState(iUart.PrcmFunctionClk(), Prcm::EClkOn);
-		
+
  		r = Interrupt::Bind( iUart.InterruptId(), UartIsr, this );
 		if ( r < 0 )
  			{
@@ -378,21 +378,22 @@ TInt TSerialKeyboard::Create()
  			}
 
 		Kern::Printf("+TSerialKeyboard::Create bound to interrupt" );
-		
+
+#ifdef USE_SYMBIAN_PRM
 		// Ask power resource manager to turn on clocks to the UART
 		// (this could take some time but we're not in any hurry)
-		/*r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmFunctionClk(), Prcm::EClkOn );
-		if( KErrNone != r )
+		r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmFunctionClk(), Prcm::EClkOn );
+		if( r == KErrNone )
 			{
-			return r;
-			}*/
-			
-		/*r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmInterfaceClk(), Prcm::EClkOn );
-		if( KErrNone != r )
-			{
-			return r;
-			}*/
+			r = PowerResourceManager::ChangeResourceState( iPrmClientId, iUart.PrmInterfaceClk(), Prcm::EClkOn );
+			}
 
+		if( r != KErrNone )
+			{
+			__KTRACE_OPT(KBOOT, Kern::Printf("+TSerialKeyboardl:PRM ChangeResourceState(clock(s)) failed, client ID=%x, err=%d", iPrmClientId, r));
+			return r;
+			}
+#endif
 		// We can assume that the debug output code has already initialized the UART, we just need to prepare it for RX
 		iUart.EnableFifo( Omap3530Uart::TUart::EEnabled, Omap3530Uart::TUart::ETriggerUnchanged, Omap3530Uart::TUart::ETrigger8 );
 		iUart.EnableInterrupt( Omap3530Uart::TUart::EIntRhr );

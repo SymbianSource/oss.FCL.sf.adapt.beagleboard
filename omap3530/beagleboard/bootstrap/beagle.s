@@ -174,7 +174,7 @@ GetRamBanks	ROUT
 		MOV		pc, lr
 1
 		; DRAM has been set-up by boot loader so no need to configure or probe
-		DCD		DRamBankBase | RAM_VERBATIM, DRamBankMaxSize
+		DCD		DRamBankBase :OR: RAM_VERBATIM, DRamBankMaxSize
 		DCD		0,0				; terminator
 
 

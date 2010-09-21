@@ -3032,8 +3032,6 @@ CyAsUsbGetNakStall(CyAsDeviceHandle handle,
 {
     CyAsReturnStatus_t ret ;
     CyAsLLRequestResponse *req_p , *reply_p ;
-    uint16_t data ;
-
     CyAsDevice *dev_p = (CyAsDevice *)handle ;
 
     (void)response ;
@@ -3053,7 +3051,6 @@ CyAsUsbGetNakStall(CyAsDeviceHandle handle,
         return CY_AS_ERROR_OUT_OF_MEMORY ;
 
     /* Set the endpoint */
-    data = (uint8_t)ep ;
     CyAsLLRequestResponse_SetWord(req_p, 0, (uint16_t)ep) ;
 
     /* A single status word response type */

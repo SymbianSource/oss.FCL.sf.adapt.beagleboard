@@ -20,8 +20,6 @@
 
 #include "omap3530_hardware_base.h"
 
-namespace
-{
 const TUint32 KCM_CLKSEL_CORE = Omap3530HwBase::TVirtual<0x48004A40>::Value;
 const TUint32 KCM_CLKSEL_SGX = Omap3530HwBase::TVirtual<0x48004B40>::Value;
 const TUint32 KCM_CLKSEL_WKUP = Omap3530HwBase::TVirtual<0x48004C40>::Value;
@@ -217,7 +215,6 @@ const TUint32 KPM_WKDEP_USBHOST = Omap3530HwBase::TVirtual<0x483074C8>::Value;
 const TUint32 KPM_PWSTCTRL_USBHOST = Omap3530HwBase::TVirtual<0x483074E0>::Value;
 const TUint32 KPM_PWSTST_USBHOST = Omap3530HwBase::TVirtual<0x483074E4>::Value;
 const TUint32 KPM_PREPWSTST_USBHOST = Omap3530HwBase::TVirtual<0x483074E8>::Value;
-
 const TUint32 KMAILBOX_SYSCONFIG = Omap3530HwBase::TVirtual<0x48094010>::Value;
 const TUint32 KCONTROL_SYSCONFIG = Omap3530HwBase::TVirtual<0x48002010>::Value;
 const TUint32 KMMU1_SYSCONFIG = Omap3530HwBase::TVirtual<0x480BD410>::Value;
@@ -281,6 +278,6 @@ const TUint32 KTI9OCP_CFG = Omap3530HwBase::TVirtual<0x49040010>::Value;
 const TUint32 KTI10OCP_CFG = Omap3530HwBase::TVirtual<0x48086010>::Value;
 const TUint32 KTI11OCP_CFG = Omap3530HwBase::TVirtual<0x48088010>::Value;
 const TUint32 KTI12OCP_CFG = Omap3530HwBase::TVirtual<0x48304010>::Value;
-}
+
 
 #endif

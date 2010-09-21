@@ -16,21 +16,13 @@ TmtpAstDev g_AstDevice;
 TmtpAstDev * g_pAstDevice = &g_AstDevice ;
 
 static uint16_t replybuf[512] ;
-static uint8_t *replyptr = (uint8_t *) replybuf ;
 
 static uint8_t *
 GetReplyArea(void)
 {
-    /*assert(replyptr != 0) ;*/
-    replyptr = 0 ;
     return (uint8_t *) replybuf ;
 }
 
-static void
-RestoreReplyArea(void)
-{
-    replyptr = (uint8_t *) replybuf ;
-}
 
 /* Globals */
 /*static uint8_t pktbuffer3[512] ;*/
@@ -45,7 +37,6 @@ static uint8_t pktbuffer11[512] ;
 
 /*static uint8_t turbopktbuffer[512] ;*/
 
-static CyBool gUsbTestDone = CyFalse ;
 static volatile CyBool gSetConfig = CyFalse ;
 static volatile CyBool gAsyncStallDone = CyFalse ;
 
@@ -57,7 +48,6 @@ static volatile CyAsHalDeviceTag g_tag ;
 static uint8_t MyConfiguration = 0 ;
 static CyCh9ConfigurationDesc *desc_p = 0 ;
 static CyCh9ConfigurationDesc *other_p = 0 ;
-static CyBool gSetupPending = CyFalse ;
 
 static volatile uint8_t gAsyncStallStale = 0;
 
@@ -103,7 +93,9 @@ StallCallbackEX(CyAsDeviceHandle h,
 static void
 StallCallbackAsync(CyAsDeviceHandle h, CyAsReturnStatus_t status, uint32_t tag, CyAsFunctCBType cbtype, void *cbdata)
 {
-    CyAsReturnStatus_t ret ;
+#ifdef PRINT_DEBUG_INFO
+	CyAsReturnStatus_t ret ;
+#endif
     (void)cbtype ;
     (void)cbdata ;
     (void)tag ;
@@ -112,7 +104,10 @@ StallCallbackAsync(CyAsDeviceHandle h, CyAsReturnStatus_t status, uint32_t tag, 
     if(gAsyncStallStale == 0)
     {
         gAsyncStallStale++;
-        ret = CyAsUsbClearStall(h, 3, StallCallbackAsync, 21);
+#ifdef PRINT_DEBUG_INFO
+        ret =
+#endif
+			CyAsUsbClearStall(h, 3, StallCallbackAsync, 21);
         CyAsHalAssert(ret == CY_AS_ERROR_SUCCESS) ;
     }
     else
@@ -289,11 +284,9 @@ int SetupUSBPPort(CyAsDeviceHandle h, uint8_t bus, CyBool isTurbo)
     CyAsUsbEnumControl config ;
 #ifdef DEBUG_ZERO
     CyAsUsbEndPointConfig epconfig ;
+    (void)epconfig;
 #endif
     uint32_t count = 0 ;
-    char *media_name = "SD";
-
-    gUsbTestDone = CyFalse ;
 
     CyAsHalPrintMessage("*** SetupUSBPPort...\n") ;
     /*
@@ -383,7 +376,7 @@ int SetupUSBPPort(CyAsDeviceHandle h, uint8_t bus, CyBool isTurbo)
 		ret = CyAsStorageQueryMedia(h, CyAsMediaSDFlash, &count, 0, 0) ;
 		if (ret != CY_AS_ERROR_SUCCESS)
 		{
-		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query %s device count - Reason code %d\n", media_name, ret) ;
+		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query SD device count - Reason code %d\n", ret) ;
 		  return -ret ;
 		}
 		CyAsHalPrintMessage("CyAsMtpApp: %d %s device(s) found\n", count, media_name) ;
@@ -391,7 +384,7 @@ int SetupUSBPPort(CyAsDeviceHandle h, uint8_t bus, CyBool isTurbo)
 		ret = CyAsStorageClaim(h, CyAsBus_1, 0, 0, 0) ;
 		if (ret != CY_AS_ERROR_SUCCESS)
 		{
-		  CyAsHalPrintMessage("CyAsMtpApp: Cannot claim %s media - Reason code %d\n", media_name, ret) ;
+		  CyAsHalPrintMessage("CyAsMtpApp: Cannot claim SD media - Reason code %d\n", ret) ;
 		  return -ret;
 		}
 
@@ -401,7 +394,7 @@ int SetupUSBPPort(CyAsDeviceHandle h, uint8_t bus, CyBool isTurbo)
 		ret = CyAsStorageQueryDevice(h, &(g_pAstDevice->dev_data), 0, 0) ;
 		if (ret != CY_AS_ERROR_SUCCESS)
 		{
-		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query %s device - Reason code %d\n", media_name, ret) ;
+		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query SD device - Reason code %d\n", ret) ;
 		  return -ret ;
 		}
 		CyAsHalPrintMessage("CyAsMtpApp: blocksize %d, %d units found\n",
@@ -414,7 +407,7 @@ int SetupUSBPPort(CyAsDeviceHandle h, uint8_t bus, CyBool isTurbo)
 		ret = CyAsStorageQueryUnit(h, &(g_pAstDevice->unit_data), 0, 0) ;
 		if (ret != CY_AS_ERROR_SUCCESS)
 		{
-		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query %s device unit - Reason code %d\n", media_name, ret) ;
+		  CyAsHalPrintMessage("CyAsMtpApp: Cannot query SD device unit - Reason code %d\n", ret) ;
 		  return -ret ;
 		}
 		CyAsHalPrintMessage("CyAsMtpApp: blocksize %d, %d Block(s) found\n",
@@ -603,14 +596,8 @@ static void SetupWriteCallback(CyAsDeviceHandle h, CyAsEndPointNumber_t ep, uint
     (void)h ;
     (void)buf_p ;
 
-    /*assert(ep == 0) ;
-    assert(buf_p == replybuf) ;*/
-
-    RestoreReplyArea() ;
     if (status != CY_AS_ERROR_SUCCESS)
         CyAsHalPrintMessage("Error returned in SetupWriteCallback - %d\n", status) ;
-
-    gSetupPending = CyFalse ;
 }
 
 static CyAsReturnStatus_t
@@ -715,12 +702,9 @@ SendSetupData(CyAsDeviceHandle h, uint32_t reqlen, uint32_t size, void *data_p)
         size = reqlen ;
 
     reply = GetReplyArea() ;
-    /*assert(reply != 0) ;*/
 
     memcpy(reply, data_p, size) ;
     ret = SetupWrite(h, reqlen, size, reply) ;
-    if (ret != CY_AS_ERROR_SUCCESS)
-        RestoreReplyArea() ;
 
     return ret ;
 }
@@ -740,7 +724,6 @@ static void ProcessGetDescriptorRequest(CyAsDeviceHandle h, uint8_t *data)
         */
         CyAsHalPrintMessage("**** CY_CH9_GD_DEVICE (size = %d)\n", sizeof(pport_device_desc)) ;
         PrintData("DD", (uint8_t *)&pport_device_desc, sizeof(pport_device_desc)) ;
-
         ret = SendSetupData(h, reqlen, sizeof(pport_device_desc), &pport_device_desc) ;
         if (ret != CY_AS_ERROR_SUCCESS)
             CyAsHalPrintMessage("****** ERROR WRITING USB DATA - %d\n", ret) ;
@@ -754,7 +737,6 @@ static void ProcessGetDescriptorRequest(CyAsDeviceHandle h, uint8_t *data)
         */
         CyAsHalPrintMessage("**** CY_CH9_GD_DEVICE (size = %d)\n", sizeof(device_qualifier)) ;
         PrintData("DD", (uint8_t *)&device_qualifier, sizeof(device_qualifier)) ;
-
         ret = SendSetupData(h, reqlen, sizeof(device_qualifier), &device_qualifier) ;
         if (ret != CY_AS_ERROR_SUCCESS)
             CyAsHalPrintMessage("****** ERROR WRITING USB DATA - %d\n", ret) ;
@@ -763,32 +745,36 @@ static void ProcessGetDescriptorRequest(CyAsDeviceHandle h, uint8_t *data)
     }
     else if (data[3] == CY_CH9_GD_CONFIGURATION)
     {
-        const char *desc_name_p ;
-        uint16_t size ;
+#ifdef PRINT_DEBUG_INFO
+		const char *desc_name_p = "UNKNOWN" ;
+#endif
+        uint16_t size = 0 ;
 
         /*
         * Return the CONFIGURATION descriptor.
         */
         if (desc_p == (CyCh9ConfigurationDesc *)&ConfigHSDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "HighSpeed" ;
+#endif
             size = sizeof(ConfigHSDesc) ;
         }
         else if (desc_p == (CyCh9ConfigurationDesc *)&ConfigFSDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "FullSpeed" ;
+#endif
             size = sizeof(ConfigFSDesc) ;
         }
         else if (desc_p == &ZeroDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "ZeroDesc" ;
+#endif
             size = sizeof(ZeroDesc) ;
         }
-        else
-        {
-            desc_name_p = "UNKNOWN" ;
-            size = 0 ;
-        }
+
         CyAsHalPrintMessage("**** CY_CH9_GD_CONFIGURATION - %s (size = %d)\n", desc_name_p, size) ;
         if (size > 0)
         {
@@ -803,32 +789,36 @@ static void ProcessGetDescriptorRequest(CyAsDeviceHandle h, uint8_t *data)
     }
     else if (data[3] == CY_CH9_GD_OTHER_SPEED_CONFIGURATION)
     {
-        const char *desc_name_p ;
-        uint16_t size ;
+#ifdef PRINT_DEBUG_INFO
+		const char *desc_name_p = "UNKNOWN" ;
+#endif
+        uint16_t size = 0 ;
 
         /*
         * Return the CONFIGURATION descriptor.
         */
         if (other_p == (CyCh9ConfigurationDesc *)&ConfigHSDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "HighSpeed" ;
+#endif
             size = sizeof(ConfigHSDesc) ;
         }
         else if (other_p == (CyCh9ConfigurationDesc *)&ConfigFSDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "FullSpeed" ;
+#endif
             size = sizeof(ConfigFSDesc) ;
         }
         else if (other_p == &ZeroDesc)
         {
+#ifdef PRINT_DEBUG_INFO
             desc_name_p = "ZeroDesc" ;
+#endif
             size = sizeof(ZeroDesc) ;
         }
-        else
-        {
-            desc_name_p = "UNKNOWN" ;
-            size = 0 ;
-        }
+
         CyAsHalPrintMessage("**** CY_CH9_GD_OTHER_SPEED_CONFIGURATION - %s (size = %d)\n", desc_name_p, size) ;
         if (size > 0)
         {
@@ -882,8 +872,7 @@ ProcessSetupPacketRequest(CyAsDeviceHandle h, uint8_t *data)
 {
     CyAsReturnStatus_t ret ;
     uint16_t reqlen = data[6] | (data[7] << 8) ;
-
-    RestoreReplyArea() ;
+    (void)ret;
 
     if ((data[0] & CY_CH9_SETUP_TYPE_MASK) == CY_CH9_SETUP_STANDARD_REQUEST)
     {
@@ -1162,7 +1151,6 @@ int CyAsSymbianStorageTest(const char *pgm, CyAsDeviceHandle h, CyAsHalDeviceTag
 {
     CyAsReturnStatus_t ret ;
 	uint32_t count = 0 ;
-	char *media_name = "SD";
 
 	g_tag = tag ;
 	memset(g_pAstDevice,0, sizeof(g_AstDevice));
@@ -1187,7 +1175,7 @@ int CyAsSymbianStorageTest(const char *pgm, CyAsDeviceHandle h, CyAsHalDeviceTag
 	ret = CyAsStorageQueryMedia(h, CyAsMediaSDFlash, &count, 0, 0) ;
 	if (ret != CY_AS_ERROR_SUCCESS)
 	{
-	  CyAsHalPrintMessage("%s: Cannot query %s device count - Reason code %d\n", pgm, media_name, ret) ;
+	  CyAsHalPrintMessage("%s: Cannot query SD device count - Reason code %d\n", pgm, ret) ;
 	  return 0 ;
 	}
 	CyAsHalPrintMessage("%d %s device(s) found\n", count, media_name) ;
@@ -1196,7 +1184,7 @@ int CyAsSymbianStorageTest(const char *pgm, CyAsDeviceHandle h, CyAsHalDeviceTag
 	ret = CyAsStorageClaim(h, CyAsBus_1, 0, 0, 0) ;
 	if (ret != CY_AS_ERROR_SUCCESS)
 	{
-	  CyAsHalPrintMessage("%s: Cannot claim %s media - Reason code %d\n", pgm, media_name, ret) ;
+	  CyAsHalPrintMessage("%s: Cannot claim SD media - Reason code %d\n", pgm, ret) ;
 	  return 0;
 	}
 
@@ -1206,7 +1194,7 @@ int CyAsSymbianStorageTest(const char *pgm, CyAsDeviceHandle h, CyAsHalDeviceTag
 	ret = CyAsStorageQueryDevice(h, &(g_pAstDevice->dev_data), 0, 0) ;
 	if (ret != CY_AS_ERROR_SUCCESS)
 	{
-	  CyAsHalPrintMessage("%s: Cannot query %s device - Reason code %d\n", pgm, media_name, ret) ;
+	  CyAsHalPrintMessage("%s: Cannot query SD device - Reason code %d\n", pgm, ret) ;
 	  return 0 ;
 	}
 	CyAsHalPrintMessage("blocksize %d, %d units found\n",
@@ -1219,7 +1207,7 @@ int CyAsSymbianStorageTest(const char *pgm, CyAsDeviceHandle h, CyAsHalDeviceTag
 	ret = CyAsStorageQueryUnit(h, &(g_pAstDevice->unit_data), 0, 0) ;
 	if (ret != CY_AS_ERROR_SUCCESS)
 	{
-	  CyAsHalPrintMessage("%s: Cannot query %s device unit - Reason code %d\n", pgm, media_name, ret) ;
+	  CyAsHalPrintMessage("%s: Cannot query SD device unit - Reason code %d\n", pgm, ret) ;
 	  return 0 ;
 	}
 	CyAsHalPrintMessage("blocksize %d, %d Block(s) found\n",

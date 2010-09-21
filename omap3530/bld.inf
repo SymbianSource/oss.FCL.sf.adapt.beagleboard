@@ -19,11 +19,12 @@
 #include "beagle_drivers/keytran/bld.inf"
 #include "beagle_drivers/lcd/bld.inf"
 #include "beagle_drivers/led/bld.inf"
-//nxz
+//West Bridge astoria drivers
 #include "beagle_drivers/wb/bld.inf"
-//skkm
+//West Bridge astoria drivers
 #include "beagle_drivers/medwb/bld.inf"
 // #include "beagle_drivers/prm/bld.inf"
+#include "beagle_drivers/medstaticrd/bld.inf"
 #include "beagle_drivers/serialmouse/bld.inf"
 #include "beagle_drivers/usbv/bld.inf"
 #include "omap3530_drivers/gpio/bld.inf"
