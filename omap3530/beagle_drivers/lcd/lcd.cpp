@@ -17,7 +17,8 @@
 // This file is part of the Beagle Base port
 // N.B. This sample code assumes that the display supports setting the backlight on or off, 
 // as well as adjusting the contrast and the brightness.
-//
+////
+
 
 #include <videodriver.h>
 #include <platform.h>
@@ -39,6 +40,7 @@
 #define DISPC_CONFIG				0x48050444
 #define DISPC_DEFAULT_COLOR0		0x4805044c
 #define DISPC_TRANS_COLOR0			0x48050454
+#define DISPC_LINE_STATUS			0x4805045C
 
 #define DISPC_TIMING_H				0x48050464
 #define DISPC_TIMING_V				0x48050468
@@ -59,11 +61,37 @@
 #define DISPC_GFX_WINDOW_SKIP		0x480504b4
 #define DISPC_GFX_TABLE_BA			0x480504b8
 
+#define VENC_F_CONTROL				0x48050C08
 #define DISPC_CONTROL				0x48050440
 
 #define GET_REGISTER(Reg)		*( (TUint *) Omap3530HwBase::TVirtual<Reg>::Value )
 #define SET_REGISTER(Reg,Val)	*( (TUint *) Omap3530HwBase::TVirtual<Reg>::Value ) = Val
 
+#define GPIO3_OE					0x49052034
+#define GPIO3_CLEARDATAOUT			0x49052090
+#define GPIO3_SETDATAOUT			0x49052094
+#define CONTROL_PADCONF_DSS_DATA18	0x48002100
+#define CONTROL_PADCONF_DSS_DATA20	0x48002104
+#define CONTROL_PADCONF_DSS_DATA22	0x48002108
+
+//const TUint32 SPICLK=0x01000000,SPISDAO=0x02000000,SPISDAI=0x04000000,SPICS0=0x08000000,SPIRESET=0x10000000;
+
+
+#define GPIO5_OE					0x49056034
+#define GPIO5_CLEARDATAOUT			0x49056090
+#define GPIO5_SETDATAOUT			0x49056094
+#define GPIO5_DATADRAIN				0x49056038
+#define CONTROL_PADCONF_MMC2_CLK	0x48002158
+#define CONTROL_PADCONF_MMC2_DAT0	0x4800215C
+#define CONTROL_PADCONF_MMC2_DAT2	0x48002160
+#define CONTROL_PADCONF_MMC2_DAT4	0x48002164
+
+#define KEXTENSION KALWAYS 
+
+//const TUint32 SPICLK=0x00000004,SPISDAO=0x00000008,SPISDAI=0x00000010,SPICS0=0x00000040/*GPIO134*/,SPIRESET=0x00000080;
+const TUint32 SPICS0=0x00000040/*GPIO134*/,SPICLK=0x01000000,SPISDAO=0x02000000,
+			SPISDAI=0x04000000,SPIRESET=0x20000000;
+/**
 #define _MODE_1280x1024_
 //#define _MODE_1024x768_
 
@@ -115,7 +143,19 @@
 #	define V_SYNC_POL	1
 #	define INTERLACE_ENABLE	0
 #endif
-
+*/
+#	define PIXEL_CLK	25000	//this value is just the RGB's clk
+#	define H_DISP		480
+#	define H_FPORCH	20
+#	define H_SYNC		20
+#	define H_BPORCH	20
+#	define H_SYNC_POL	1
+#	define V_DISP		800
+#	define V_FPORCH	500
+#	define V_SYNC		250
+#	define V_BPORCH	500
+#	define V_SYNC_POL	1
+#	define INTERLACE_ENABLE	0
 
 
 // TO DO: (mandatory)
@@ -139,16 +179,18 @@ const TInt KConfigLcdMaxDisplayBrightness	= 255;
 // TO DO: (mandatory)
 // define the physical screen dimensions
 // This is only example code... you need to modify it for your hardware
-const TUint	KConfigLcdWidth					= 360;//640;		// 640 pixels per line
-const TUint	KConfigLcdHeight				= 640;//480;		// 480 lines per panel
-
+//const TUint	KConfigLcdWidth					= 480;//360;//640;		// 640 pixels per line
+//const TUint	KConfigLcdHeight				= 800;//640;//480;		// 480 lines per panel
+const TUint	KConfigLcdWidth					= 360;//360;//640;		// 640 pixels per line
+const TUint	KConfigLcdHeight				= 640;//640;//480;		// 480 lines per panel
 // TO DO: (mandatory)
 // define the characteristics of the LCD display
 // This is only example code... you need to modify it for your hardware
 const TBool	KConfigLcdIsMono				= EFalse;
-const TBool	KConfigLcdPixelOrderLandscape	= ETrue;
+const TBool	KConfigLcdPixelOrderLandscape	= EFalse;//ETrue;
 const TBool	KConfigLcdPixelOrderRGB			= ETrue;
-const TInt	KConfigLcdMaxDisplayColors		= 16777216;//65536;	//24bit: 16777216;
+//const TInt	KConfigLcdMaxDisplayColors		= 262144;//16777216;//65536;	//24bit: 16777216;
+const TInt	KConfigLcdMaxDisplayColors		= 16777216;//262144;//16777216;//65536;	//24bit: 16777216;
 
 
 // TO DO: (mandatory)
@@ -156,8 +198,8 @@ const TInt	KConfigLcdMaxDisplayColors		= 16777216;//65536;	//24bit: 16777216;
 // A TWIP is a 20th of a point.  A point is a 72nd of an inch
 // Therefore a TWIP is a 1440th of an inch
 // This is only example code... you need to modify it for your hardware
-const TInt	KConfigLcdWidthInTwips			= 2670;		// = 6.69 inches	//15*1440;
-const TInt	KConfigLcdHeightInTwips			= 3550;		//5616;		// = 5.11 inches	//12*1440;
+const TInt	KConfigLcdWidthInTwips			= 2670;//2670;		// = 6.69 inches	//15*1440;
+const TInt	KConfigLcdHeightInTwips			= 3550;//3550;		//5616;		// = 5.11 inches	//12*1440;
 
 // TO DO: (mandatory)
 // define the available display modes
@@ -178,10 +220,15 @@ static const SLcdConfig Lcd_Mode_Config[KConfigLcdNumberOfDisplayModes]=
 		{
 		0,								// iMode
 		0,								// iOffsetToFirstVideoBuffer
+//		FRAME_BUFFER_SIZE(16/*32*//*16*/, KConfigLcdWidth, KConfigLcdHeight),	// iLenghtOfVideoBufferInBytes
+//		KConfigLcdWidth*2/*4*/,//2,				// iOffsetBetweenLines
+//		EFalse,							// iIsPalettized
+//		16/*32,*///16								// iBitsPerPixel
 		FRAME_BUFFER_SIZE(32/*16*/, KConfigLcdWidth, KConfigLcdHeight),	// iLenghtOfVideoBufferInBytes
 		KConfigLcdWidth*4,//2,				// iOffsetBetweenLines
 		EFalse,							// iIsPalettized
 		32,//16								// iBitsPerPixel
+
 		}
 	};	
 
@@ -257,6 +304,7 @@ private:
 	DPlatChunkHw* iSecureChunk;
 	TBool iWsSwitchOnScreen;
  	TBool iSecureDisplay;
+//	TDfcQue* iDfcQ;
 	TMessageQue iMsgQ;
 	TDfc iPowerUpDfc;
 	TDfc iPowerDownDfc;	
@@ -269,6 +317,7 @@ private:
 
 	TVideoInfoV01 iSecureVideoInfo;
 	NFastMutex iLock;				// protects against being preempted whilst manipulating iVideoInfo/iSecureVideoInfo
+//	TPhysAddr ivRamPhys;
 	TPhysAddr iSecurevRamPhys;
 	
 	TBool iBacklightOn;
@@ -321,6 +370,481 @@ void power_down_dfc(TAny* aPtr)
 	((DLcdPowerHandler*)aPtr)->PowerDownDfc();
 	}
 
+void Wait_(void)	//Wait_() nearly =1ms
+{
+	Kern::NanoWait(7000000);
+//	Kern::NanoWait(10000000);
+//	Kern::NanoWait(10000000);
+//	Kern::NanoWait(10000000);
+	
+}
+void Wait_1(void)
+{
+	Kern::NanoWait(700000);
+}
+void Wait(int ms)
+{
+	for(int i=0;i<ms;i++)
+		Wait_();
+}
+void Wait2(int ms)
+{
+	for(int i=0;i<ms;i++)
+		Wait_();
+}
+void Wait3(int ms)
+{
+	for(int i=0;i<ms;i++)
+		Wait_1();
+}
+
+
+/**
+set the mux mode to GPIO, used to simulate GPIO function
+SCL--GPIO88,--output
+SDO--GPIO89,--output
+SDI--GPIO90--input
+CSa--GPIO91--output
+CSb--GPIO92--output
+RESET--GPIO93--output
+CS0--GPIO134--output, LCD's chip select
+*/
+void SET_GPIOTOSPI(void)
+{
+	TUint32 l=0x00;
+	TInt8	n=0x01,n1=0x04;
+	TInt8	muxmode=0x04;//set mode4(GPIO)
+//	l=GET_REGISTER(CONTROL_PADCONF_MMC2_CLK)&0xFFF8FFF8|muxmode|muxmode<<16;	//set as GPIO130.131
+//	SET_REGISTER(CONTROL_PADCONF_MMC2_CLK,l);
+	l=GET_REGISTER(CONTROL_PADCONF_MMC2_DAT0)&0xFFFFFFF8|muxmode;	//set as GPIO132
+	SET_REGISTER(CONTROL_PADCONF_MMC2_DAT0,l);
+	l=GET_REGISTER(CONTROL_PADCONF_MMC2_DAT2)&0xFFFFFFF8|muxmode;	//set as GPIO134.135
+	SET_REGISTER(CONTROL_PADCONF_MMC2_DAT2,l);
+	
+	l=GET_REGISTER(GPIO5_OE)&0xFFFFFF23|n<<4|n<<5;//set GPIO130.131.134.135 as output, 132 as input
+	SET_REGISTER(GPIO5_OE,l);
+
+	l=GET_REGISTER(CONTROL_PADCONF_DSS_DATA18)&0xFFF8FFF8|muxmode|muxmode<<16;	//set as GPIO88,89
+	SET_REGISTER(CONTROL_PADCONF_DSS_DATA18,l);
+	l=GET_REGISTER(CONTROL_PADCONF_DSS_DATA20)&0xFFF8FFF8|muxmode|muxmode<<16;	//set as GPIO90,91
+	SET_REGISTER(CONTROL_PADCONF_DSS_DATA20,l);
+	l=GET_REGISTER(CONTROL_PADCONF_DSS_DATA22)&0xFFFFFFF8|muxmode|muxmode<<16;	//set as GPIO92,93
+	SET_REGISTER(CONTROL_PADCONF_DSS_DATA22,l);
+	
+	l=GET_REGISTER(GPIO3_OE)&0xC0FFFFFF|n1<<24;//SPI's input and output
+	SET_REGISTER(GPIO3_OE,l);
+	
+/////////set the init state
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);//
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);//
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPICLK);// 
+	Wait3(1);
+}
+void SCLRISING(void)	//create a rising edge
+{
+	SET_REGISTER(GPIO3_SETDATAOUT,SPICLK);		
+	Wait3(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPICLK);
+	//Wait(10);
+	
+}
+
+/**
+Write_Reg_NT35582() is the function used to initialize LCD with the SPI, it follows the instruction 
+from NT35582 spec page.21
+*/
+void Write_Reg_NT35582(TUint8 highcmd, TUint8 lowcmd, TUint8 lowpara)
+{
+	int i=0;
+	//Write 1st command
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	//Wait(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set R/W=0
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set D/CX=0
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set H/L=1
+	Wait3(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait3(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		if(highcmd>>i&1)
+			{
+			SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		else
+			{
+			SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		}
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait3(1);
+	//Write 2nd command
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	//Wait(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set R/W=0
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set D/CX=0
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set H/L=0
+	Wait3(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait3(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		if(lowcmd>>i&1)
+			{
+			SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		else
+			{
+			SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		}
+	
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait3(1);
+	//Write parameter
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	//Wait(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set R/W=0
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set D/CX=1
+	Wait3(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set H/L=0
+	Wait3(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait3(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		if(lowpara>>i&1)
+			{
+			SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		else
+			{
+			SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set bit=1
+			Wait3(1);
+			SCLRISING();
+			}
+		}
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait3(1);
+
+
+
+	
+}
+void Read_Reg_NT35582(TUint8 highcmd, TUint8 lowcmd)
+{
+	int i=0;
+	TUint8 lowpara=0;
+	//Write 1st command
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	Wait(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set R/W=0
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set D/CX=0
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set H/L=1
+	Wait(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		if(highcmd>>i&1)
+			{
+			SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set bit=1
+			Wait(1);
+			SCLRISING();
+			}
+		else
+			{
+			SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set bit=1
+			Wait(1);
+			SCLRISING();
+			}
+		}
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait(1);
+	//Write 2nd command
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	Wait(1);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set R/W=0
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set D/CX=0
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set H/L=0
+	Wait(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		if(lowcmd>>i&1)
+			{
+			SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set bit=1
+			Wait(1);
+			SCLRISING();
+			}
+		else
+			{
+			SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set bit=1
+			Wait(1);
+			SCLRISING();
+			}
+		}
+	
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait(1);
+	//Read  parameter
+	SET_REGISTER(GPIO5_CLEARDATAOUT,SPICS0);	//set cs0 low
+	Wait(1);
+	SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set R/W=1
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_SETDATAOUT,SPISDAO);	//set D/CX=1
+	Wait(1);
+	SCLRISING();
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set H/L=0
+	Wait(1);
+	SCLRISING();
+	for(i=0;i<5;i++)
+		{
+		SET_REGISTER(GPIO3_CLEARDATAOUT,SPISDAO);	//set data=0
+		Wait(1);
+		SCLRISING();
+		}
+	for(i=7;i>=0;i--)
+		{
+		SCLRISING();
+		if(GET_REGISTER(GPIO5_DATADRAIN)&SPISDAI)
+			lowpara|=1<<i;
+		else
+			lowpara|=0<<i;
+		}
+	SET_REGISTER(GPIO5_SETDATAOUT,SPICS0);	//set cs0 high
+	Wait(1);
+	Kern::Printf("Get para from Reg %x %x is %x",highcmd,lowcmd,lowpara);
+
+
+	
+}
+void BYDLCD_INIT(void)
+{
+	Kern::Printf("Start LCD driver IC NT35582 Init");
+	SET_GPIOTOSPI();
+
+	SET_REGISTER(GPIO3_SETDATAOUT,SPIRESET);
+	Wait(100);
+	SET_REGISTER(GPIO3_CLEARDATAOUT,SPIRESET);
+	Wait(100);
+	SET_REGISTER(GPIO3_SETDATAOUT,SPIRESET);
+	Wait(100);
+	
+	for(int i=0;i<1;i++)
+		{
+		Kern::Printf("init");
+	Write_Reg_NT35582(0x01,0x00,0x00);
+	//Wait(100);
+	
+	Write_Reg_NT35582(0xC0,0x00,0x86);
+	Write_Reg_NT35582(0xC0,0x01,0x00);
+	Write_Reg_NT35582(0xC0,0x02,0x86);
+	Write_Reg_NT35582(0xC0,0x03,0x00);
+
+	Write_Reg_NT35582(0xC1,0x00,0x60);
+
+	Write_Reg_NT35582(0xC2,0x00,0x21);
+	Write_Reg_NT35582(0xC2,0x02,0x70);
+
+	Write_Reg_NT35582(0xB6,0x00,0x10);
+	Write_Reg_NT35582(0xB6,0x02,0x30);
+
+	Write_Reg_NT35582(0xC7,0x00,0x8F);// here change the VCOM voltage
+
+	Write_Reg_NT35582(0x36,0x00,0x41);
+	Write_Reg_NT35582(0x3A,0x00,0x66);
+
+	Write_Reg_NT35582(0xE0,0x00,0x0E);
+	Write_Reg_NT35582(0xE0,0x01,0x14);
+	Write_Reg_NT35582(0xE0,0x02,0x29);
+	Write_Reg_NT35582(0xE0,0x03,0x3A);
+	Write_Reg_NT35582(0xE0,0x04,0x1D);
+	Write_Reg_NT35582(0xE0,0x05,0x30);
+	Write_Reg_NT35582(0xE0,0x06,0x61);
+	Write_Reg_NT35582(0xE0,0x07,0x3D);
+	Write_Reg_NT35582(0xE0,0x08,0x22);
+	Write_Reg_NT35582(0xE0,0x09,0x2A);
+	Write_Reg_NT35582(0xE0,0x0A,0x87);
+	Write_Reg_NT35582(0xE0,0x0B,0x16);
+	Write_Reg_NT35582(0xE0,0x0C,0x3B);
+	Write_Reg_NT35582(0xE0,0x0D,0x4C);
+	Write_Reg_NT35582(0xE0,0x0E,0x78);
+	Write_Reg_NT35582(0xE0,0x0F,0x96);
+	Write_Reg_NT35582(0xE0,0x10,0x4A);
+	Write_Reg_NT35582(0xE0,0x11,0x4D);
+
+	Write_Reg_NT35582(0xE1,0x00,0x0E);
+	Write_Reg_NT35582(0xE1,0x01,0x14);
+	Write_Reg_NT35582(0xE1,0x02,0x29);
+	Write_Reg_NT35582(0xE1,0x03,0x3A);
+	Write_Reg_NT35582(0xE1,0x04,0x1D);
+	Write_Reg_NT35582(0xE1,0x05,0x30);
+	Write_Reg_NT35582(0xE1,0x06,0x61);
+	Write_Reg_NT35582(0xE1,0x07,0x3F);
+	Write_Reg_NT35582(0xE1,0x08,0x20);
+	Write_Reg_NT35582(0xE1,0x09,0x26);
+	Write_Reg_NT35582(0xE1,0x0A,0x83);
+	Write_Reg_NT35582(0xE1,0x0B,0x16);
+	Write_Reg_NT35582(0xE1,0x0C,0x3B);
+	Write_Reg_NT35582(0xE1,0x0D,0x4C);
+	Write_Reg_NT35582(0xE1,0x0E,0x78);
+	Write_Reg_NT35582(0xE1,0x0F,0x96);
+	Write_Reg_NT35582(0xE1,0x10,0x4A);
+	Write_Reg_NT35582(0xE1,0x11,0x4D);
+
+	Write_Reg_NT35582(0xE2,0x00,0x0E);
+	Write_Reg_NT35582(0xE2,0x01,0x14);
+	Write_Reg_NT35582(0xE2,0x02,0x29);
+	Write_Reg_NT35582(0xE2,0x03,0x3A);
+	Write_Reg_NT35582(0xE2,0x04,0x1D);
+	Write_Reg_NT35582(0xE2,0x05,0x30);
+	Write_Reg_NT35582(0xE2,0x06,0x61);
+	Write_Reg_NT35582(0xE2,0x07,0x3D);
+	Write_Reg_NT35582(0xE2,0x08,0x22);
+	Write_Reg_NT35582(0xE2,0x09,0x2A);
+	Write_Reg_NT35582(0xE2,0x0A,0x87);
+	Write_Reg_NT35582(0xE2,0x0B,0x16);
+	Write_Reg_NT35582(0xE2,0x0C,0x3B);
+	Write_Reg_NT35582(0xE2,0x0D,0x4C);
+	Write_Reg_NT35582(0xE2,0x0E,0x78);
+	Write_Reg_NT35582(0xE2,0x0F,0x96);
+	Write_Reg_NT35582(0xE2,0x10,0x4A);
+	Write_Reg_NT35582(0xE2,0x11,0x4D);
+
+	Write_Reg_NT35582(0xE3,0x00,0x0E);
+	Write_Reg_NT35582(0xE3,0x01,0x14);
+	Write_Reg_NT35582(0xE3,0x02,0x29);
+	Write_Reg_NT35582(0xE3,0x03,0x3A);
+	Write_Reg_NT35582(0xE3,0x04,0x1D);
+	Write_Reg_NT35582(0xE3,0x05,0x30);
+	Write_Reg_NT35582(0xE3,0x06,0x61);
+	Write_Reg_NT35582(0xE3,0x07,0x3F);
+	Write_Reg_NT35582(0xE3,0x08,0x20);
+	Write_Reg_NT35582(0xE3,0x09,0x26);
+	Write_Reg_NT35582(0xE3,0x0A,0x83);
+	Write_Reg_NT35582(0xE3,0x0B,0x16);
+	Write_Reg_NT35582(0xE3,0x0C,0x3B);
+	Write_Reg_NT35582(0xE3,0x0D,0x4C);
+	Write_Reg_NT35582(0xE3,0x0E,0x78);
+	Write_Reg_NT35582(0xE3,0x0F,0x96);
+	Write_Reg_NT35582(0xE3,0x10,0x4A);
+	Write_Reg_NT35582(0xE3,0x11,0x4D);
+
+	Write_Reg_NT35582(0xE4,0x00,0x0E);
+	Write_Reg_NT35582(0xE4,0x01,0x14);
+	Write_Reg_NT35582(0xE4,0x02,0x29);
+	Write_Reg_NT35582(0xE4,0x03,0x3A);
+	Write_Reg_NT35582(0xE4,0x04,0x1D);
+	Write_Reg_NT35582(0xE4,0x05,0x30);
+	Write_Reg_NT35582(0xE4,0x06,0x61);
+	Write_Reg_NT35582(0xE4,0x07,0x3D);
+	Write_Reg_NT35582(0xE4,0x08,0x22);
+	Write_Reg_NT35582(0xE4,0x09,0x2A);
+	Write_Reg_NT35582(0xE4,0x0A,0x87);
+	Write_Reg_NT35582(0xE4,0x0B,0x16);
+	Write_Reg_NT35582(0xE4,0x0C,0x3B);
+	Write_Reg_NT35582(0xE4,0x0D,0x4C);
+	Write_Reg_NT35582(0xE4,0x0E,0x78);
+	Write_Reg_NT35582(0xE4,0x0F,0x96);
+	Write_Reg_NT35582(0xE4,0x10,0x4A);
+	Write_Reg_NT35582(0xE4,0x11,0x4D);
+	
+	Write_Reg_NT35582(0xE5,0x00,0x0E);
+	Write_Reg_NT35582(0xE5,0x01,0x14);
+	Write_Reg_NT35582(0xE5,0x02,0x29);
+	Write_Reg_NT35582(0xE5,0x03,0x3A);
+	Write_Reg_NT35582(0xE5,0x04,0x1D);
+	Write_Reg_NT35582(0xE5,0x05,0x30);
+	Write_Reg_NT35582(0xE5,0x06,0x61);
+	Write_Reg_NT35582(0xE5,0x07,0x3F);
+	Write_Reg_NT35582(0xE5,0x08,0x20);
+	Write_Reg_NT35582(0xE5,0x09,0x26);
+	Write_Reg_NT35582(0xE5,0x0A,0x83);
+	Write_Reg_NT35582(0xE5,0x0B,0x16);
+	Write_Reg_NT35582(0xE5,0x0C,0x3B);
+	Write_Reg_NT35582(0xE5,0x0D,0x4C);
+	Write_Reg_NT35582(0xE5,0x0E,0x78);
+	Write_Reg_NT35582(0xE5,0x0F,0x96);
+	Write_Reg_NT35582(0xE5,0x10,0x4A);
+	Write_Reg_NT35582(0xE5,0x11,0x4D);
+
+	
+	Write_Reg_NT35582(0x11,0x00,0x00);
+	Wait(150);
+	Write_Reg_NT35582(0x29,0x00,0x00);
+	Wait(100);
+		}
+	//Kern::Printf("SW RESET");
+	//Write_Reg_NT35582a(0x01,0x00,0x00);
+	//Wait(2000);
+
+	//Kern::Printf("SLP Out");
+	//Write_Reg_NT35582a(0x11,0x00,0x00);
+	//Wait(2000);
+	//Kern::Printf("DISPON");
+	//Write_Reg_NT35582a(0x29,0x00,0x00);
+	//Wait(2000);
+	
+	Kern::Printf("END driver IC NT35582 Init");
+	//Wait(2000);
+}
 
 /**
 Default constructor
@@ -344,10 +868,12 @@ Called by factory function at ordinal 0
 */
 TInt DLcdPowerHandler::Create()
 	{
+	BYDLCD_INIT();
+	Wait2(1000);
+
 #ifdef ENABLE_GCE_MODE
 	pLcd = this;
 #endif
-
 	iDfcQ=Kern::DfcQue0();	// use low priority DFC queue for this driver 
 
 	// map the video RAM
@@ -590,6 +1116,9 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	
 	SET_REGISTER( DISPC_DEFAULT_COLOR0, 0xFFFFFFFF );
 	SET_REGISTER( DISPC_TRANS_COLOR0, 0x00000000 );
+	TUint16 LINENUMBER=799;
+	l=LINENUMBER;
+	SET_REGISTER(DISPC_LINE_STATUS, l);
 	
 	TUint8 hbp = H_BPORCH - 1;	// Horizontal Back Porch
 	TUint8 hfp = H_FPORCH - 1;	// Horizontal front porch
@@ -602,11 +1131,11 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	l = hbp<<20 | hfp<<8 | hsw;
 	SET_REGISTER( DISPC_TIMING_H, l );
 	
-	TUint8 vbp = V_BPORCH;		// Vertical back porch
-	TUint8 vfp = V_FPORCH;		// Vertical front porch
+	TUint16 vbp = V_BPORCH;		// Vertical back porch
+	TUint16 vfp = V_FPORCH;		// Vertical front porch
 	TUint8 vsw = V_SYNC;		// Vertical synchronization pulse width
-	__ASSERT_ALWAYS( vbp<=255, Kern::Fault("LCD", 1) );
-	__ASSERT_ALWAYS( vfp<=255, Kern::Fault("LCD", 1) );
+//	__ASSERT_ALWAYS( vbp<=255, Kern::Fault("LCD", 1) );
+//	__ASSERT_ALWAYS( vfp<=255, Kern::Fault("LCD", 1) );
 	__ASSERT_ALWAYS( vsw>=1 && vsw<=255, Kern::Fault("LCD", 1) );
 	l = vbp<<20 | vfp<<8 | vsw;
 	SET_REGISTER( DISPC_TIMING_V, l );
@@ -614,11 +1143,11 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	TUint8 onoff= 0;
 	TUint8 rf	= 0;
 	TUint8 ieo 	= 0;
-	TUint8 ipc	= 1;			// Invert Pixel Clock
-	TUint8 ihs	= H_SYNC_POL ? 0 : 1;	// Invert HSYNC (0: Positive Sync polarity, 1: Negative Sync polarity)
-	TUint8 ivs	= V_SYNC_POL ? 0 : 1;	// Invert VSYNC (0: Positive Sync polarity, 1: Negative Sync polarity)
+	TUint8 ipc	= 0;			// Invert Pixel Clock
+	TUint8 ihs	= H_SYNC_POL ;//? 0 : 1;	// Invert HSYNC (0: Positive Sync polarity, 1: Negative Sync polarity)
+	TUint8 ivs	= V_SYNC_POL ;//? 0 : 1;	// Invert VSYNC (0: Positive Sync polarity, 1: Negative Sync polarity)
 	TUint8 acbi	= 0;
-	TUint16 acb	= 0x28;			// AC-bias pin frequency
+	TUint8 acb	= 0x28;			// AC-bias pin frequency
 	l = onoff<<17 | rf<<16 | ieo<<15 | ipc<<14 | ihs<<13 | ivs<<12 | acbi<<8 | acb;
 	SET_REGISTER( DISPC_POL_FREQ, l );
 	
@@ -656,14 +1185,14 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	
 	TInt8 GFXSELFREFRESH		= 0x0;
 	TInt8 GFXARBITRATION		= 0x0;
-	TInt8 GFXROTATION			= 0x0;
+	TInt8 GFXROTATION			= 0x2;
 	TInt8 GFXFIFOPRELOAD		= 0x0;
 	TInt8 GFXENDIANNESS			= 0x0;
 	TInt8 GFXNIBBLEMODE			= 0x0;
 	TInt8 GFXCHANNELOUT			= 0x0;
 	TInt8 GFXBURSTSIZE			= 0x2;	// 16x32bit bursts
 	TInt8 GFXREPLICATIONENABLE	= 0x0;	// Disable Graphics replication logic
-	TInt8 GFXFORMAT				= 0x8;//0x6;	// RGB16=0x6, RGB24-unpacked=0x8, RGB24-packed=0x9
+	TInt8 GFXFORMAT				= 0x8;//0x6;//0x6;	// RGB16=0x6, RGB24-unpacked=0x8, RGB24-packed=0x9
 	TInt8 GFXENABLE				= 0x1;	// Graphics enabled
 	l = GFXSELFREFRESH<<15 | GFXARBITRATION<<14 | GFXROTATION<<12 | GFXFIFOPRELOAD<<11 | GFXENDIANNESS<<10 | GFXNIBBLEMODE<<9 | GFXCHANNELOUT<8 | GFXBURSTSIZE<<6 | GFXREPLICATIONENABLE<<5 | GFXFORMAT<<1 | GFXENABLE;
 	SET_REGISTER( DISPC_GFX_ATTRIBUTES, l );
@@ -699,7 +1228,7 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	
 	TInt8 SPATIALTEMPORALDITHERINGFRAMES	= 0;
 	TInt8 LCDENABLEPOL			= 0;
-	TInt8 LCDENABLESIGNAL		= 0;
+	TInt8 LCDENABLESIGNAL		= 1;
 	TInt8 PCKFREEENABLE			= 0;
 	TInt8 TDMUNUSEDBITS			= 0;
 	TInt8 TDMCYCLEFORMAT		= 0;
@@ -713,14 +1242,14 @@ void DLcdPowerHandler::PowerUpLcd(TBool aSecure)
 	TInt8 OVERLAYOPTIMIZATION	= 0;
 	TInt8 RFBIMODE				= 0;
 	TInt8 SECURE				= 0;
-	TInt8 TFTDATALINES			= 0x3;
+	TInt8 TFTDATALINES			= 0x2;//0x3;//0x2;
 	TInt8 STDITHERENABLE		= 0;
-	TInt8 GODIGITAL				= 1;
+	TInt8 GODIGITAL				= 0;
 	TInt8 GOLCD					= 1;
 	TInt8 M8B					= 0;
 	TInt8 STNTFT				= 1;
 	TInt8 MONOCOLOR				= 0;
-	TInt8 DIGITALENABLE			= 1;
+	TInt8 DIGITALENABLE			= 0;
 	TInt8 LCDENABLE				= 1;	
 	l = SPATIALTEMPORALDITHERINGFRAMES<<30 | LCDENABLEPOL<<29 | LCDENABLESIGNAL<<28 | PCKFREEENABLE<<27 | 
 		TDMUNUSEDBITS<<25 | TDMCYCLEFORMAT<<23 | TDMPARALLELMODE<<21 | TDMENABLE<<20 | HT<<17 | GPOUT1<<16 | 
@@ -932,6 +1461,7 @@ TInt DLcdPowerHandler::SetDisplayMode(TInt aMode)
 
 	__KTRACE_OPT(KEXTENSION,Kern::Printf("SetDisplayMode = %d", aMode));
 
+	Kern::Printf("SetDisplayMode = %d", aMode);
 	if (aMode < 0 || aMode >= KConfigLcdNumberOfDisplayModes)
 		return KErrArgument;
 
@@ -959,7 +1489,8 @@ TInt DLcdPowerHandler::SetDisplayMode(TInt aMode)
 
 	__KTRACE_OPT(KEXTENSION,Kern::Printf("SetDisplayMode mode = %d, otfp = %d, palettized = %d, bpp = %d, obl = %d",
 		aMode, iVideoInfo.iOffsetToFirstPixel, iVideoInfo.iIsPalettized, iVideoInfo.iBitsPerPixel, iVideoInfo.iOffsetBetweenLines));
-
+	Kern::Printf("SetDisplayMode mode = %d, otfp = %d, palettized = %d, bpp = %d, obl = %d",
+		aMode, iVideoInfo.iOffsetToFirstPixel, iVideoInfo.iIsPalettized, iVideoInfo.iBitsPerPixel, iVideoInfo.iOffsetBetweenLines);
 	return KErrNone;
 	}
 
