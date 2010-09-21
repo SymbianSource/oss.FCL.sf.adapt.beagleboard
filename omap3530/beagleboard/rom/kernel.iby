@@ -43,6 +43,7 @@ extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL             
 //extension[VARID]=	\Epoc32\Release\##KMAIN##\##BUILD##\resman.ldd				\sys\bin\resman.ldd
 
 #include <rom/omapshared/tps65950.iby>
+#include <rom/omap3530/spi.iby>
 
 device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD				\sys\bin\euart.pdd
 device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd

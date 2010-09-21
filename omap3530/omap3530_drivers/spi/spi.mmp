@@ -1,0 +1,75 @@
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// lukasz.forynski@gmail.com
+//
+// Contributors:
+//
+//
+// Description:
+// omap3530/omap3530_drivers/spi/spi.mmp
+//
+
+#include <assp/omap3530_assp/assp.mmh>
+//#include "kernel/kern_ext.mmh" // this is already included from iic_channel.mmh
+// ..and probably it shouldn't be
+
+
+// Select the mode to build
+// For Master-Slave mode, uncomment both MASTER and SLAVE defines
+#define __USE_MASTER_MODE__
+//#define __USE_SLAVE_MODE__
+
+
+//macro STANDALONE_CHANNEL
+//#define STANDALONE_CHANNEL /*Only for iic_channel.mmh to pick up the needed source files*/
+
+// PSL source
+SOURCEPATH       .
+SOURCE           psl_init.cpp
+
+#ifdef __USE_MASTER_MODE__
+macro MASTER_MODE
+SOURCE           master.cpp
+#endif
+
+#ifdef __USE_SLAVE_MODE__
+macro SLAVE_MODE
+SOURCE           slave.cpp
+#endif
+
+
+// PIL source
+#include   "../../../../../os/kernelhwsrv/kernel/eka/drivers/iic/iic_channel.mmh"
+sourcepath ../../../../../os/kernelhwsrv/kernel/eka/drivers/iic/
+source		IIC_PIL_SOURCE
+
+
+TARGET           AsspTarget(spi,dll)
+TARGETTYPE       kext
+LINKAS           spi.dll
+//DEFFILE          ./def/~/spi.def
+NOSTRICTDEF
+
+
+USERINCLUDE      .
+SYSTEMINCLUDE    +\include\assp\omap3530_assp 
+SYSTEMINCLUDE 	 +\include\drivers 
+SYMBIAN_BASE_SYSTEMINCLUDE(assp/omap3530_assp)
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
+
+LIBRARY          AsspTarget(kaomap3530,lib)
+LIBRARY          AsspTarget(prcm,lib)
+LIBRARY          AsspTarget(gpio,lib)
+
+// #ifdef USE_SYMBIAN_PRM?
+//library				resman.lib
+
+EPOCALLOWDLLDATA
+
+CAPABILITY       all
+
+VENDORID         0x70000001

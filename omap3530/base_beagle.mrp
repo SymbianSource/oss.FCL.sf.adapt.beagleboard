@@ -14,6 +14,7 @@ binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\usbv all
 binary	\sf\adaptation\beagleboard\omap3530\kernel all
 binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\gpio all
 binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\i2c all
+# binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\spi all
 binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prcm all
 # binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prm all
 binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\uart all
@@ -35,6 +36,7 @@ exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\usbv
 exports	\sf\adaptation\beagleboard\omap3530\kernel
 exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\gpio
 exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\i2c
+
 exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prcm
 # exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prm
 exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\uart

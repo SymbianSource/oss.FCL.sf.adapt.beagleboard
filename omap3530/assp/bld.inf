@@ -19,14 +19,15 @@ ARMV5
 
 PRJ_EXPORTS
 
-./inc/assp.mmh				assp/omap3530_assp/		//
-./inc/omap3530_assp_priv.h		assp/omap3530_assp/		//
-./inc/omap3530_irqmap.h			assp/omap3530_assp/		//
-./inc/omap3530_hardware_base.h		assp/omap3530_assp/		//
-./inc/omap3530_timer.h			assp/omap3530_assp/		//
-./inc/omap3530_ktrace.h			assp/omap3530_assp/		//
-./inc/omap3530_asspreg.h			assp/omap3530_assp/		//
-./inc/locks.h			assp/omap3530_assp/		//
+./inc/assp.mmh                  assp/omap3530_assp/    //
+./inc/omap3530_assp_priv.h      assp/omap3530_assp/    //
+./inc/omap3530_irqmap.h         assp/omap3530_assp/    //
+./inc/omap3530_hardware_base.h  assp/omap3530_assp/    //
+./inc/omap3530_timer.h          assp/omap3530_assp/    //
+./inc/omap3530_ktrace.h         assp/omap3530_assp/    //
+./inc/omap3530_asspreg.h        assp/omap3530_assp/    //
+./inc/omap3530_scm.h            assp/omap3530_assp/    //
+./inc/locks.h                   assp/omap3530_assp/    //
 
 
 PRJ_MMPFILES
