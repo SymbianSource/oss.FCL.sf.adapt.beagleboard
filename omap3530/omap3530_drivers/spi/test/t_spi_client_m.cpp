@@ -72,6 +72,8 @@ void TestSynchronousOperation()
 	test.Next(_L("TestSynchronousOperation()"));
 
 	test.Next(_L("HalfDuplexSingleWrite()"));
+
+	while(1)
 	TestError(testLdd.HalfDuplexSingleWrite());
 
 	test.Next(_L("HalfDuplexMultipleWrite()"));

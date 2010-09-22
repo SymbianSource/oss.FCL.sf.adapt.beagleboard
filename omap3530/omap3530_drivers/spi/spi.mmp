@@ -41,6 +41,13 @@ macro SLAVE_MODE
 SOURCE           slave.cpp
 #endif
 
+// define one of the below values to switch PIN modes for McSPI3 to match your PCB connections.
+// i.e. McSPI3 can be routed to 3 different pin sets using below defines - if both commented out
+// the default routing is used, which takes McSPI3 out to the extension header (beagleboard).
+// See omap3530_spi.h for more details.
+//macro SPI_MODULE_3_PIN_OPTION_2
+//macro SPI_MODULE_3_PIN_OPTION_3
+
 
 // PIL source
 #include   "../../../../../os/kernelhwsrv/kernel/eka/drivers/iic/iic_channel.mmh"
@@ -51,6 +58,7 @@ source		IIC_PIL_SOURCE
 TARGET           AsspTarget(spi,dll)
 TARGETTYPE       kext
 LINKAS           spi.dll
+
 //DEFFILE          ./def/~/spi.def
 NOSTRICTDEF
 

@@ -21,6 +21,7 @@
 #define __OMAP3530_SPI_H__
 
 #include <assp/omap3530_assp/omap3530_scm.h>
+#include <assp/omap3530_assp/omap3530_gpio.h>
 
 
 #define BIT_MASK(shift,len)       (((1u << (len)) - 1) << (shift))
@@ -325,26 +326,13 @@ const TUint MCSPI_XFERLEVEL_AEL_OFFSET  = 0;  // 5:0 AEL Buffer Almost Empty (th
 //----------------------------------
 // PAD (PIN) configuration for SPI
 //----------------------------------
-
-//#define SPI_CHANNEL_3_PIN_OPTION_2 // TODO - move this to mmp file!
-//#define SPI_CHANNEL_3_PIN_OPTION_3
-
-// flags for CS signal pins - in order to keep them in certain state when SPI is inactive..
-const TUint KCsPinUp = SCM::EPullUdEnable | SCM::EPullTypeSelect; //
-const TUint KCsPinDown = SCM::EPullUdEnable; //
-
-const TUint KCsPinOffHi =  SCM::EOffOutEnable | SCM::EOffOutValue; //
-const TUint KCsPinOffLow = SCM::EOffOutEnable; //
-
-const TUint KCsPinModeUp   = /*KCsPinUp   |*//* KCsPinOffHi |*/ SCM::EInputEnable;
-const TUint KCsPinModeDown = KCsPinDown | KCsPinOffLow;
-
 const TUint KMaxSpiChannelsPerModule = 4; // there are max 4 channels (McSPI 1)
 
 struct TPinConfig
 	{
 	TLinAddr              iAddress;
 	SCM::TLowerHigherWord iMswLsw;
+	TUint8                iPinNumber;
 	TUint16               iFlags;
 	};
 
@@ -358,82 +346,82 @@ struct TSpiPinConfig
 
 const TSpiPinConfig TSpiPinConfigMcSpi1 =
 	{
-	{CONTROL_PADCONF_MCSPI1_CLK,  SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi1_clk
-	{CONTROL_PADCONF_MCSPI1_CLK,  SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi1_simo
-	{CONTROL_PADCONF_MCSPI1_SOMI, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi1_somi
+	{CONTROL_PADCONF_MCSPI1_CLK,  SCM::ELsw, 171, SCM::EMode0 | SCM::EInputEnable}, // mcspi1_clk
+	{CONTROL_PADCONF_MCSPI1_CLK,  SCM::EMsw, 172, SCM::EMode0 | SCM::EInputEnable}, // mcspi1_simo
+	{CONTROL_PADCONF_MCSPI1_SOMI, SCM::ELsw, 173, SCM::EMode0 | SCM::EInputEnable}, // mcspi1_somi
 		{
-		{CONTROL_PADCONF_MCSPI1_SOMI, SCM::EMsw, SCM::EMode1}, // mcspi1_cs0
-		{CONTROL_PADCONF_MCSPI1_CS1,  SCM::ELsw, SCM::EMode1}, // mcspi1_cs1
-		{CONTROL_PADCONF_MCSPI1_CS1,  SCM::EMsw, SCM::EMode1}, // mcspi1_cs2
-		{CONTROL_PADCONF_MCSPI1_CS3,  SCM::ELsw, SCM::EMode1}, // mcspi1_cs3
+		{CONTROL_PADCONF_MCSPI1_SOMI, SCM::EMsw, 174, SCM::EMode0}, // mcspi1_cs0
+		{CONTROL_PADCONF_MCSPI1_CS1,  SCM::ELsw, 175, SCM::EMode0}, // mcspi1_cs1
+		{CONTROL_PADCONF_MCSPI1_CS1,  SCM::EMsw, 176, SCM::EMode0}, // mcspi1_cs2
+		{CONTROL_PADCONF_MCSPI1_CS3,  SCM::ELsw, 177, SCM::EMode0}, // mcspi1_cs3
 		}
 	};
 
 const TSpiPinConfig TSpiPinConfigMcSpi2 =
 	{
-	{CONTROL_PADCONF_MCSPI1_CS3,  SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi2_clk
-	{CONTROL_PADCONF_MCSPI2_SIMO, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi2_simo
-	{CONTROL_PADCONF_MCSPI2_SIMO, SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi2_somi
+	{CONTROL_PADCONF_MCSPI1_CS3,  SCM::EMsw, 178, SCM::EMode0 | SCM::EInputEnable}, // mcspi2_clk
+	{CONTROL_PADCONF_MCSPI2_SIMO, SCM::ELsw, 179, SCM::EMode0 | SCM::EInputEnable}, // mcspi2_simo
+	{CONTROL_PADCONF_MCSPI2_SIMO, SCM::EMsw, 180, SCM::EMode0 | SCM::EInputEnable}, // mcspi2_somi
 		{
-		{CONTROL_PADCONF_MCSPI2_CS0,  SCM::ELsw, SCM::EMode1}, // mcspi2_cs0
-		{CONTROL_PADCONF_MCSPI2_CS0,  SCM::EMsw, SCM::EMode1}, // mcspi2_cs1
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
+		{CONTROL_PADCONF_MCSPI2_CS0, SCM::ELsw, 181, SCM::EMode0}, // mcspi2_cs0
+		{CONTROL_PADCONF_MCSPI2_CS0, SCM::EMsw, 182, SCM::EMode0}, // mcspi2_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
 
 
-#if defined(SPI_CHANNEL_3_PIN_OPTION_2)
+#if defined(SPI_MODULE_3_PIN_OPTION_2)
 const TSpiPinConfig TSpiPinConfigMcSpi3 =
 	{
-	{CONTROL_PADCONF_DSS_DATA18, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
-	{CONTROL_PADCONF_DSS_DATA18, SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
-	{CONTROL_PADCONF_DSS_DATA20, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
+	{CONTROL_PADCONF_DSS_DATA18, SCM::ELsw, 88, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_clk
+	{CONTROL_PADCONF_DSS_DATA18, SCM::EMsw, 89, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_simo
+	{CONTROL_PADCONF_DSS_DATA20, SCM::ELsw, 90, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_somi
 		{
-		{CONTROL_PADCONF_DSS_DATA20, SCM::EMsw, SCM::EMode1}, // mcspi3_cs0
-		{CONTROL_PADCONF_DSS_DATA20, SCM::ELsw, SCM::EMode1}, // mcspi3_cs1
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
+		{CONTROL_PADCONF_DSS_DATA20, SCM::EMsw, 91, SCM::EMode2}, // mcspi3_cs0
+		{CONTROL_PADCONF_DSS_DATA22, SCM::ELsw, 92, SCM::EMode2}, // mcspi3_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
-#elif defined(SPI_CHANNEL_3_PIN_OPTION_3)
+#elif defined(SPI_MODULE_3_PIN_OPTION_3)
 const TSpiPinConfig TSpiPinConfigMcSpi3 =
 	{
-	{CONTROL_PADCONF_ETK_D2, SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
-	{CONTROL_PADCONF_ETK_D0, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
-	{CONTROL_PADCONF_ETK_D0, SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
+	{CONTROL_PADCONF_ETK_D2, SCM::EMsw, 17, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
+	{CONTROL_PADCONF_ETK_D0, SCM::ELsw, 14, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
+	{CONTROL_PADCONF_ETK_D0, SCM::EMsw, 15, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
 		{
-		{CONTROL_PADCONF_ETK_D2, SCM::ELsw, SCM::EMode1}, // mcspi3_cs0
-		{CONTROL_PADCONF_ETK_D6, SCM::EMsw, SCM::EMode1}, // mcspi3_cs1
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
+		{CONTROL_PADCONF_ETK_D2, SCM::ELsw, 16, SCM::EMode1}, // mcspi3_cs0
+		{CONTROL_PADCONF_ETK_D6, SCM::EMsw, 21, SCM::EMode1}, // mcspi3_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
 #else // default option (for beagle- these are pins on the extension header)
 const TSpiPinConfig TSpiPinConfigMcSpi3 =
 	{
-	{CONTROL_PADCONF_MMC2_CLK,  SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
-	{CONTROL_PADCONF_MMC2_CLK,  SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
-	{CONTROL_PADCONF_MMC2_DAT0, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
+	{CONTROL_PADCONF_MMC2_CLK,  SCM::ELsw, 130, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
+	{CONTROL_PADCONF_MMC2_CLK,  SCM::EMsw, 131, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
+	{CONTROL_PADCONF_MMC2_DAT0, SCM::ELsw, 132, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
 		{
-		{CONTROL_PADCONF_MMC2_DAT2, SCM::EMsw, SCM::EMode1}, // mcspi3_cs0
-		{CONTROL_PADCONF_MMC2_DAT2, SCM::ELsw, SCM::EMode1}, // mcspi3_cs1
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
+		{CONTROL_PADCONF_MMC2_DAT2, SCM::EMsw, 135, SCM::EMode1}, // mcspi3_cs0
+		{CONTROL_PADCONF_MMC2_DAT2, SCM::ELsw, 134, SCM::EMode1}, // mcspi3_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
 #endif
 
 const TSpiPinConfig TSpiPinConfigMcSpi4 =
 	{
-	{CONTROL_PADCONF_MCBSP1_CLKR, SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_clk
-	{CONTROL_PADCONF_MCBSP1_DX,   SCM::ELsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_simo
-	{CONTROL_PADCONF_MCBSP1_DX,   SCM::EMsw, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_somi
+	{CONTROL_PADCONF_MCBSP1_CLKR, SCM::ELsw, 156, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_clk
+	{CONTROL_PADCONF_MCBSP1_DX,   SCM::ELsw, 158, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_simo
+	{CONTROL_PADCONF_MCBSP1_DX,   SCM::EMsw, 159, SCM::EMode1 | SCM::EInputEnable}, // mcspi4_somi
 		{
-		{CONTROL_PADCONF_MCBSP_CLKS, SCM::EMsw, SCM::EMode1}, // mcspi3_cs0
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
-		{0, SCM::ELsw, 0}, // not supported
+		{CONTROL_PADCONF_MCBSP_CLKS, SCM::EMsw, 161, SCM::EMode1}, // mcspi3_cs0
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
 

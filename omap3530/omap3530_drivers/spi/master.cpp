@@ -50,6 +50,7 @@ DSpiMasterBeagle::DSpiMasterBeagle(TInt aChannelNumber, TBusType aBusType, TChan
 	iIrqId = KMcSpiIrqId[iChannelNumber];
 	iHwBase = KMcSpiRegBase[iChannelNumber];
 	iState = EIdle;
+	iCurrSS = -1;
 	DBGPRINT(Kern::Printf("DSpiMasterBeagle::DSpiMasterBeagle: at 0x%x, iChannelNumber = %d", this, iChannelNumber));
 	}
 
@@ -184,7 +185,7 @@ TBool DSpiMasterBeagle::TransConfigDiffersFromPrev()
 		iCurrHeader = newHeader; //copy the header..
 		return ETrue;
 		}
-	return ETrue;
+	return EFalse;
 	}
 
 // Init the hardware with the data provided in the transaction and slave-address field
@@ -193,7 +194,7 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 	{
 	DBGPRINT(Kern::Printf("ConfigureInterface()"));
 
-	// soft reset the SPI..(Channel 3 for now)
+	// soft reset the SPI..
 	TUint val = AsspRegister::Read32(iHwBase + MCSPI_SYSCONFIG);
 	val = MCSPI_SYSCONFIG_SOFTRESET;  // issue reset
 
@@ -261,9 +262,20 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 	// CS (SS) pin direction..
 	val = MCSPI_SYST_SPIDATDIR0;
 
-	// drive csx pin hight or low
-	val |= (iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)? 1 << iCurrSS : 0;
-	AsspRegister::Write32(iHwBase + MCSPI_SYST, val);
+	// drive csx pin high or low
+//	val |= (iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)? 1 << iCurrSS : 0;
+//	AsspRegister::Modify32(iHwBase + MCSPI_SYST, val);
+
+	if(iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)
+		{
+		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 1u << iCurrSS, MCSPI_SYST_SPIDATDIR0);
+		}
+	else
+		{
+		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 0, (1u << iCurrSS) | MCSPI_SYST_SPIDATDIR0);
+		}
+
+
 
 	// Set the MS bit to 0 to provide the clock (ie. to setup as master)
 #ifndef SINGLE_MODE
@@ -455,17 +467,17 @@ TInt DSpiMasterBeagle::DoTransfer(TUint8 aType)
 			AsspRegister::Write32(iHwBase + MCSPI_CHxCTRL(iCurrSS), MCSPI_CHxCTRL_EN);
 
 			AsspRegister::Modify32(iHwBase + MCSPI_IRQSTATUS, 0,
-								   MCSPI_IRQ_TX_EMPTY(iCurrSS) /*| MCSPI_IRQ_TX_UNDERFLOW(iCurrSS)*/);
+			                       MCSPI_IRQ_TX_EMPTY(iCurrSS) /*| MCSPI_IRQ_TX_UNDERFLOW(iCurrSS)*/);
 
 			AsspRegister::Modify32(iHwBase + MCSPI_IRQENABLE, 0,
-								   MCSPI_IRQ_TX_EMPTY(iCurrSS) /*| MCSPI_IRQ_TX_UNDERFLOW(iCurrSS)*/);
+			                       MCSPI_IRQ_TX_EMPTY(iCurrSS) /*| MCSPI_IRQ_TX_UNDERFLOW(iCurrSS)*/);
 
 #ifdef SINGLE_MODE
 			// in SINGLE mode needs to manually assert CS line for current
 			AsspRegister::Modify32(iHwBase + MCSPI_CHxCONF(iCurrSS), 0, MCSPI_CHxCONF_FORCE);
 
 			// change the pad config - now the SPI drives the line appropriately..
-			SetCsActive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode);
+			SetCsActive(iChannelNumber, iCurrSS);
 #endif /*SINGLE_MODE*/
 
 #ifdef USE_TX_FIFO
@@ -526,7 +538,7 @@ TInt DSpiMasterBeagle::DoTransfer(TUint8 aType)
 				AsspRegister::Modify32(iHwBase + MCSPI_CHxCONF(iCurrSS), 0, MCSPI_CHxCONF_FORCE);
 
 				// change the pad config - now the SPI drives the line appropriately..
-				SetCsActive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode);
+				SetCsActive(iChannelNumber, iCurrSS);
 #endif /*SINGLE_MODE*/
 				}
 			else
