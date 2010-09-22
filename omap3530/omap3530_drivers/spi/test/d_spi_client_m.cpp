@@ -331,7 +331,7 @@ TInt DSpiClientChannel::HalfDuplexSingleWrite()
 	TPckgBuf<TConfigSpiV01> header(KHeader);
 
 	// create transfer object
-	const TInt KBuffLength = 10; // tTODO temp ..
+	const TInt KBuffLength = 64;
 	TBuf8<KBuffLength> txTransferBuf; // txbuffer..
 
 	// fill it with some data..(this will also set the length of the buffer)
@@ -347,10 +347,6 @@ TInt DSpiClientChannel::HalfDuplexSingleWrite()
 	TIicBusTransaction transaction(&header, &txTransfer);
 
 	// queue the transaction synchronously
-	r = IicBus::QueueTransaction(busId, &transaction);
-
-	// TODO - temporary added here..
-	SET_SLAVE_ADDR(busId, 1);
 	r = IicBus::QueueTransaction(busId, &transaction);
 
 	LOG_FUNCTION_RETURN;
