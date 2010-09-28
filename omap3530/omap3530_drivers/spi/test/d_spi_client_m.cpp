@@ -14,6 +14,8 @@
 //
 // This test driver is a simple example IIC SPI client implementation - and a test to SPI implementation.
 // It is an LDD but PDD or kernel extension can implement / use the IIC SPI bus exactly the same way.
+// There is a lot of code duplication in this test code, but this is in order to provide clear and separate implementation
+// for each of these use cases, which can serve as example usecases that should be easy to adopt for the real purpose.
 //
 
 // Note: IMPORTANT! -If you intend to make changes to the driver!
@@ -95,7 +97,9 @@ void DSpiClientTestFactory::GetCaps(TDes8& aDes) const
 TInt DSpiClientTestFactory::Create(DLogicalChannelBase*& aChannel)
 	{
 	if (iOpenChannels >= KMaxNumChannels)
+		{
 		return KErrOverflow;
+		}
 
 	aChannel = new DSpiClientChannel;
 	return aChannel ? KErrNone : KErrNoMemory;
@@ -232,7 +236,7 @@ TInt DSpiClientChannel::DoRequest(TInt aId, TRequestStatus* aStatus, TAny* a1, T
 					aId, aStatus, a1, a2));
 
 	// TODO: There are unimplemented functions - returning KErrNotSupported - treat this as a 'sort of'
-	// of test-driven development.. Ideally - they should all be implemented..
+	// test-driven development.. Ideally - they should all be implemented..
 	TInt r = KErrNone;
 	switch (aId)
 		{
@@ -367,7 +371,7 @@ TInt DSpiClientChannel::HalfDuplexMultipleWrite()
 
 	TUint32 busId = 0;
 	SET_BUS_TYPE(busId, DIicBusChannel::ESpi);
-	SET_CHAN_NUM(busId, 2);   // THis is the ModuleNumber, i.e. McSPIx (minus one), e.g. 2 for McSPI3
+	SET_CHAN_NUM(busId, 3);   // THis is the ModuleNumber, i.e. McSPIx (minus one), e.g. 2 for McSPI3
 	SET_SLAVE_ADDR(busId, 0); // THis is the ChannelNumber (Slave number of the above McSPIx)
 
 	// create header

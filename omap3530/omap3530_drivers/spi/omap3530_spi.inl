@@ -20,23 +20,28 @@
 // This sets the CS line to inactive mode (Specify aActiveMode as appropriate for configuration)
 // The CS pin will be put back to the opposite mode - using GPIO.. THis is in order to always keep
 // the CS line in an 'inactive' state (de-asserted) when the SPI is disabled.
-inline void SetCsInactive(TInt aModule, TInt aChannel, TSpiSsPinMode aActiveMode)
+inline void SetCsInactive(TInt aModule, TInt aChannel, TSpiSsPinMode aActiveMode, TUint aPinSetId = 0)
 	{
-	//__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG( aModule != 2 ? !aPinSetId : ETrue, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // only channel 3 supports other pin configurations
+
 	// set the pin to the opposite to the currently active CS mode..
 	const TPinConfig& csConf = ModulePinConfig[aModule].iCs[aChannel];
-	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // don't try to use non-existing CS!
 
 	// now switch the pin mode..(making sure it is at the proper level before that)
 	GPIO::SetOutputState(csConf.iPinNumber, aActiveMode == ESpiCSPinActiveLow ? GPIO::EHigh : GPIO::ELow);
 	SCM::SetPadConfig(csConf.iAddress, csConf.iMswLsw, SCM::EMode4); // always go to mode 4 (gpio)
 	}
 
-void SetCsActive(TInt aModule, TInt aChannel)
+
+inline void SetCsActive(TInt aModule, TInt aChannel, TUint aPinSetId = 0)
 	{
-	//__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
-	const TPinConfig &csConf = ModulePinConfig[aModule].iCs[aChannel];
-	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG( aModule != 2 ? !aPinSetId : ETrue, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // only channel 3 supports other pin configurations
+
+	const TPinConfig &csConf = ModulePinConfig[aModule + aPinSetId].iCs[aChannel];
+	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // don't try to use non-existing CS!
 
 	// now switch the pin mode back to the SPI
 	SCM::SetPadConfig(csConf.iAddress, csConf.iMswLsw, csConf.iFlags | SCM::EInputEnable); // revert to intended mode
@@ -44,10 +49,13 @@ void SetCsActive(TInt aModule, TInt aChannel)
 
 
 // Setup pad function for SPI pins..
-void SetupSpiPins(TUint aSpiModule)
+inline void SetupSpiPins(TUint aModule, TUint aPinSetId = 0)
 	{
-	//__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
-	const TSpiPinConfig& pinCnf = ModulePinConfig[aSpiModule];
+	__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG(aModule != 2 ? !aPinSetId : ETrue, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // only channel 3 supports other pin configurations
+
+	const TSpiPinConfig& pinCnf = ModulePinConfig[aModule + aPinSetId];
+
 	SCM::SetPadConfig(pinCnf.iClk.iAddress, pinCnf.iClk.iMswLsw, pinCnf.iClk.iFlags);
 	SCM::SetPadConfig(pinCnf.iSimo.iAddress, pinCnf.iSimo.iMswLsw, pinCnf.iSimo.iFlags);
 	SCM::SetPadConfig(pinCnf.iSomi.iAddress, pinCnf.iSomi.iMswLsw, pinCnf.iSomi.iFlags);
@@ -57,12 +65,13 @@ void SetupSpiPins(TUint aSpiModule)
 		{
 		if(pinCnf.iCs[i].iPinNumber)
 			{
+			// pre-set the GPIO..
 			GPIO::SetPinDirection(pinCnf.iCs[i].iPinNumber, GPIO::EOutput);
 			GPIO::SetPinMode(pinCnf.iCs[i].iPinNumber, GPIO::EEnabled);
 			}
 		else
 			{
-			break;
+			break; // no more channels (cs signals)
 			}
 		}
 	}

@@ -23,11 +23,9 @@
 #include <assp/omap3530_assp/omap3530_scm.h>
 #include <assp/omap3530_assp/omap3530_gpio.h>
 
-
 #define BIT_MASK(shift,len)       (((1u << (len)) - 1) << (shift))
 #define GET_BITS(w,shift,len)     (((w) >> (shift)) & ((1 << (len)) - 1))
 #define SET_BITS(w,set,shift,len) ((w) &= ~BIT_MASK(shift, len), (w) |= ((set) << (shift)))
-
 
 // Device Instance Summary
 const TUint MCSPI1_phys = 0x48098000; // 4Kbytes
@@ -49,7 +47,6 @@ const TUint KMcSpiRegBase[] =
 	Omap3530HwBase::TVirtual<MCSPI4_phys>::Value  //McSPI module 4
 	};
 
-
 //.. and IRQ lines for SPI channels
 const TUint KMcSpiIrqId[] =
 	{
@@ -59,14 +56,16 @@ const TUint KMcSpiIrqId[] =
 	EOmap3530_IRQ48_SPI4_IRQ  //McSPI module 4
 	};
 
-// available channels per module (i.e. number of 'slave select'  inputs/outpus per module)
-const TUint KMcSpiNumChannels[] =
+// available channels per module i.e. number of 'slave select'  inputs/outpus signals / addresses
+// per module.
+const TUint KMcSpiNumSupportedSlaves[] =
 	{
-	4, // channels 0 - 3
-	2, // channels 0 - 1
-	2, // channels 0 - 1
-	1  // channel 0  only
+	4, // slave address range: 0 - 3
+	2, // slave address range: 0 - 1
+	6, // slave address range: 0 - 5 (0,1: pin option 0; 2,3: pin option 1; 4,5: pin option 2)
+	1  // slave address range: 0 only
 	};
+
 
 //---------------------------------------------------------------
 // MCSPI Registers offsets and bits definitions
@@ -370,35 +369,8 @@ const TSpiPinConfig TSpiPinConfigMcSpi2 =
 		}
 	};
 
-
-#if defined(SPI_MODULE_3_PIN_OPTION_2)
-const TSpiPinConfig TSpiPinConfigMcSpi3 =
-	{
-	{CONTROL_PADCONF_DSS_DATA18, SCM::ELsw, 88, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_clk
-	{CONTROL_PADCONF_DSS_DATA18, SCM::EMsw, 89, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_simo
-	{CONTROL_PADCONF_DSS_DATA20, SCM::ELsw, 90, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_somi
-		{
-		{CONTROL_PADCONF_DSS_DATA20, SCM::EMsw, 91, SCM::EMode2}, // mcspi3_cs0
-		{CONTROL_PADCONF_DSS_DATA22, SCM::ELsw, 92, SCM::EMode2}, // mcspi3_cs1
-		{0, SCM::ELsw, 0, 0}, // not supported
-		{0, SCM::ELsw, 0, 0}, // not supported
-		}
-	};
-#elif defined(SPI_MODULE_3_PIN_OPTION_3)
-const TSpiPinConfig TSpiPinConfigMcSpi3 =
-	{
-	{CONTROL_PADCONF_ETK_D2, SCM::EMsw, 17, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
-	{CONTROL_PADCONF_ETK_D0, SCM::ELsw, 14, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
-	{CONTROL_PADCONF_ETK_D0, SCM::EMsw, 15, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
-		{
-		{CONTROL_PADCONF_ETK_D2, SCM::ELsw, 16, SCM::EMode1}, // mcspi3_cs0
-		{CONTROL_PADCONF_ETK_D6, SCM::EMsw, 21, SCM::EMode1}, // mcspi3_cs1
-		{0, SCM::ELsw, 0, 0}, // not supported
-		{0, SCM::ELsw, 0, 0}, // not supported
-		}
-	};
-#else // default option (for beagle- these are pins on the extension header)
-const TSpiPinConfig TSpiPinConfigMcSpi3 =
+// McSPI3 supports 3 different pin routing settings
+const TSpiPinConfig TSpiPinConfigMcSpi3_0 =
 	{
 	{CONTROL_PADCONF_MMC2_CLK,  SCM::ELsw, 130, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
 	{CONTROL_PADCONF_MMC2_CLK,  SCM::EMsw, 131, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
@@ -410,7 +382,32 @@ const TSpiPinConfig TSpiPinConfigMcSpi3 =
 		{0, SCM::ELsw, 0, 0}, // not supported
 		}
 	};
-#endif
+
+const TSpiPinConfig TSpiPinConfigMcSpi3_1 =
+	{
+	{CONTROL_PADCONF_DSS_DATA18, SCM::ELsw, 88, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_clk
+	{CONTROL_PADCONF_DSS_DATA18, SCM::EMsw, 89, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_simo
+	{CONTROL_PADCONF_DSS_DATA20, SCM::ELsw, 90, SCM::EMode2 | SCM::EInputEnable}, // mcspi3_somi
+		{
+		{CONTROL_PADCONF_DSS_DATA20, SCM::EMsw, 91, SCM::EMode2}, // mcspi3_cs0
+		{CONTROL_PADCONF_DSS_DATA22, SCM::ELsw, 92, SCM::EMode2}, // mcspi3_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
+		}
+	};
+
+const TSpiPinConfig TSpiPinConfigMcSpi3_2 =
+	{
+	{CONTROL_PADCONF_ETK_D2, SCM::EMsw, 17, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_clk
+	{CONTROL_PADCONF_ETK_D0, SCM::ELsw, 14, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_simo
+	{CONTROL_PADCONF_ETK_D0, SCM::EMsw, 15, SCM::EMode1 | SCM::EInputEnable}, // mcspi3_somi
+		{
+		{CONTROL_PADCONF_ETK_D2, SCM::ELsw, 16, SCM::EMode1}, // mcspi3_cs0
+		{CONTROL_PADCONF_ETK_D6, SCM::EMsw, 21, SCM::EMode1}, // mcspi3_cs1
+		{0, SCM::ELsw, 0, 0}, // not supported
+		{0, SCM::ELsw, 0, 0}, // not supported
+		}
+	};
 
 const TSpiPinConfig TSpiPinConfigMcSpi4 =
 	{
@@ -429,10 +426,14 @@ const TSpiPinConfig ModulePinConfig[] =
 	{
 	TSpiPinConfigMcSpi1,
 	TSpiPinConfigMcSpi2,
-	TSpiPinConfigMcSpi3,
-	TSpiPinConfigMcSpi4
+	TSpiPinConfigMcSpi3_0, // (default mode for McSPI3 - SPI addresses: 0 and 1)
+	TSpiPinConfigMcSpi4,
+	TSpiPinConfigMcSpi3_1, // other pin mode for McSPI3.. (spi addresses: 2 and 3)
+	TSpiPinConfigMcSpi3_2  // other pin mode for McSPI3.. (spi addresses: 4 and 5)
 	};
 
+
 #include "omap3530_spi.inl"
+
 
 #endif /* __OMAP3530_SPI_H__ */

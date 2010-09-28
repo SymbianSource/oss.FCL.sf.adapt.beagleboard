@@ -18,7 +18,8 @@ PRJ_PLATFORMS
 ARMV5
 
 PRJ_EXPORTS
-spi.iby  rom/omap3530/
+spi.iby         rom/omap3530/
+
 
 PRJ_MMPFILES
 spi

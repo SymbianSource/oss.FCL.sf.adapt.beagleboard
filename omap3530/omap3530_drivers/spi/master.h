@@ -41,8 +41,8 @@ private:
 	virtual TInt HandleSlaveTimeout();
 
 	// Internal methods
+	TInt PrepareConfiguration();
 	TInt ConfigureInterface();
-	TBool TransConfigDiffersFromPrev();
 	TInt ProcessNextTransfers();
 	TInt StartTransfer(TIicBusTransfer* aTransferPtr, TUint8 aType);
 	TInt DoTransfer(TUint8 aType);
@@ -88,6 +88,7 @@ private:
 
 	TConfigSpiV01 iCurrHeader;
 	TInt iCurrSS;
+	TInt iCurrSlavePinSet;
 	};
 
 #endif //__OMAP3530_SPI_MASTER_H__

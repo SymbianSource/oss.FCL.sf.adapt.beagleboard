@@ -47,18 +47,17 @@ DSpiMasterBeagle::DSpiMasterBeagle(TInt aChannelNumber, TBusType aBusType, TChan
 	iTransferEndDfc(TransferEndDfc, this, KIicPslDfcPriority)
 	{
 	iChannelNumber = aChannelNumber;
-	iIrqId = KMcSpiIrqId[iChannelNumber];
+	iIrqId  = KMcSpiIrqId[iChannelNumber];
 	iHwBase = KMcSpiRegBase[iChannelNumber];
-	iState = EIdle;
-	iCurrSS = -1;
+	iState  = EIdle;
+	iCurrSS = -1; // make sure channel will be fully configured on the first use
 	DBGPRINT(Kern::Printf("DSpiMasterBeagle::DSpiMasterBeagle: at 0x%x, iChannelNumber = %d", this, iChannelNumber));
 	}
 
 TInt DSpiMasterBeagle::DoCreate()
 	{
-	DBGPRINT(Kern::Printf("\nDSpiMasterBeagle::DoCreate() ch: %d \n", iChannelNumber));
+	DBGPRINT(Kern::Printf("\nDSpiMasterBeagle::DoCreate() McSPI%d \n", iChannelNumber+1));
 	DBGPRINT(Kern::Printf("HW revision is %x", AsspRegister::Read32(iHwBase + MCSPI_REVISION)));
-
 	TInt r = KErrNone;
 
 	// Create the DFCQ to be used by the channel
@@ -99,8 +98,8 @@ TInt DSpiMasterBeagle::DoCreate()
 	Prcm::SetClockState( Prcm::EClkMcSpi3_I, Prcm::EClkOn );
 	// TODO:consider auto-idle for PRCM.CM_AUTOIDLE1_CORE
 
+	// setup default spi pins. For channel 2 (McSPI3) it can be configured dynamically
 	SetupSpiPins(iChannelNumber);
-	// end of system wide settings..
 
 	return r;
 	}
@@ -148,44 +147,50 @@ TInt DSpiMasterBeagle::DoRequest(TIicBusTransaction* aTransaction)
 	iCurrTransaction = aTransaction;
 
 	// Configure the hardware to support the transaction
-	TInt r = KErrNone;
-	if(TransConfigDiffersFromPrev())
+	TInt r = PrepareConfiguration();
+	if(r == KErrNone)
 		{
 		r = ConfigureInterface();
-		if(r != KErrNone)
+		if(r == KErrNone)
 			{
-			return r;
+			// start processing transfers of this transaction.
+			r = ProcessNextTransfers();
 			}
 		}
-
-	// start processing transfers of this transaction.
-	r = ProcessNextTransfers();
 	return r;
 	}
 
-TBool DSpiMasterBeagle::TransConfigDiffersFromPrev()
+TInt DSpiMasterBeagle::PrepareConfiguration()
 	{
 	TConfigSpiV01 &newHeader = (*(TConfigSpiBufV01*) (GetTransactionHeader(iCurrTransaction)))();
 
 	// get the slave address (i.e. known as a 'channel' for the current SPI module)
-	TInt slaveAddr = GET_SLAVE_ADDR(iCurrTransaction->GetBusId());
-	DBGPRINT(Kern::Printf("slaveAddr %x", slaveAddr));
+	TInt busId       = iCurrTransaction->GetBusId();
+	TInt slaveAddr   = GET_SLAVE_ADDR(busId);
+	TInt slavePinSet = 0;
 
-	// compare it to the previous configuration..
-	if(slaveAddr                        != iCurrSS ||
-	   newHeader.iWordWidth             != iCurrHeader.iWordWidth ||
-	   newHeader.iClkSpeedHz            != iCurrHeader.iClkSpeedHz ||
-	   newHeader.iClkMode               != iCurrHeader.iClkMode ||
-	   newHeader.iTimeoutPeriod         != iCurrHeader.iTimeoutPeriod ||
-	   newHeader.iBitOrder              != iCurrHeader.iBitOrder ||
-	   newHeader.iTransactionWaitCycles != iCurrHeader.iTransactionWaitCycles ||
-	   newHeader.iSSPinActiveMode       != iCurrHeader.iSSPinActiveMode)
+	if(slaveAddr >= KMcSpiNumSupportedSlaves[iChannelNumber]) // address is 0-based
 		{
-		iCurrSS = slaveAddr;
-		iCurrHeader = newHeader; //copy the header..
-		return ETrue;
+		DBG_ERR(Kern::Printf("Slave address for McSPI%d should be < %, was: %d !",
+				iChannelNumber + 1, KMcSpiNumSupportedSlaves[iChannelNumber], slaveAddr));
+		return KErrArgument; // Slave address out of range
 		}
-	return EFalse;
+
+	// Slave addresses > 1 for McSPI3 (iChannel2) really means alternative pin settings,
+	// so adjust it in such case. *Pin set indexes are +1 to skip over the pin set for McSPI4
+	// channel in the pin configuration table.
+	if(iChannelNumber == 2 && slaveAddr > 1)
+		{
+		slavePinSet  =  slaveAddr > 3 ?  3 : 2; // slaveAddr: 2-3: pin set 2(1*); 4-5: pin set 3(2*)
+		slaveAddr &= 1; // modulo 2 (i.e. 2 CS for McSPI3)
+		}
+
+	// store configuration parameters
+	iCurrSS          = slaveAddr;
+	iCurrSlavePinSet = slavePinSet;
+	iCurrHeader      = newHeader; //copy the header..
+
+	return KErrNone;
 	}
 
 // Init the hardware with the data provided in the transaction and slave-address field
@@ -193,6 +198,12 @@ TBool DSpiMasterBeagle::TransConfigDiffersFromPrev()
 TInt DSpiMasterBeagle::ConfigureInterface()
 	{
 	DBGPRINT(Kern::Printf("ConfigureInterface()"));
+
+	// make sure pins are set up properly (only for McSPI3)
+	if(iCurrSlavePinSet == 2)
+		{
+		SetupSpiPins(iChannelNumber, iCurrSlavePinSet);
+		}
 
 	// soft reset the SPI..
 	TUint val = AsspRegister::Read32(iHwBase + MCSPI_SYSCONFIG);
@@ -204,9 +215,14 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 	while (!(val & MCSPI_SYSSTATUS_RESETDONE))
 		val = AsspRegister::Read32(iHwBase + MCSPI_SYSSTATUS);
 
-	//AsspRegister::Write32(iHwBase + MCSPI_SYSCONFIG, MCSPI_SYSCONFIG_CLOCKACTIVITY_ALL_ON);
-
-	AsspRegister::Write32(iHwBase + MCSPI_IRQSTATUS, ~0); // clear all interrupts (for now) -- normally only for channel..
+	// disable and clear all interrupts..
+	AsspRegister::Write32(iHwBase + MCSPI_IRQENABLE, 0);
+	AsspRegister::Write32(iHwBase + MCSPI_IRQSTATUS,
+	                      MCSPI_IRQ_RX_FULL(iCurrSS) |
+	                      MCSPI_IRQ_RX_FULL(iCurrSS) |
+	                      MCSPI_IRQ_TX_UNDERFLOW(iCurrSS) |
+	                      MCSPI_IRQ_TX_EMPTY(iCurrSS) |
+	                      MCSPI_IRQ_RX_OVERFLOW);
 
 	// channel configuration
 	//	Set the SPI1.MCSPI_CHxCONF[18] IS bit to 0 for the spi1_somi pin in receive mode.
@@ -259,23 +275,18 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 	// update the register..
 	AsspRegister::Write32(iHwBase + MCSPI_CHxCONF(iCurrSS), val);
 
-	// CS (SS) pin direction..
+	// set spim_somi pin direction to input
 	val = MCSPI_SYST_SPIDATDIR0;
 
-	// drive csx pin high or low
-//	val |= (iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)? 1 << iCurrSS : 0;
-//	AsspRegister::Modify32(iHwBase + MCSPI_SYST, val);
-
+	// drive csx pin to inactive state
 	if(iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)
 		{
-		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 1u << iCurrSS, MCSPI_SYST_SPIDATDIR0);
+		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 1u << iCurrSS, 0);
 		}
 	else
 		{
-		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 0, (1u << iCurrSS) | MCSPI_SYST_SPIDATDIR0);
+		AsspRegister::Modify32(iHwBase + MCSPI_SYST, 0, (1u << iCurrSS));
 		}
-
-
 
 	// Set the MS bit to 0 to provide the clock (ie. to setup as master)
 #ifndef SINGLE_MODE
@@ -477,7 +488,7 @@ TInt DSpiMasterBeagle::DoTransfer(TUint8 aType)
 			AsspRegister::Modify32(iHwBase + MCSPI_CHxCONF(iCurrSS), 0, MCSPI_CHxCONF_FORCE);
 
 			// change the pad config - now the SPI drives the line appropriately..
-			SetCsActive(iChannelNumber, iCurrSS);
+			SetCsActive(iChannelNumber, iCurrSS, iCurrSlavePinSet);
 #endif /*SINGLE_MODE*/
 
 #ifdef USE_TX_FIFO
@@ -538,7 +549,7 @@ TInt DSpiMasterBeagle::DoTransfer(TUint8 aType)
 				AsspRegister::Modify32(iHwBase + MCSPI_CHxCONF(iCurrSS), 0, MCSPI_CHxCONF_FORCE);
 
 				// change the pad config - now the SPI drives the line appropriately..
-				SetCsActive(iChannelNumber, iCurrSS);
+				SetCsActive(iChannelNumber, iCurrSS, iCurrSlavePinSet);
 #endif /*SINGLE_MODE*/
 				}
 			else
@@ -761,28 +772,12 @@ void DSpiMasterBeagle::TransferEndDfc(TAny* aPtr)
 		               Kern::Fault("SPI master: exiting not having received all?", 12));
 		}
 
-	// make sure the CS pin is asserted..
-	if(a->iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)
-		{
-		AsspRegister::Modify32(a->iHwBase + MCSPI_SYST, 0, 1 << a->iCurrSS);
-		}
-	else
-		{
-		AsspRegister::Modify32(a->iHwBase + MCSPI_SYST, 1 << a->iCurrSS, 0);
-		}
-
 #ifdef SINGLE_MODE
 	// manually de-assert CS line for this channel
 	AsspRegister::Modify32(a->iHwBase + MCSPI_CHxCONF(a->iCurrSS), MCSPI_CHxCONF_FORCE, 0);
 
-	// drive csx pin high or low. Doing this here causes, that CS lines are toggled for each transfers.
-	TUint val = (a->iCurrHeader.iSSPinActiveMode == ESpiCSPinActiveLow)? 1 << a->iCurrSS : 0;
-	if (val)
-		{
-		AsspRegister::Modify32(a->iHwBase + MCSPI_SYST, 0, val);
-		}
 	// put the CS signal to 'inactive' state (as on channel disable it would have a glitch)
-	SetCsInactive(a->iChannelNumber, a->iCurrSS, a->iCurrHeader.iSSPinActiveMode);
+	SetCsInactive(a->iChannelNumber, a->iCurrSS, a->iCurrHeader.iSSPinActiveMode, a->iCurrSlavePinSet);
 
 #endif
 
@@ -807,14 +802,18 @@ void DSpiMasterBeagle::ExitComplete(TInt aErr, TBool aComplete /*= ETrue*/)
 	DBGPRINT(Kern::Printf("DSpiMasterBeagle::ExitComplete, aErr %d, aComplete %d", aErr, aComplete));
 
 	// make sure CS is in inactive state (for the current / last transaction) on error
-	if(!aComplete)
-		{
-		SetCsInactive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode);
-		}
+	// TODO: add extendable transaction support (..i.e. with no de-assertion of CS pin between such transactions)
+	SetCsInactive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode, iCurrSlavePinSet);
 
-	// disable this channel (and reset..)
+	// disable this channel
 	AsspRegister::Modify32(iHwBase + MCSPI_CHxCTRL(iCurrSS), MCSPI_CHxCTRL_EN, 0);
-	AsspRegister::Write32(iHwBase + MCSPI_SYSCONFIG, MCSPI_SYSCONFIG_SOFTRESET);
+
+	// in the case of error - make sure to reset the channel
+	if(aErr != KErrNone)
+		{
+		AsspRegister::Write32(iHwBase + MCSPI_SYSCONFIG, MCSPI_SYSCONFIG_SOFTRESET);
+		iCurrSS = -1; // make sure the interface will be re-configured at next transaction
+		}
 
 	// Disable interrupts for the channel
 	Interrupt::Disable(iIrqId);

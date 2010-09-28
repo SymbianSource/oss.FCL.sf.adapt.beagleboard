@@ -19,7 +19,8 @@
 #ifndef __OMAP3530_SPI_PSL_H__
 #define __OMAP3530_SPI_PSL_H__
 
-const TInt KIicPslNumOfChannels = 1; // Number of channels supported // TODO only one for now..
+const TInt KIicPslNumOfChannels = 2; // Number of channels supported // TODO only two 3 and 4 for now..
+// FIXME - there is a crash when using channels 1 and 2 - when accesing registers at e.g. 0xc609a000
 
 struct TIicOperationType
     {

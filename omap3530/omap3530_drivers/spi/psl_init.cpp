@@ -50,8 +50,8 @@ DECLARE_STANDARD_EXTENSION()
 		// The first argument repesents the PSL-assigned channel number
 		// The second argument, DIicBusChannel::ESpi, should be replaced with the relevant bus type for the PSL
 //		chan = DSpiMasterBeagle::New(i, DIicBusChannel::ESpi, DIicBusChannel::EFullDuplex);
-		if((TInt)KIicPslNumOfChannels == 1)// TODO: hack - only for the time being - enable channel 3
-			chan = DSpiMasterBeagle::New(2, DIicBusChannel::ESpi, DIicBusChannel::EFullDuplex);
+		if((TInt)KIicPslNumOfChannels == 2)// TODO: hack - only for the time being - enable channel 3
+			chan = DSpiMasterBeagle::New(i+2, DIicBusChannel::ESpi, DIicBusChannel::EFullDuplex);
 		else
 			{
 			Kern::Printf("remove hack from here: %s,line %d", __FILE__, __LINE__);
