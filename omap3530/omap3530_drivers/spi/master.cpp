@@ -185,9 +185,15 @@ TInt DSpiMasterBeagle::PrepareConfiguration()
 		slaveAddr &= 1; // modulo 2 (i.e. 2 CS for McSPI3)
 		}
 
+	// reconfigure pins if needed..
+	if(slavePinSet != iCurrSlavePinSet)
+		{
+		iCurrSlavePinSet = slavePinSet;
+		SetupSpiPins(iChannelNumber, iCurrSlavePinSet);
+		}
+
 	// store configuration parameters
 	iCurrSS          = slaveAddr;
-	iCurrSlavePinSet = slavePinSet;
 	iCurrHeader      = newHeader; //copy the header..
 
 	return KErrNone;
@@ -198,12 +204,6 @@ TInt DSpiMasterBeagle::PrepareConfiguration()
 TInt DSpiMasterBeagle::ConfigureInterface()
 	{
 	DBGPRINT(Kern::Printf("ConfigureInterface()"));
-
-	// make sure pins are set up properly (only for McSPI3)
-	if(iCurrSlavePinSet == 2)
-		{
-		SetupSpiPins(iChannelNumber, iCurrSlavePinSet);
-		}
 
 	// soft reset the SPI..
 	TUint val = AsspRegister::Read32(iHwBase + MCSPI_SYSCONFIG);
@@ -272,6 +272,8 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 //	val |= MCSPI_CHxCONF_FFER; // fifo enable for receive.. (TODO)
 #endif
 
+	val |= (iCurrHeader.iTransactionWaitCycles & 3) << MCSPI_CHxCONF_TCS_SHIFT;
+
 	// update the register..
 	AsspRegister::Write32(iHwBase + MCSPI_CHxCONF(iCurrSS), val);
 
@@ -291,6 +293,8 @@ TInt DSpiMasterBeagle::ConfigureInterface()
 	// Set the MS bit to 0 to provide the clock (ie. to setup as master)
 #ifndef SINGLE_MODE
 	AsspRegister::Write32(iHwBase + MCSPI_MODULCTRL, MCSPI_MODULCTRL_MS_MASTER);
+	// change the pad config - now the SPI drives the line appropriately..
+	SetCsActive(iChannelNumber, iCurrSS, iCurrSlavePinSet);
 #else
 	AsspRegister::Write32(iHwBase + MCSPI_MODULCTRL, MCSPI_MODULCTRL_MS_MASTER | MCSPI_MODULCTRL_SINGLE);
 #endif
@@ -801,16 +805,17 @@ void DSpiMasterBeagle::ExitComplete(TInt aErr, TBool aComplete /*= ETrue*/)
 	{
 	DBGPRINT(Kern::Printf("DSpiMasterBeagle::ExitComplete, aErr %d, aComplete %d", aErr, aComplete));
 
-	// make sure CS is in inactive state (for the current / last transaction) on error
-	// TODO: add extendable transaction support (..i.e. with no de-assertion of CS pin between such transactions)
-	SetCsInactive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode, iCurrSlavePinSet);
-
-	// disable this channel
-	AsspRegister::Modify32(iHwBase + MCSPI_CHxCTRL(iCurrSS), MCSPI_CHxCTRL_EN, 0);
 
 	// in the case of error - make sure to reset the channel
 	if(aErr != KErrNone)
 		{
+		// make sure CS is in inactive state (for the current / last transaction) on error
+		// TODO: add extendable transaction support (..i.e. with no de-assertion of CS pin between such transactions)
+		SetCsInactive(iChannelNumber, iCurrSS, iCurrHeader.iSSPinActiveMode, iCurrSlavePinSet);
+
+		// disable this channel
+		AsspRegister::Modify32(iHwBase + MCSPI_CHxCTRL(iCurrSS), MCSPI_CHxCTRL_EN, 0);
+
 		AsspRegister::Write32(iHwBase + MCSPI_SYSCONFIG, MCSPI_SYSCONFIG_SOFTRESET);
 		iCurrSS = -1; // make sure the interface will be re-configured at next transaction
 		}
@@ -863,7 +868,8 @@ TInt DSpiMasterBeagle::CheckHdr(TDes8* aHdrBuff)
 		// check if word width and clock are supported
 		if(SpiWordWidth(header.iWordWidth) < KMinSpiWordWidth ||
 		   SpiClkValue(header.iClkSpeedHz) < 0 || // == KErrNotSupported
-		   header.iBitOrder == ELsbFirst) // this SPI only transmits MSB fist
+		   header.iBitOrder == ELsbFirst ||  // this SPI only transmits MSB fist
+		   (TUint)header.iTransactionWaitCycles > KMaxTransactionWaitTime) // max 3(+.5) cycles between words
 			{
 #ifdef _DEBUG
 			if(header.iBitOrder == ELsbFirst)
@@ -872,7 +878,11 @@ TInt DSpiMasterBeagle::CheckHdr(TDes8* aHdrBuff)
 				DBG_ERR(Kern::Printf("iClkSpeedHz: %d is not supported", header.iClkSpeedHz));
 			if((SpiWordWidth(header.iWordWidth)+ 1) >> MCSPI_CHxCONF_WL_OFFSET < KMinSpiWordWidth)
 				DBG_ERR(Kern::Printf("iWordWidth: %d is not supported, min value is: %d",
-						              SpiWordWidth(header.iWordWidth), KMinSpiWordWidth));
+						             SpiWordWidth(header.iWordWidth), KMinSpiWordWidth));
+			if((TUint)header.iTransactionWaitCycles > 3)
+				DBG_ERR(Kern::Printf("iTransactionWaitCycles: %d is not supported, value should be from 0 to %d",
+				                     header.iTransactionWaitCycles, KMaxTransactionWaitTime));
+
 			DumpHeader(header);
 #endif
 			r = KErrNotSupported;

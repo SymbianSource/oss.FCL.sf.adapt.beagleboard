@@ -26,7 +26,7 @@ inline void SetCsInactive(TInt aModule, TInt aChannel, TSpiSsPinMode aActiveMode
 	__ASSERT_DEBUG( aModule != 2 ? !aPinSetId : ETrue, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // only channel 3 supports other pin configurations
 
 	// set the pin to the opposite to the currently active CS mode..
-	const TPinConfig& csConf = ModulePinConfig[aModule].iCs[aChannel];
+	const TPinConfig& csConf = ModulePinConfig[aModule + aPinSetId].iCs[aChannel];
 	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // don't try to use non-existing CS!
 
 	// now switch the pin mode..(making sure it is at the proper level before that)

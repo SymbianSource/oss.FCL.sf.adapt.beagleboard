@@ -317,7 +317,7 @@ TInt DSpiClientChannel::HalfDuplexSingleWrite()
 	TUint32 busId = 0;
 	SET_BUS_TYPE(busId, DIicBusChannel::ESpi);
 	SET_CHAN_NUM(busId, 2);   // THis is the ModuleNumber, i.e. McSPIx (minus one), e.g. 2 for McSPI3
-	SET_SLAVE_ADDR(busId, 0); // THis is the ChannelNumber (Slave number of the above McSPIx)
+	SET_SLAVE_ADDR(busId, 2); // THis is the ChannelNumber (Slave number of the above McSPIx)
 
 	// create header
 	const TConfigSpiV01 KHeader =
@@ -499,14 +499,14 @@ TInt DSpiClientChannel::HalfDuplexMultipleRead()
 	// create header
 	const TConfigSpiV01 KHeader =
 		{
-		ESpiWordWidth_8, //iWordWidth
-		1500000, //iClkSpeed 3MHz (could use SpiFreqHz(32))
-		ESpiPolarityLowRisingEdge, //iClkMode
-		500, // iTimeoutPeriod
-		EBigEndian, // iEndianness
-		EMsbFirst, //iBitOrder
-		0, //iTransactionWaitCycles
-		ESpiCSPinActiveLow //iCsPinActiveMode
+		ESpiWordWidth_8,           // iWordWidth
+		3000000,                   // iClkSpeed 3MHz
+		ESpiPolarityLowRisingEdge, // iClkMode
+		500,                       // iTimeoutPeriod
+		EBigEndian,                // iEndianness
+		EMsbFirst,                 // iBitOrder
+		0,                         // iTransactionWaitCycles
+		ESpiCSPinActiveLow         // iCsPinActiveMode
 		};
 
 	TPckgBuf<TConfigSpiV01> header(KHeader);

@@ -209,6 +209,8 @@ const TUint MCSPI_CHxCONF_TCS_0_5 = 0 << 25; // 0x0: 0.5 clock cycle
 const TUint MCSPI_CHxCONF_TCS_1_5 = 1 << 25; // 0x1: 1.5 clock cycles
 const TUint MCSPI_CHxCONF_TCS_2_5 = 2 << 25; // 0x2: 2.5 clock cycles
 const TUint MCSPI_CHxCONF_TCS_3_5 = 3 << 25; // 0x3: 3.5 clock cycles
+const TUint MCSPI_CHxCONF_TCS_SHIFT = 25;
+const TUint KMaxTransactionWaitTime = 3;
 
 const TUint MCSPI_CHxCONF_SBPOL = 1 << 24; // Start bit polarity (0: spi word is command, 1: spi word is data)
 const TUint MCSPI_CHxCONF_SBE   = 1 << 23; // Start bit enable - 0x1: Start bit D/CX added before transfer.
