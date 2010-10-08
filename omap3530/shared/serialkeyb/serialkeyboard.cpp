@@ -323,7 +323,7 @@ private:
 	static void UartIsr( TAny* aParam );
 	static void AddKeyDfc( TAny* aParam );
 	void AddKey( TUint aKey );
-	
+
 
 private:
 	enum TState
@@ -377,8 +377,6 @@ TInt TSerialKeyboard::Create()
 			return r;
  			}
 
-		Kern::Printf("+TSerialKeyboard::Create bound to interrupt" );
-
 #ifdef USE_SYMBIAN_PRM
 		// Ask power resource manager to turn on clocks to the UART
 		// (this could take some time but we're not in any hurry)
@@ -407,7 +405,7 @@ TInt TSerialKeyboard::Create()
 void TSerialKeyboard::UartIsr( TAny* aParam )
 	{
 	TSerialKeyboard* self = reinterpret_cast<TSerialKeyboard*>( aParam );
-	
+
 	const TUint iir = Omap3530Uart::IIR::iMem.Read( self->iUart );
 
 	if ( 0 == (iir bitand Omap3530Uart::IIR::IT_PENDING::KMask) )
@@ -419,7 +417,7 @@ void TSerialKeyboard::UartIsr( TAny* aParam )
 		if ( (pending bitand Omap3530Uart::IIR::IT_TYPE::ERHR) || (pending bitand Omap3530Uart::IIR::IT_TYPE::ERxLineStatus) )
 			{
 			TUint byte = self->iUart.Read();
-			
+
 			if( KMagicCrashValue == byte )
 				{
 				Kern::Fault( "SERKEY-FORCED", 0 );
@@ -467,7 +465,7 @@ void TSerialKeyboard::AddKeyDfc( TAny* aParam )
 	case EEscaping2:
 		{
 		TInt index = self->iKey - KEscapeBase;
-		
+
 		if ( (index >= 0) && (index < KEscapeCount) )
 			{
 			self->AddKey( KEscapedScanCode[ index ] );
@@ -498,13 +496,13 @@ void TSerialKeyboard::AddKey( TUint aKey )
 
 	TRawEvent e;
 
-	
+
 	if ( func )
 		{
 		e.Set( TRawEvent::EKeyDown, EStdKeyRightFunc, 0 );
 		Kern::AddEvent( e );
 		}
-	
+
 	if ( ctrl )
 		{
 		e.Set( TRawEvent::EKeyDown, EStdKeyRightCtrl, 0 );

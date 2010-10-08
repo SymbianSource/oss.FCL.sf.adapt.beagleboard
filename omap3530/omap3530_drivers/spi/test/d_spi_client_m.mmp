@@ -1,0 +1,49 @@
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// lukasz.forynski@gmail.com
+//
+// Contributors:
+//
+//
+// Description:
+// omap3530_drivers/spi/test/d_spi_client_m.mmp
+//
+
+#define __USING_ASSP_REGISTER_API__
+#define __USING_ASSP_INTERRUPT_API__
+
+#include <beagle/variant.mmh>
+#include <kernel/kern_ext.mmh>
+
+// link against the IIC controller library..
+library       iic.lib
+
+target        VariantTarget(d_spi_client_m,ldd)
+romtarget     d_spi_client_m.ldd
+
+// for testing only (for local loop-back detection) - link agains GPIO..
+library       AsspTarget(gpio,lib)
+
+targettype     ldd
+sourcepath     ./
+source         d_spi_client_m.cpp
+
+OS_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE    +\include\assp\omap3530_assp
+SYSTEMINCLUDE 	 +\include\drivers
+SYMBIAN_BASE_SYSTEMINCLUDE(assp/omap3530_assp)
+SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
+SYMBIAN_BASE_SYSTEMINCLUDE(kernel)
+
+
+uid		0x100000af
+vendorid 0x70000001
+
+capability		all
+epocallowdlldata
+
+SMPSAFE
