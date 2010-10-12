@@ -50,7 +50,7 @@ device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
 #ifdef TSHELL_SERIAL
 //Use VT100 Over Serial
 #define EDISP_DRV	\EDISP_VT100.DLL
-#else
+#else // not TSHELL_SERIAL
 	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_lcd.dll				\sys\bin\lcd.dll
 #ifdef SERIALMOUSE
 #ifdef BASE_ROM
@@ -58,8 +58,10 @@ device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
 #else
 	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL		\sys\bin\eserialmouse.dll
 #endif
-#else
+#else // not SERIALMOUSE
+#ifndef EXCLUDE_SERIALKEYBOARD
 	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
+#endif
 #endif
 #endif
 
