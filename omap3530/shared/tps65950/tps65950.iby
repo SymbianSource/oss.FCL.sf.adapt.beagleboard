@@ -13,13 +13,5 @@
 // Description:
 //
 
-
-#ifdef BASE_TEXT_SHELL_BUILD
-
+ 
 extension[0x09080001]=    \Epoc32\Release\ARMV5\##BUILD##\tps65950.dll 			\sys\bin\tps65950.dll
-
-#else
-
-extension[VARID]=\epoc32\release\ARMV5\UDEB\tps65950.dll				\sys\bin\tps65950.dll
-
-#endif
