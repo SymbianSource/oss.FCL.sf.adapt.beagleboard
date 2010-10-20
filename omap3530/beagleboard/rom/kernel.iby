@@ -69,6 +69,12 @@ file[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL				\sy
 extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\ELOCD.LDD							\sys\bin\elocd.ldd
 extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDINT.PDD				\sys\bin\medint.pdd
 
+// Persistent storage
+extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_medstaticrd.pdd	    	\sys\bin\medstaticrd.pdd
+
+// Estart
+data=               	\epoc32\rom\beagle\estart.txt					    \sys\data\estart.txt
+
 // Uncommnet to include West Bridge Astoria Symbian Storage driver 
 //extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD				\sys\bin\medwb.pdd
 device[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\PIPELIB.LDD							\sys\bin\pipelib.ldd
