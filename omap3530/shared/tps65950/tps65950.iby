@@ -13,5 +13,15 @@
 // Description:
 //
 
- 
+
+#ifdef BASE_TEXT_SHELL_BUILD
+
+// This line is used for lernelhwsrvkernel\eka\rom.pl - it does not work for "buildrom" or iMaker
 extension[0x09080001]=    \Epoc32\Release\ARMV5\##BUILD##\tps65950.dll 			\sys\bin\tps65950.dll
+
+#else
+
+// This line is used for buildrom and iMaker.
+extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\tps65950.dll				\sys\bin\tps65950.dll
+
+#endif
