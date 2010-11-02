@@ -21,12 +21,18 @@
 
 // controller specific constants..
 const TUint KMaxNumPoints = 3;
+
+
+const TInt KNumColumns = 0x4; // TODO update these values..
+const TInt KNumRows = 0x4;
+
+
 typedef void (*TVoidCallback) (TAny*);
 
 
 // spi specific constants..
-const TUint KSpiPacketLength = 4;
-const TUint KStartByte = 0x56 << 1;
+const TUint KMaxPacketLength = 16;
+const TUint KStartByte = 0x80;
 const TUint KWrite     = 0;
 const TUint KRead      = 1;
 const TUint KReadCommand  = KStartByte | KRead;
@@ -61,15 +67,19 @@ class TTouchControllerInterface
 public:
 	inline TTouchControllerInterface();
 	inline TInt Read(TUint8 aRegAddress, TUint8& aValue);
+	inline TInt ReadMultiple(TUint8 aStartAddress, TInt aNumBytes);
 	inline TInt Write(TUint8 aRegAddress, TUint8 aValue);
-	inline TInt Write(TUint8 aRegAddress, TUint8* aValues, TInt aNumOfItems);
+	inline TInt WriteMultiple(TUint8 aStartAddress, TInt aNumBytes);
+	inline TDes& ReadBuff();
+	inline TDes& WriteBuff();
 
 
 private:
+	TInt iCurrentReadStart;
 	// SPI duplex transaction with two transfers for each direction
 	TPckgBuf<TConfigSpiV01> iSpiTransactionHeader;
-	TBuf8<KSpiPacketLength> iSpiWriteBuffer;
-	TBuf8<KSpiPacketLength> iSpiReadBuffer;
+	TBuf8<KMaxPacketLength> iSpiWriteBuffer;
+	TBuf8<KMaxPacketLength> iSpiReadBuffer;
 	TIicBusTransfer         iSpiTxTransfer;
 	TIicBusTransfer         iSpiRxTransfer;
 	TIicBusTransaction      iSpiTransaction;
@@ -81,9 +91,9 @@ class TouchController
 public:
 	enum TTouchMode
 		{
-		ESingle = 0,
-		EMulti,
-		EGesture
+		EModeSingle = 0,
+		EModeMulti,
+		EModeGesture
 		};
 
 	enum TResolution
@@ -109,6 +119,7 @@ public:
 
 	TInt HardReset();
 	TInt SoftReset();
+	TInt Configure(TTouchMode aMode);
 	TInt SetTouchMode(TTouchMode aMode);
 	TInt SetResolution(TResolution aResolution);
 	TInt SetLongerSamplingRate(TUint aRate);

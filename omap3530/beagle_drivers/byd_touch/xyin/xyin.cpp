@@ -284,7 +284,7 @@ TInt DTemplateDigitiser::DoCreate()
 		r = GPIO::SetInterruptTrigger(KDataReadyPin, GPIO::EEdgeRising);
 		if(r == KErrNone)
 			{
-			GPIO::SetDebounceTime(KDataReadyPin, 500);
+			GPIO::SetDebounceTime(KDataReadyPin, 100);
 			SCM::SetPadConfig(CONTROL_PADCONF_MMC2_DAT0, SCM::EMsw, SCM::EMode4 | SCM::EInputEnable); // 133 (mmc2dat1)
 			r = GPIO::SetPinMode(KDataReadyPin, GPIO::EEnabled);
 			}
@@ -297,17 +297,7 @@ TInt DTemplateDigitiser::DoCreate()
 
 		// some of the pre-configuration of the touch controller could be done here..
 		iController.HardReset();
-		iController.SetTouchMode(TouchController::ESingle);
-
-		TPoint winStart, winStop;
-		winStart.iX = 0;
-		winStart.iY = 0;
-		winStop.iX = 0xfff;
-		winStop.iY = 0xfff;
-		iController.EnableWindowMode(winStart, winStop);
-
-		iController.SetNumberOfRows(8);
-		iController.SetNumberOfColumns(8);
+		iController.Configure(TouchController::EModeSingle);
 
 		DigitiserPowerUp();
 		}
@@ -352,10 +342,20 @@ void DTemplateDigitiser::TakeSample()
 	// Read from appropriate hardware register to determine whether digitiser panel is being touched
 	// Set penDown to ETrue if touched or EFalse if not touched.
 	//
+	TPoint points[4];
+	TInt num_points = 0;
+	TInt r = iController.GetMeasurements(points, num_points);
+	Kern::Printf("Num touches: %d", num_points);
+	Kern::Printf("Measurments: (r: %d)", r);
+	for(TInt i = 0; i < num_points; i++)
+		{
+		Kern::Printf("%d: iX: %d, iY: %d",i, points[i].iX, points[i].iY);
+		}
 
-//	DEBUG_PRINT(Kern::Printf("TS: S%d PD%d Sp%d", (TInt)iState, penDown?1:0, iSamplesCount));
-	TInt penDown = iController.NumOfTouches();
-	Kern::Printf("Num touches: %d", penDown);
+	TInt penDown = num_points;
+
+	//	DEBUG_PRINT(Kern::Printf("TS: S%d PD%d Sp%d", (TInt)iState, penDown?1:0, iSamplesCount));
+
 	if (iState==E_HW_PowerUp)
 		{
 		// waiting for pen to go up after switch on due to pen down or through the HAL
@@ -421,15 +421,6 @@ void DTemplateDigitiser::TakeSample()
 	// This is only example code... you need to modify it for your hardware
 	//
 	TPoint aResults;
-
-	TPoint points[4];
-	TInt num_points = 0;
-	TInt r = iController.GetMeasurements(points, num_points);
-	Kern::Printf("Measurments: (r: %d)", r);
-	for(TInt i = 0; i < 4/* num_points*/; i++)
-		{
-		Kern::Printf("%d: iX: %d, iY: %d",i, points[i].iX, points[i].iY);
-		}
 
 	// X axis
 	iX[iSamplesCount] = aResults.iX;
