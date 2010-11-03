@@ -1,49 +1,48 @@
 component  base_beagle
 
-source \sf\adaptation\beagleboard\omap3530
+source omap3530
 
-binary	\sf\adaptation\beagleboard\omap3530\assp all
-binary	\sf\adaptation\beagleboard\omap3530\beagleboard all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\hal all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\keytran all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\lcd all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\led all
-# binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\prm all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\serialmouse all
-binary	\sf\adaptation\beagleboard\omap3530\beagle_drivers\usbv all
-binary	\sf\adaptation\beagleboard\omap3530\kernel all
-binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\gpio all
-binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\i2c all
-binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prcm all
-# binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prm all
-binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\uart all
-binary	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\usbcc all
-binary	\sf\adaptation\beagleboard\omap3530\shared\monitor all
-binary	\sf\adaptation\beagleboard\omap3530\shared\mstick all
-binary	\sf\adaptation\beagleboard\omap3530\shared\serialkeyb all
-binary	\sf\adaptation\beagleboard\omap3530\shared\tps65950 all
+binary	assp all
+binary	beagleboard all
+binary	beagle_drivers\hal all
+binary	beagle_drivers\keytran all
+binary	beagle_drivers\lcd all
+binary	beagle_drivers\led all
+# binary	beagle_drivers\prm all
+binary	beagle_drivers\serialmouse all
+binary	beagle_drivers\usbv all
+binary	kernel all
+binary	omap3530_drivers\gpio all
+binary	omap3530_drivers\i2c all
+binary	omap3530_drivers\prcm all
+# binary	omap3530_drivers\prm all
+binary	omap3530_drivers\uart all
+binary	omap3530_drivers\usbcc all
+binary	shared\monitor all
+binary	shared\mstick all
+binary	shared\serialkeyb all
+binary	shared\tps65950 all
 
-exports	\sf\adaptation\beagleboard\omap3530\assp
-exports	\sf\adaptation\beagleboard\omap3530\beagleboard
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\hal
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\keytran
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\lcd
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\led
-# exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\prm
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\serialmouse
-exports	\sf\adaptation\beagleboard\omap3530\beagle_drivers\usbv
-exports	\sf\adaptation\beagleboard\omap3530\kernel
-exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\gpio
-exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\i2c
-exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prcm
-# exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\prm
-exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\uart
-exports	\sf\adaptation\beagleboard\omap3530\omap3530_drivers\usbcc
-exports	\sf\adaptation\beagleboard\omap3530\shared\monitor
-exports	\sf\adaptation\beagleboard\omap3530\shared\mstick
-exports	\sf\adaptation\beagleboard\omap3530\shared\serialkeyb
-exports	\sf\adaptation\beagleboard\omap3530\shared\tps65950
+exports	assp
+exports	beagleboard
+exports	beagle_drivers\hal
+exports	beagle_drivers\keytran
+exports	beagle_drivers\lcd
+exports	beagle_drivers\led
+# exports	beagle_drivers\prm
+exports	beagle_drivers\serialmouse
+exports	beagle_drivers\usbv
+exports	kernel
+exports	omap3530_drivers\gpio
+exports	omap3530_drivers\i2c
+exports	omap3530_drivers\prcm
+# exports	omap3530_drivers\prm
+exports	omap3530_drivers\uart
+exports	omap3530_drivers\usbcc
+exports	shared\monitor
+exports	shared\mstick
+exports	shared\serialkeyb
+exports	shared\tps65950
 
-notes_source	\sf\adaptation\beagleboard\omap3530\release.src
-
+notes_source	release.src
 
