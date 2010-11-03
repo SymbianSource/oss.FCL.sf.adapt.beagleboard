@@ -17,7 +17,8 @@
 // check that "rom -v=beagle -i=armv5" still builds                 *
 //
 
-
+#ifndef __BASE_BEAGLE_IBY__
+#define __BASE_BEAGLE_IBY__
 
 #ifdef _FULL_DEBUG
 #ifndef _DEBUG
@@ -108,19 +109,23 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 // Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
 	device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\display.ldd			\sys\bin\display0.ldd
+#ifndef EXCLUDE_SERIALKEYBOARD
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard_uisoftkeys.dll	\sys\bin\ekeyb.dll
+#endif
 #else
 #ifdef TSHELL_SERIAL
 //Use VT100 Over Serial
 #define EDISP_DRV	\EDISP_VT100.DLL
-#else
+#else // not TSHELL_SERIAL
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd.dll				\sys\bin\lcd.dll
 #ifdef TSHELL_SERIALMOUSE
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_serialmouse.DLL	\sys\bin\eserialmouse.dll
 #else
+#ifndef EXCLUDE_SERIALKEYBOARD
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
-#endif
-#endif
+#endif // EXCLUDE_SERIALKEYBOARD
+#endif // TSHELL_SERIALMOUSE
+#endif // TSHELL_SERIAL
 #endif //SYMBIAN_BASE_USE_GCE
 
 device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_EUART.PDD				\sys\bin\euart.pdd
@@ -142,3 +147,5 @@ extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\
 #endif
 
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
+
+#endif
