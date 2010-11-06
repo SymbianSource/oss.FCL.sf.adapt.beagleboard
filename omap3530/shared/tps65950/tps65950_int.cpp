@@ -42,13 +42,13 @@ namespace TPS65950
 
 struct TInterruptBank
 	{
-	TInt	iBit[8]; 
+	TInt	iBit[8];
 	};
 
 struct TSubInterruptBank
 	{
 	TUint8	iLen;
-	TUint16	iRegs[6];		
+	TUint16	iRegs[6];
 	};
 
 enum TMaskPolarity
@@ -94,30 +94,30 @@ static SInterruptHandler TheHandlers[ TPS65950::KNumTPSInts ];
 
 static const TControl KControl[ TPS65950::KNumTPSInts ] =
 	{
-//iimr iReg      group      bitoffset					/*	
-/*0*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_SC_DETECT,	ESetToEnable}, 		
+//iimr iReg      group      bitoffset					/*
+/*0*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_SC_DETECT,	ESetToEnable},
 /*1*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_MBCHG,		ESetToEnable},
 /*2*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_PWROK_TIMEOUT, ESetToEnable},
-/*3*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_HOT_DIE,		ESetToEnable},	
+/*3*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_HOT_DIE,		ESetToEnable},
 /*4*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_RTC_IT,		ESetToEnable},
 /*5*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_USB_PRES,		ESetToEnable},
 /*6*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_CHG_PRES,		ESetToEnable},
 /*7*/{	Register::PWR_IMR1,	Register::PWR_IMR1,	Register::PWR_ISR1,	PWR_IMR1::PWR_CHG_PWRONS,	ESetToEnable},
-			
+
 /*8*/{	Register::MADC_IMR1,	Register::MADC_IMR1,	Register::MADC_ISR1,	MADC_IMR1::MADC_USB_ISR1,	EClearToEnable},
 /*9*/{	Register::MADC_IMR1,	Register::MADC_IMR1,	Register::MADC_ISR1,	MADC_IMR1::MADC_SW2_ISR1,	EClearToEnable},
 /*10*/{	Register::MADC_IMR1,	Register::MADC_IMR1,	Register::MADC_ISR1,	MADC_IMR1::MADC_SW1_ISR1,	EClearToEnable},
 /*11*/{	Register::MADC_IMR1,	Register::MADC_IMR1,	Register::MADC_ISR1,	MADC_IMR1::MADC_RT_ISR1,	EClearToEnable},
-			
+
 /*12*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO7ISR1,	EClearToEnable},
 /*13*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO6ISR1,	EClearToEnable},
-/*14*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO5ISR1,	EClearToEnable},	
+/*14*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO5ISR1,	EClearToEnable},
 /*15*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO4ISR1,	EClearToEnable},
 /*16*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO3ISR1,	EClearToEnable},
 /*17*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO2ISR1,	EClearToEnable},
 /*18*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO1ISR1,	EClearToEnable},
 /*19*/{	Register::GPIO_IMR1A,			Register::GPIO_IMR1A, Register::GPIO_ISR1A,	GPIO_IMR1A::GPIO0ISR1,	EClearToEnable},
-			
+
 /*20*/	{	Register::GPIO_IMR2A,			Register::GPIO_IMR2A, Register::GPIO_ISR2A,	GPIO_IMR2A::GPIO15ISR2,	EClearToEnable},
 /*22*/{	Register::GPIO_IMR2A,			Register::GPIO_IMR2A, Register::GPIO_ISR2A,	GPIO_IMR2A::GPIO14ISR2,	EClearToEnable},
 /*23*/{	Register::GPIO_IMR2A,			Register::GPIO_IMR2A, Register::GPIO_ISR2A,	GPIO_IMR2A::GPIO13ISR2,	EClearToEnable},
@@ -129,7 +129,7 @@ static const TControl KControl[ TPS65950::KNumTPSInts ] =
 
 /*29*/{	Register::GPIO_IMR3A,			Register::GPIO_IMR3A, Register::GPIO_ISR3A,	GPIO_IMR3A::GPIO17ISR3,	EClearToEnable},
 /*30*/{	Register::GPIO_IMR3A,			Register::GPIO_IMR3A, Register::GPIO_ISR3A,	GPIO_IMR3A::GPIO16ISR3,	EClearToEnable},
-			
+
 /*31*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_BATSTS_ISR1,	EClearToEnable},
 /*32*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_TBATOR1_ISR1,	EClearToEnable},
 /*33*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_TBATOR2_ISR1,	EClearToEnable},
@@ -138,46 +138,46 @@ static const TControl KControl[ TPS65950::KNumTPSInts ] =
 /*36*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_IICHGHIGH_ISR1,	EClearToEnable},
 /*37*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_TMOVF_ISR1,	EClearToEnable},
 /*38*/{	Register::BCIIMR1A,				Register::BCIIMR1A,		Register::BCIISR1A,	BCIIMR1A::BCI_WOVF_ISR1,	EClearToEnable},
-	
+
 /*39*/{	Register::BCIIMR2A,				Register::BCIIMR2A,		Register::BCIISR2A,	BCIIMR2A::BCI_ACCHGOV_ISR1,	EClearToEnable},
 /*40*/{	Register::BCIIMR2A,				Register::BCIIMR2A,		Register::BCIISR2A,	BCIIMR2A::BCI_VBUSOV_ISR1,	EClearToEnable},
 /*41*/{	Register::BCIIMR2A,				Register::BCIIMR2A,		Register::BCIISR2A,	BCIIMR2A::BCI_VBATOV_ISR1,	EClearToEnable},
 /*42*/{	Register::BCIIMR2A,				Register::BCIIMR2A,		Register::BCIISR2A,	BCIIMR2A::BCI_VBATLVL_ISR1,	EClearToEnable},
-			
+
 /*43*/{	Register::KEYP_IMR1,			Register::KEYP_IMR1,	Register::KEYP_ISR1,	KEYP_IMR1::KEYP_ITMISR1,	EClearToEnable},
 /*44*/{	Register::KEYP_IMR1,			Register::KEYP_IMR1,	Register::KEYP_ISR1,	KEYP_IMR1::KEYP_ITTOISR1,	EClearToEnable},
 /*45*/{	Register::KEYP_IMR1,			Register::KEYP_IMR1,	Register::KEYP_ISR1,	KEYP_IMR1::KEYP_ITLKISR1,	EClearToEnable},
 /*46*/{	Register::KEYP_IMR1,			Register::KEYP_IMR1,	Register::KEYP_ISR1,	KEYP_IMR1::KEYP_ITKPISR1,	EClearToEnable},
-			
-/*46*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_IDGND,		ESetToEnable }, 
+
+/*46*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_IDGND,		ESetToEnable },
 /*47*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_SESSEND,		ESetToEnable },
 /*48*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_SESSVALID,	ESetToEnable },
-/*49*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_VBUSVALID,	ESetToEnable },	
+/*49*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_VBUSVALID,	ESetToEnable },
 /*50*/{	Register::USB_INT_EN_RISE_SET,	Register::USB_INT_EN_RISE_CLR,	Register::USB_INT_STS, USB_INT_STS::USB_INTSTS_HOSTDISCONNECT, ESetToEnable },
-			
+
 /*51*/{	Register::CARKIT_INT_EN_SET,	Register::CARKIT_INT_EN_CLR,	Register::CARKIT_INT_STS,	CARKIT_INT_STS::CARKIT_CARDP,	ESetToEnable },
 /*52*/{	Register::CARKIT_INT_EN_SET,	Register::CARKIT_INT_EN_CLR,	Register::CARKIT_INT_STS,	CARKIT_INT_STS::CARKIT_CARINTDET,	ESetToEnable },
 /*53*/{	Register::CARKIT_INT_EN_SET,	Register::CARKIT_INT_EN_CLR,	Register::CARKIT_INT_STS,	CARKIT_INT_STS::CARKIT_IDFLOAT,	ESetToEnable },
-	
+
 /*54*/{	Register::OTHER_INT_EN_RISE_SET, Register::OTHER_INT_EN_RISE_CLR, Register::OTHER_INT_STS,	OTHER_INT_STS::OTHER_INT_VB_SESS_VLD,	ESetToEnable },
 /*55*/{	Register::OTHER_INT_EN_RISE_SET, Register::OTHER_INT_EN_RISE_CLR, Register::OTHER_INT_STS,	OTHER_INT_STS::OTHER_INT_DM_HI,	ESetToEnable },
 /*56*/{	Register::OTHER_INT_EN_RISE_SET, Register::OTHER_INT_EN_RISE_CLR, Register::OTHER_INT_STS,	OTHER_INT_STS::OTHER_INT_DP_HI,	ESetToEnable },
 /*57*/{	Register::OTHER_INT_EN_RISE_SET, Register::OTHER_INT_EN_RISE_CLR, Register::OTHER_INT_STS,	OTHER_INT_STS::OTHER_INT_MANU,	ESetToEnable },
 /*58*/{	Register::OTHER_INT_EN_RISE_SET, Register::OTHER_INT_EN_RISE_CLR, Register::OTHER_INT_STS,	OTHER_INT_STS::OTHER_INT_ABNORMAL_STRESS,	ESetToEnable },
-			
+
 /*59*/{	Register::ID_INT_EN_RISE_SET,	Register::ID_INT_EN_RISE_CLR,	Register::ID_INT_STS,		ID_INT_STS::ID_INTID_RES_FLOAT,	ESetToEnable },
 /*60*/{	Register::ID_INT_EN_RISE_SET,	Register::ID_INT_EN_RISE_CLR,	Register::ID_INT_STS,		ID_INT_STS::ID_INTID_RES_440K,	ESetToEnable },
 /*61*/{	Register::ID_INT_EN_RISE_SET,	Register::ID_INT_EN_RISE_CLR,	Register::ID_INT_STS,		ID_INT_STS::ID_INTID_RES_200K,	ESetToEnable },
 /*62*/{	Register::ID_INT_EN_RISE_SET,	Register::ID_INT_EN_RISE_CLR,	Register::ID_INT_STS,		ID_INT_STS::ID_INTID_RES_102K,	ESetToEnable },
-				
-/*63*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_PSM_ERROR,	ESetToEnable },	
+
+/*63*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_PSM_ERROR,	ESetToEnable },
 /*64*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_PH_ACC,	ESetToEnable },
 /*65*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_CHARGER,	ESetToEnable },
 /*66*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_USB_HOST,	ESetToEnable },
 /*67*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_USB_OTG_B,	ESetToEnable },
 /*68*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_CARKIT,	ESetToEnable },
 /*69*/	{	Register::CARKIT_SM_1_INT_EN_SET, Register::CARKIT_SM_1_INT_EN_CLR, Register::CARKIT_SM_1_INT_STS, CARKIT_SM_1_INT_STS::CARKIT_SM_1_DISCONNECTED,	ESetToEnable },
-			
+
 /*70*/	{	Register::CARKIT_SM_2_INT_EN_SET, Register::CARKIT_SM_2_INT_EN_CLR, Register::CARKIT_SM_2_INT_STS, CARKIT_SM_2_INT_STS::CARKIT_SM_2_STOP_PLS_MISS,	ESetToEnable },
 /*71*/	{	Register::CARKIT_SM_2_INT_EN_SET, Register::CARKIT_SM_2_INT_EN_CLR, Register::CARKIT_SM_2_INT_STS, CARKIT_SM_2_INT_STS::CARKIT_SM_2_STEREO_TO_MONO,	ESetToEnable },
 /*72*/	{	Register::CARKIT_SM_2_INT_EN_SET, Register::CARKIT_SM_2_INT_EN_CLR, Register::CARKIT_SM_2_INT_STS, CARKIT_SM_2_INT_STS::CARKIT_SM_2_PHONE_UART,	ESetToEnable },
@@ -205,13 +205,13 @@ const static TInterruptBank madcBank = {
 
 const static TInterruptBank gpioBank0 = {
 		ETPS65950_IRQ_GPIO_0ISR1,
-		ETPS65950_IRQ_GPIO_1ISR1,	
+		ETPS65950_IRQ_GPIO_1ISR1,
 		ETPS65950_IRQ_GPIO_2ISR1,
 		ETPS65950_IRQ_GPIO_3ISR1,
 		ETPS65950_IRQ_GPIO_4ISR1,
 		ETPS65950_IRQ_GPIO_5ISR1,
 		ETPS65950_IRQ_GPIO_6ISR1,
-		ETPS65950_IRQ_GPIO_7ISR2	
+		ETPS65950_IRQ_GPIO_7ISR2
 };
 
 const static TInterruptBank gpioBank1 = {
@@ -256,10 +256,10 @@ const static TInterruptBank keypBank = {
 };
 
 const static TInterruptBank usbINTSTSBank = {
-		ETPS65950_IRQ_USB_INTSTS_IDGND, 
+		ETPS65950_IRQ_USB_INTSTS_IDGND,
 		ETPS65950_IRQ_USB_INTSTS_SESSEND,
 		ETPS65950_IRQ_USB_INTSTS_SESSVALID,
-		ETPS65950_IRQ_USB_INTSTS_VBUSVALID,	
+		ETPS65950_IRQ_USB_INTSTS_VBUSVALID,
 		ETPS65950_IRQ_USB_INTSTS_HOSTDISCONNECT
 };
 
@@ -285,7 +285,7 @@ const static TInterruptBank usbIDINTBank = {
 };
 
 const static TInterruptBank usbSM1Bank = {
-		ETPS65950_IRQ_USB_CARKIT_SM_1_PSM_ERROR,	
+		ETPS65950_IRQ_USB_CARKIT_SM_1_PSM_ERROR,
 		ETPS65950_IRQ_USB_CARKIT_SM_1_PH_ACC,
 		ETPS65950_IRQ_USB_CARKIT_SM_1_CHARGER,
 		ETPS65950_IRQ_USB_CARKIT_SM_1_USB_HOST,
@@ -301,17 +301,17 @@ const static TInterruptBank usbSM2Bank = {
 };
 
 const static TInterruptBank* TheMapTable [6][6]  = {
- //maps against PIH_ISR bits		
+ //maps against PIH_ISR bits
  //reg banks	sub modules
 				{&gpioBank0,		&gpioBank1,		&gpioBank2,		NULL,			NULL,			NULL},
 				{&keypBank,			NULL,			NULL,			NULL,			NULL,			NULL},
 				{&bciBank0,			&bciBank1,		NULL,			NULL,			NULL,			NULL},
 				{&madcBank,			NULL,			NULL,			NULL,			NULL,			NULL},
 				{&usbINTSTSBank,	&usbCARKITBank,	&usbOTHERBank,	&usbIDINTBank,	&usbSM1Bank,	&usbSM2Bank},
-				{&pwrBank,			NULL,			NULL,			NULL,			NULL,			NULL}							
+				{&pwrBank,			NULL,			NULL,			NULL,			NULL,			NULL}
 };
 
-const static TSubInterruptBank subBank[6] = { 
+const static TSubInterruptBank subBank[6] = {
 	/*gpio*/{3,{Register::GPIO_ISR1A,Register::GPIO_ISR2A,Register::GPIO_ISR3A,NULL,NULL,NULL}},
 		/*keyp*/{1,{Register::KEYP_ISR1,NULL,NULL,NULL,NULL,NULL}},
 		/*bci*/	{2,{Register::BCIISR1A,Register::BCIISR2A,NULL,NULL,NULL,NULL}},
@@ -356,7 +356,7 @@ TInt TPS65950Int::Init()
 
 TInt TPS65950Int::InitialiseTPS65950IntController()
 	{
-	__KTRACE_OPT(KTPS65950,Kern::Printf("+TPS65950Int:InitIntController"));	
+	__KTRACE_OPT(KTPS65950,Kern::Printf("+TPS65950Int:InitIntController"));
 
 	struct TInitRegList
 		{
@@ -387,7 +387,7 @@ TInt TPS65950Int::InitialiseTPS65950IntController()
 		{ Register::ID_INT_EN_RISE_CLR,	0x0f },
 		{ Register::ID_INT_EN_FALL_CLR,	0x0f },
 		{ Register::CARKIT_SM_1_INT_EN_CLR,0xff },
-		{ Register::CARKIT_SM_2_INT_EN_CLR,0xff },		
+		{ Register::CARKIT_SM_2_INT_EN_CLR,0xff },
 		{ KEYP_SIH_CTRL::Addr,	KEYP_SIH_CTRL::SIH_PENDDIS |  KEYP_SIH_CTRL::SIH_COR | KEYP_SIH_CTRL::SIH_EXCLEN },
 		{ Register::KEYP_IMR1,		0x0f },
 		{ Register::KEYP_IMR2,		0x0f },
@@ -442,14 +442,27 @@ TInt TPS65950Int::InitialiseTPS65950IntController()
 		r = WriteSync( KInitList[i].iReg, KInitList[i].iValue );
 		}
 
-	// Clear all interrupts
-	for( TInt i = 0; (i < KClearListCount) && (KErrNone == r); ++i )
+	if(r == KErrNone)
 		{
-		TUint8 dummy;
-		r = ReadSync( KClearList[i], dummy );
+		// Clear all interrupts
+		for( TInt i = 0; (i < KClearListCount) && (KErrNone == r); ++i )
+			{
+			// some registers need more reads to clear them, e.g. PWR_ISR1 needs 3- why is that?
+			TInt num_attempts = 5;
+			TUint8 dummy = 3;
+			while(dummy && (num_attempts > 0))
+				{
+				num_attempts--;
+				r = ReadSync( KClearList[i], dummy );
+				if(r != KErrNone)
+					{
+					break;
+					}
+				}
+			}
 		}
 
-	__KTRACE_OPT(KTPS65950,Kern::Printf("-TPS65950Int:InitIntController:%d", r));	
+	__KTRACE_OPT(KTPS65950,Kern::Printf("-TPS65950Int:InitIntController:%d", r));
 
 	return r;
 	}
@@ -519,22 +532,22 @@ TInt TPS65950Int::Enable(TInt aId)
 		CHECK_PRECONDITIONS(MASK_NOT_ISR | MASK_NOT_IDFC,"tps65950::InterruptEnable Cant enable a slow src in ISR Context");
 
 		TUint tblOffset = aId - KTPS65950IrqFirst;
-		
+
 		TInt irq=__SPIN_LOCK_IRQSAVE_R(BeagleExtIVTLock);
 		if( TheHandlers[ tblOffset ].iIsr == Spurious )
 			{
 			r = KErrNotReady;
 			}
 		__SPIN_UNLOCK_IRQRESTORE_R(BeagleExtIVTLock,irq);
-				
+
 		if( r != KErrNone )
 			{
-			__KTRACE_OPT(KTPS65950,Kern::Printf("=tps65950:Enable:%d NOT BOUND", aId ));	
+			__KTRACE_OPT(KTPS65950,Kern::Printf("=tps65950:Enable:%d NOT BOUND", aId ));
 			}
 		else
 			{
 			const TControl& control = KControl[ tblOffset ];
-		
+
 			TUint8 val;
 			ReadSync( control.iSetReg, val );
 			if( EClearToEnable == control.iPolarity )
@@ -568,22 +581,22 @@ TInt TPS65950Int::Disable(TInt aId)
 		CHECK_PRECONDITIONS(MASK_NOT_ISR | MASK_NOT_IDFC,"tps65950::InterruptDisable Cant disable a slow src in ISR Context");
 
 		TUint tblOffset = aId - KTPS65950IrqFirst;
-		
+
 		TInt irq=__SPIN_LOCK_IRQSAVE_R(BeagleExtIVTLock);
 		if( TheHandlers[ tblOffset ].iIsr == Spurious )
 			{
 			r = KErrNotReady;
 			}
 		__SPIN_UNLOCK_IRQRESTORE_R(BeagleExtIVTLock,irq);
-				
+
 		if( r != KErrNone )
 			{
-			__KTRACE_OPT(KTPS65950,Kern::Printf("=tps65950:Disable:%d NOT BOUND", aId ));	
+			__KTRACE_OPT(KTPS65950,Kern::Printf("=tps65950:Disable:%d NOT BOUND", aId ));
 			}
 		else
 			{
 			const TControl& control = KControl[ tblOffset ];
-		
+
 			if( EClearToEnable == control.iPolarity )
 				{
 				ClearSetSync( control.iClrReg, KClearNone, control.iBitMask );
@@ -612,7 +625,7 @@ TInt TPS65950Int::Clear(TInt aId)
 	if( (TUint)aId < KTPS65950IrqLast )
 		{
 		CHECK_PRECONDITIONS(MASK_NOT_ISR,"tps65950::InterruptClear Cant clear a slow src in ISR Context");
-		
+
 		TUint tblOffset = aId - KTPS65950IrqFirst;
 		TUint8 value;
 		//clear on read !  //we may lose some of the other ints if many enabled
@@ -635,24 +648,24 @@ TInt TPS65950Int::SetPriority(TInt aId, TInt aPriority)
 
 
 void TPS65950Int::Dispatch(TAny * aParam )
-	{	
+	{
 	Interrupt::Disable(EOmap3530_IRQ7_SYS_NIRQ);
-	reinterpret_cast<TPS65950Int*>(aParam)->iDfc.Add();	
+	reinterpret_cast<TPS65950Int*>(aParam)->iDfc.Add();
 	}
 
 void TPS65950Int::Dfc( TAny* aParam )
-	{	
+	{
 	__KTRACE_OPT(KTPS65950,Kern::Printf("+tps65950Int:Dfc" ));
 
 	TUint8 highVectors=0;
 	TUint8 subVector=0;
-	
+
 	ReadSync( PIH_ISR_P1::Addr, highVectors );
 	__ASSERT_DEBUG( highVectors != 0,Kern::Fault("tps65950 int signalled but no vector ",highVectors));
-	
+
 	for(TInt i=0; i<=5;i++,highVectors >>=1)
 		{
-		if(highVectors & 0x1)			
+		if(highVectors & 0x1)
 			{
 			for(TInt8 j=0;j<subBank[i].iLen;j++)
 				{
@@ -660,20 +673,20 @@ void TPS65950Int::Dfc( TAny* aParam )
 				for(TInt k=0;k < 8;k++)
 					{
 					if(subVector & 0x1)
-						{	
+						{
 						TInt tblOffset =  TheMapTable[i][j]->iBit[k] - KTPS65950IrqFirst;
 
 						__KTRACE_OPT(KTPS65950,Kern::Printf("=tps65950:Dfc:BIT_%d HIGH on REG %x VECTOR is %x ISR %x",
 													k,subBank[i].iRegs[j], tblOffset, TheHandlers[tblOffset].iIsr));
-						
+
 						(TheHandlers[tblOffset].iIsr)(TheHandlers[tblOffset].iPtr);
-						}	
+						}
 					subVector >>= 1;
 					}
-				}		
+				}
 			}
-		}		
-	Interrupt::Enable(EOmap3530_IRQ7_SYS_NIRQ);	
+		}
+	Interrupt::Enable(EOmap3530_IRQ7_SYS_NIRQ);
 
 	__KTRACE_OPT(KTPS65950,Kern::Printf("-tps65950:Dfc" ));
 	}

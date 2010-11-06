@@ -53,7 +53,7 @@ device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD                     \sys
 #ifdef TSHELL_SERIAL
 //Use VT100 Over Serial
 #define EDISP_DRV \EDISP_VT100.DLL
-#else
+#else // not TSHELL_SERIAL
 extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_lcd.dll         \sys\bin\lcd.dll
 #ifdef SERIALMOUSE
 #ifdef BASE_ROM
@@ -61,14 +61,22 @@ extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse_tshell
 #else
 extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL  \sys\bin\eserialmouse.dll
 #endif
-#else
+#else // not SERIALMOUSE
+#ifndef EXCLUDE_SERIALKEYBOARD
 extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL  \sys\bin\ekeyb.dll
+#endif
 #endif
 #endif
 
 file[VARID]=\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL   \sys\bin\ekdata.dll
 extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\ELOCD.LDD            \sys\bin\elocd.ldd
 extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDINT.PDD  \sys\bin\medint.pdd
+
+// Persistent storage
+extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_medstaticrd.pdd	    	\sys\bin\medstaticrd.pdd
+
+// Estart
+data=               	\epoc32\rom\beagle\estart.txt					    \sys\data\estart.txt
 
 // Uncommnet to include West Bridge Astoria Symbian Storage driver 
 //extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD \sys\bin\medwb.pdd
