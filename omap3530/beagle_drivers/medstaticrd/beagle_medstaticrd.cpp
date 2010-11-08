@@ -522,7 +522,9 @@ TInt DMediaDriverStaticRD::ContinueTransaction( TUint32 aTransactionSectorOffset
 			memcpy( iTransferBufferLin, (TAny *)(iDiscBufferLin+(aTransactionSectorOffset<<9)), aTransactionSectorCount*512 );
 		}
 		iLatestTransferSectorCount = aTransactionSectorCount;
-		Isr(this); // terrible hack, we've yransferred all the sectors and now we pretend to generate an interrupt
+		
+		// Isr(this); // terrible hack, we've yransferred all the sectors and now we pretend to generate an interrupt
+		iSessionEndDfc.Enque();
 		}
 	else
 		{
