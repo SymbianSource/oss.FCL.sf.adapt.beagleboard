@@ -64,3 +64,5 @@ romchecksum=0x12345678
 #ifdef UNICODE
 unicode
 #endif
+
+#define VFPHELPERS

@@ -88,6 +88,9 @@ extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL				\sys\
 
 #define	EUSER_DLL	../../ARMV5/##BUILD##/_omap3530_euser.dll
 
+// VFP support
+extension[VARID]= \Epoc32\Release\##KMAIN##\##BUILD##\EVFP.DLL \sys\bin\evfp.dll
+
 #ifdef TEST_ROM
 #include <rom\##VARIANT##\test.iby>
 #endif
