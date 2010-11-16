@@ -20,7 +20,7 @@ targettype		dll
 linkas			hal.dll
 noexportlibrary
 
-sourcepath		../../../../../../../sf/os/kernelhwsrv/halservices/hal/src
+sourcepath		../../../../../../sf/os/kernelhwsrv/halservices/hal/src
 source			hal_main.cpp userhal.cpp
 
 sourcepath		+/build/generatedcpp/hal
@@ -30,7 +30,7 @@ OS_LAYER_SYSTEMINCLUDE
 
 library			euser.lib
 
-deffile			../../../../../../../sf/os/kernelhwsrv/halservices/hal/~/hal.def
+deffile			../../../../../../sf/os/kernelhwsrv/halservices/hal/~/hal.def
 
 uid				0x1000008d 0x100039e8
 

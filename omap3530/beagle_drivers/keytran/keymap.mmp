@@ -37,7 +37,7 @@ source				keymap.cpp
 
 library				euser.lib
 
-deffile				../../../../../../../sf/os/kernelhwsrv/kernel/eka/~/ekdata.def
+deffile				../../../../../../sf/os/kernelhwsrv/kernel/eka/~/ekdata.def
 
 nostrictdef
 noexportlibrary

@@ -38,7 +38,7 @@ PRJ_MMPFILES
 src/vbeagle
 
 // Build MEDINT.PDD - this depends on our variantmediadef.h
-../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/medint/medint
+../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/medint/medint
 
 
 //
@@ -66,7 +66,7 @@ option		SOURCES			beagle.s
 option		EXTRA_SRC_PATH		$(EXTENSION_ROOT)/bootstrap
 option		EXTRA_INC_PATH		$(EXTENSION_ROOT)/bootstrap
 option		INCLUDES		config.inc
-option		E32PATH			$(EXTENSION_ROOT)/../../../../../../sf/os/kernelhwsrv/kernel
+option		E32PATH			$(EXTENSION_ROOT)/../../../../../sf/os/kernelhwsrv/kernel
 
 end
 
