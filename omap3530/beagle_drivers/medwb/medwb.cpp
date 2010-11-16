@@ -22,7 +22,7 @@
 #include "locmedia.h"
 #include "platform.h"
 //#include "variantmediadef.h"
-#include <assp\omap3530_assp\CyAsSymbianStorageDriver.h>
+#include <assp/omap3530_assp/CyAsSymbianStorageDriver.h>
 
 //#define REGIST_MEDIA_USE_MMC
 #define _MEDWB_DEBUG_1_

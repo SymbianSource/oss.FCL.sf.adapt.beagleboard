@@ -21,7 +21,7 @@
 
 primary[VARID]=		\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EKERN.EXE              \sys\bin\ekern.exe
 extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_KAOMAP3530.DLL         \sys\bin\kaomap3530.dll
-#include <rom\omapshared\mstick.iby>
+#include <rom/omapshared/mstick.iby>
 
 // Removed BTRACEX
 //extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_BTRACEX.LDD            \sys\bin\btracex.ldd
