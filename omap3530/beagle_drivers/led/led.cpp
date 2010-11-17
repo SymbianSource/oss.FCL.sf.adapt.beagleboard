@@ -13,82 +13,109 @@
 // Description:
 // omap3530/beagle_drivers/led/led.cpp
 //
-
-#include <kern_priv.h>
 #include <beagle/beagle_gpio.h>
-#include <assp/omap3530_assp/omap3530_gpio.h>
-#include <beagle/variant.h>
-#include <assp/omap3530_assp/omap3530_assp_priv.h>
-#include <assp/omap3530_assp/omap3530_irqmap.h> // GPIO interrupts
 
-#include <assp.h> // Required for definition of TIsr
+const TInt KBeatTimeInSeconds = 4;
 
-static NTimer * heartBeatTimer;
+class LedHeartBeat
+	{
+public:
+	inline LedHeartBeat();
+	/*inline ~LedHeartBeat() { iTimer.Cancel(); }*/ // will it ever be destroyed?
+	TInt DoCreate();
+	static void Beat(TAny *aPtr);
+private:
+	NTimer iTimer;
+	TBool iIsLedOn;
+	};
 
-
-
-static void ledIsr(TAny* aPtr)
-	{									
-	//make sure the led is always in the sma estate when we crash
-	
-	GPIO::SetOutputState(KGPIO_LED1, GPIO::ELow);
-	Kern::Fault("User invoked crash via keypad",KErrDied);
+LedHeartBeat::LedHeartBeat() :
+	iTimer(Beat, this)
+	{
 	}
 
-static void beatLedHeartBeat(TAny * ptr)
+TInt LedHeartBeat::DoCreate()
 	{
-	GPIO::TGpioState ledState;
-	GPIO::GetOutputState(KGPIO_LED1, ledState);
-		
-	if(GPIO::EHigh == ledState)
+	TInt r = GPIO::SetPinDirection(KGPIO_LED0, GPIO::EOutput);
+	if (r == KErrNone)
 		{
-		GPIO::SetOutputState(KGPIO_LED1, GPIO::ELow);
+		GPIO::SetPinMode(KGPIO_LED0, GPIO::EEnabled);
+		GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
+		iTimer.OneShot(NKern::TimerTicks(KBeatTimeInSeconds * 1000));		
 		}
 	else
 		{
-		GPIO::SetOutputState(KGPIO_LED1, GPIO::EHigh);
+		Kern::Printf("LedHeartBeat: SetPinDirection for LED failed, r %d", r);
 		}
-	
-	heartBeatTimer->Again(Variant::GetMsTickPeriod());
+	return r;
 	}
 
+void LedHeartBeat::Beat(TAny * aPtr)
+	{
+	LedHeartBeat* b = (LedHeartBeat*)aPtr;
+	if(b->iIsLedOn)
+		{
+		GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
+		b->iIsLedOn = EFalse;
+		}
+	else
+		{
+		GPIO::SetOutputState(KGPIO_LED0, GPIO::EHigh);
+		b->iIsLedOn = ETrue;
+		}
+	b->iTimer.Again(NKern::TimerTicks(KBeatTimeInSeconds * 1000));
+	}
+
+// the following macro is defined in led.mmp file..
+#ifdef USER_BUTTON_ENTERS_CRASH_DEBUGGER
+static void UserButtonIsr(TAny* aPtr)
+	{
+	//make sure the heartbeat led is OFF when we crash
+	GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
+	Kern::Printf("User button pressed, entering crash debugger..\n");
+	Kern::Fault("led.cpp", __LINE__);
+	}
+
+TInt SetupUserButton()
+	{
+	TInt r = GPIO::BindInterrupt(KGPIO_UserButton, UserButtonIsr, NULL);
+	if(r != KErrNone)
+		{
+		Kern::Printf("GPIO::BindInterrupt() failed for button %d, r=%d, (is in use?)",
+		             KGPIO_UserButton, r);
+		return r;
+		}
+
+	r = GPIO::SetInterruptTrigger(KGPIO_UserButton, GPIO::EEdgeRising);
+	if(r == KErrNone)
+		{
+		r = GPIO::SetPinDirection(KGPIO_UserButton, GPIO::EInput);
+		if(r == KErrNone)
+			{
+			GPIO::SetDebounceTime(KGPIO_UserButton, 500);
+			GPIO::SetPinMode(KGPIO_UserButton, GPIO::EEnabled);
+			r = GPIO::EnableInterrupt(KGPIO_UserButton);
+			}
+		}
+	return r;
+	}
+#endif
 
 DECLARE_STANDARD_EXTENSION()
 	{
-		
-	//Set up the button to proivde a panic button invoking Fault()
-	if(KErrNone != GPIO::SetPinDirection(KGPIO_UserButton, GPIO::EInput))
-		return KErrArgument;
-		
-	GPIO::SetPinMode(KGPIO_UserButton, GPIO::EEnabled);
-	GPIO::SetDebounceTime(KGPIO_UserButton, 500);
-	
-	if(KErrNone !=GPIO::BindInterrupt(KGPIO_UserButton, ledIsr,NULL))
-		return KErrArgument;
-		
-	if(KErrNone !=GPIO::SetInterruptTrigger(KGPIO_UserButton, GPIO::EEdgeRising))
-		return KErrArgument;
-		
-	if(KErrNone !=GPIO::EnableInterrupt(KGPIO_UserButton))
+	TInt r = KErrNoMemory;
+	LedHeartBeat* beat = new LedHeartBeat;
+	if(beat)
 		{
-		GPIO::UnbindInterrupt(KGPIO_UserButton);
-		return KErrInUse;
-		}		
+		r = beat->DoCreate();
+		}
 
-	//setup the Led to flash at the system tick rate ( heartbeat) 
-	heartBeatTimer = new NTimer(beatLedHeartBeat,NULL);
-	
-	if(KErrNone != GPIO::SetPinDirection(KGPIO_LED1, GPIO::EOutput))
-			return KErrArgument;
-	
-	if(KErrNone != GPIO::SetPinDirection(KGPIO_LED0, GPIO::EOutput))
-				return KErrArgument;
-
-	GPIO::SetPinMode(KGPIO_LED0, GPIO::EEnabled);
-	GPIO::SetPinMode(KGPIO_LED1, GPIO::EEnabled);
-	GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);	
-	
-	heartBeatTimer->OneShot(Variant::GetMsTickPeriod(),ETrue);
-	return KErrNone;	
+#ifdef USER_BUTTON_ENTERS_CRASH_DEBUGGER
+	if(r == KErrNone)
+		{
+		r = SetupUserButton();
+		}
+#endif
+	return r;
 	}
 

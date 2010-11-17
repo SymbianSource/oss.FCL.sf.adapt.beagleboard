@@ -36,7 +36,8 @@ static CyAsDevice *gDeviceList = 0 ;
 /*
  * The current debug level
  */
-static uint8_t DebugLevel = 0 ;
+#ifdef CY_AS_LOG_SUPPORT
+static uint8_t DebugLevel = 0 ; //commented out as it's not
 
 /*
  * This function sets the debug level for the API
@@ -48,7 +49,7 @@ CyAsMiscSetLogLevel(uint8_t level)
     DebugLevel = level ;
 }
 
-#ifdef CY_AS_LOG_SUPPORT
+//#ifdef CY_AS_LOG_SUPPORT
 
 /*
  * This function is a low level logger for the API.
@@ -1146,8 +1147,6 @@ MyHandleResponseReset(CyAsDevice* dev_p,
                       CyAsLLRequestResponse *reply_p,
                       CyAsResetType type)
 {
-    uint16_t   v ;
-
     (void)req_p ;
     (void)reply_p ;
 
@@ -1158,7 +1157,7 @@ MyHandleResponseReset(CyAsDevice* dev_p,
      */
     if (CyAsDeviceIsInSuspendMode(dev_p))
     {
-        v = CyAsHalReadRegister(dev_p->tag, CY_AS_MEM_CM_WB_CFG_ID) ;
+        CyAsHalReadRegister(dev_p->tag, CY_AS_MEM_CM_WB_CFG_ID) ;
         CyAsHalSleep (1) ;
     }
 
@@ -1520,7 +1519,7 @@ CyAsMiscSetTraceLevel(CyAsDeviceHandle handle,
     if (CyAsDeviceIsInSuspendMode(dev_p))
         return CY_AS_ERROR_IN_SUSPEND ;
 
-    if (bus < 0 || bus >= CY_AS_MAX_BUSES)
+    if (bus >= CY_AS_MAX_BUSES)
         return CY_AS_ERROR_NO_SUCH_BUS ;
 
     if (device >= CY_AS_MAX_STORAGE_DEVICES)
@@ -3092,9 +3091,8 @@ CyAsRemoveCBNode(CyAsCBQueue * queue_p)
 
 void MyPrintFuncCBNode(CyAsFuncCBNode* node)
 {
-    CyAsFunctCBType type = CyAsFunctCBTypeGetType(node->dataType) ;
     CyAsHalPrintMessage("[cd:%2u dt:%2u cb:0x%08x d:0x%08x nt:%1i]",
-        node->client_data, type, (uint32_t)node->cb_p, (uint32_t)node->data, node->nodeType) ;
+        node->client_data, CyAsFunctCBTypeGetType(node->dataType), (uint32_t)node->cb_p, (uint32_t)node->data, node->nodeType) ;
 }
 
 void MyPrintCBQueue(CyAsCBQueue* queue_p)
@@ -3332,7 +3330,7 @@ CyAsMiscFuncCallback(CyAsDevice *dev_p,
         CyAsHalAssert(CyFalse) ;
         break ;
     }
-
+    (void) type;
     /*
      * If the low level layer returns a direct error, use the corresponding error code.
      * If not, use the error code based on the response from firmware.
@@ -3346,7 +3344,6 @@ CyAsMiscFuncCallback(CyAsDevice *dev_p,
         CyAsRemoveCBNode(dev_p->func_cbs_misc) ;
     else
         CyAsRemoveCBNode(dev_p->func_cbs_res) ;
-
 }
 
 

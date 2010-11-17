@@ -29,7 +29,10 @@
 #include <nklib.h>
 //#include <resourceman.h>
 
+#ifdef USE_SYMBIAN_PRM
 _LIT(KDfcName, "I2C_DFC"); // Not used by the I2c dfc!
+#endif
+
 DECLARE_STANDARD_EXTENSION()
 	{
 	return KErrNone;
@@ -72,6 +75,7 @@ struct TUnitControl
 
 	// The DFC for this unit - it runs on the thread associated with the active transfer
 	TDfc iDfc;
+
 
 	// the slave devices on this unit's bus
 	TDeviceControl iDevice[KMaxDevicesPerUnit];
@@ -162,8 +166,11 @@ EXPORT_C TTransferPb::TTransferPb() :
 
 EXPORT_C THandle Open(const TConfigPb& aConfig)
 	{
+#ifdef USE_SYMBIAN_PRM
 	//TInt r = PowerResourceManager::RegisterClient( prmClientId, KDfcName );
 	//__NK_ASSERT_ALWAYS(r==KErrNone);
+#error FIXME: the DFC, along with the associated dfcq have to be created (e.g. in DLL entry point?)
+#endif
 	THandle h;
 	__NK_ASSERT_ALWAYS(aConfig.iVersion == I2C_VERSION);
 	if (aConfig.iUnit >= E1 && aConfig.iUnit <= E3)

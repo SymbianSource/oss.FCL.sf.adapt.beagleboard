@@ -84,7 +84,7 @@ static TUint8 TempWriteBuf[2];
 
 // Spinlock to protect queue when adding or removing items
 //static TSpinLock QueueLock(TSpinLock::EOrderGenericIrqLow1+1);
-static TSpinLock QueueLock();
+//static TSpinLock QueueLock();
 
 GLDEF_D TDfcQue*	TheDfcQue;
 
@@ -99,12 +99,12 @@ LOCAL_C void InternalPanic( TInt aLine )
 	{
 	Kern::Fault( "tps65950", aLine );
 	}
-
+#ifdef _DEBUG
 LOCAL_C void PanicClient( TPS65950::TPanic aPanic )
 	{
 	Kern::PanicCurrentThread( KDriverNameDes, aPanic );
 	}
-
+#endif
 namespace TPS65950
 {
 void CompletionDfcFunction( TAny* aParam );

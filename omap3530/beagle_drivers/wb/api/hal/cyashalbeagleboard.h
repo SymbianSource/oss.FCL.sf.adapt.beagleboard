@@ -280,15 +280,23 @@ CyAsHalSleep(uint32_t ms) ;
 #define CyAnHalDisablePolling()
 #define CyAnHalEnablePolling()
 
-#define CyAsHalPrintMessage
-//#define CyAsHalPrintMessage Kern::Printf
-#define CyAnHalPrintMessage CyAsHalPrintMessage
+// #define PRINT_DEBUG_INFO // uncomment for debug info..
+#ifdef PRINT_DEBUG_INFO
+#define CyAsHalPrintMessage(...) Kern::Printf(__VA_ARGS__)
+#else
+#define CyAsHalPrintMessage(...)
+#endif
+#define CyAnHalPrintMessage CyAsHalPrintMessage (...)
 
 void
 CyAsHalPrintMessage2(const char* msg);
 
-/*#define CyAsHalAssert(cond)	if (!(cond)) { CyAsHalPrintMessage ("Assertion failed at %s:%d\n", __FILE__, __LINE__); }*/
+#ifdef PRINT_DEBUG_INFO
+#define CyAsHalAssert(cond)	if (!(cond)) { CyAsHalPrintMessage ("Assertion failed at %s:%d\n", __FILE__, __LINE__); }
+#else
 #define CyAsHalAssert(cond)
+#endif
+
 #define CyAnHalAssert(cond) CyAsHalAssert(cond)
 
 /*

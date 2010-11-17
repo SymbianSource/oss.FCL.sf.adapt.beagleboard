@@ -212,6 +212,7 @@ EXPORT_C void Variant::UartInit()
 void Beagle::DebugInit()
 	{
 	Variant::UartInit();
+	iDebugInitialised = ETrue;
 	}
 
 void Beagle::DebugOutput(TUint aLetter)
