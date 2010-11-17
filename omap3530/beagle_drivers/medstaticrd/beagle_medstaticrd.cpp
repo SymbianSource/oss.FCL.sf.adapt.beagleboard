@@ -19,7 +19,7 @@
 
 #include "locmedia.h"
 #include "platform.h"
-#include "/sf/adapt/beagleboard/omap3530/beagleboard/inc/variantmediadef.h"
+#include "variantmediadef.h"
 #include "beagle_medstaticrd.h"
 //#include "syborg.h"
 

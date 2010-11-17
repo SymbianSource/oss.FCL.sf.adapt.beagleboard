@@ -27,6 +27,7 @@ ROMTARGET		staticrd.dll
 systeminclude		+/include/drivers
 SYMBIAN_BASE_SYSTEMINCLUDE(drivers)
 SYSTEMINCLUDE	AsspNKernIncludePath
+USERINCLUDE ../../beagleboard/inc
 
 SOURCEPATH		.
 SOURCE			beagle_medstaticrd.cpp
