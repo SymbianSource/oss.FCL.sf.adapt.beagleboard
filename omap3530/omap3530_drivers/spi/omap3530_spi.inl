@@ -44,7 +44,7 @@ inline void SetCsActive(TInt aModule, TInt aChannel, TUint aPinSetId = 0)
 	__ASSERT_DEBUG(csConf.iAddress, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // don't try to use non-existing CS!
 
 	// now switch the pin mode back to the SPI
-	SCM::SetPadConfig(csConf.iAddress, csConf.iMswLsw, csConf.iFlags | SCM::EInputEnable); // revert to intended mode
+	SCM::SetPadConfig(csConf.iAddress, csConf.iMswLsw, csConf.iFlags);
 	}
 
 
@@ -75,6 +75,22 @@ inline void SetupSpiPins(TUint aModule, TUint aPinSetId = 0)
 			}
 		}
 	}
+
+// McSPI3 can have 3 different pin configuration, but only one can be active at the time.
+// for that reason, before switching to different mode -at least SOMI has to be deactivated
+// otherwise the newly activated pin does not work (why??). Changing these pins to the GPIO (mode 4)
+inline void DeactivateSpiPins(TUint aModule, TUint aPinSetId = 0)
+	{
+	__ASSERT_DEBUG(aModule < KMaxSpiChannelsPerModule, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // aChannel > module channels
+	__ASSERT_DEBUG(aModule != 2 ? !aPinSetId : ETrue, Kern::Fault("omap3530_spi.inl, line: ", __LINE__)); // only channel 3 supports other pin configurations
+
+	const TSpiPinConfig& pinCnf = ModulePinConfig[aModule + aPinSetId];
+
+	SCM::SetPadConfig(pinCnf.iClk.iAddress, pinCnf.iClk.iMswLsw, SCM::EMode4 | SCM::EInputEnable);
+	SCM::SetPadConfig(pinCnf.iSimo.iAddress, pinCnf.iSimo.iMswLsw, SCM::EMode4 | SCM::EInputEnable);
+	SCM::SetPadConfig(pinCnf.iSomi.iAddress, pinCnf.iSomi.iMswLsw, SCM::EMode4 | SCM::EInputEnable);
+	}
+
 
 // helper function - returns appropriate value for the register for a given mode
 inline TUint32 SpiClkMode(TSpiClkMode aClkMode)

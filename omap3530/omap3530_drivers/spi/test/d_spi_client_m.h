@@ -174,14 +174,86 @@ protected:
 	TInt HalfDuplexMultipleWriteRead();
 	TInt FullDuplexSingle();
 	TInt FullDuplexMultiple();
-	TInt HalfDuplexExtendable();
-	TInt FullDuplexExtendable();
 
+	// set of example transfers with transactions queued asynchronously
+	// callback for asynchronous transactions..
+	static void SingleHalfDuplexTransCallback(TIicBusTransaction* aTransaction,
+	                                          TInt aBusId,
+	                                          TInt aResult,
+	                                          TAny* aParam);
+	// test functions..
+	TInt AsyncHalfDuplexSingleWrite(TRequestStatus* aStatus);
+	TInt AsyncHalfDuplexSingleRead(TRequestStatus* aStatus);
+	TInt AsyncHalfDuplexMultipleWrite(TRequestStatus* aStatus);
+	TInt AsyncHalfDuplexMultipleRead(TRequestStatus* aStatus);
+	TInt AsyncHalfDuplexMultipleWriteRead(TRequestStatus* aStatus);
+	TInt AsyncFullDuplexSingle(TRequestStatus* aStatus);
+	TInt AsyncFullDuplexMultiple(TRequestStatus* aStatus);
 
 private:
-	TRequestStatus iStatus;
 	DThread* iClient;
 	};
+
+// template for wrapper class used in asynchronous transactions in order to manage
+// pointers to buffers and allocated objects (to further access the data/release memory)
+
+template <int Size>
+class TTransactionWrapper
+	{
+public:
+	TTransactionWrapper(DThread* aClient, TRequestStatus* aReqStatus, TConfigSpiBufV01* aHeader) :
+	  iHeader(aHeader),
+	  iCallback(NULL),
+	  iClient(aClient),
+	  iReqStatus(aReqStatus)
+	  {
+	  }
+
+	TTransactionWrapper() : iHeader(NULL), iCallback(NULL), iClient(NULL), iReqStatus(NULL)
+		{
+		for(TUint i = 0; i < Size; ++i)
+			{
+			iTxBuffers[i]   = NULL;
+			iRxBuffers[i]   = NULL;
+			iTxTransfers[i] = NULL;
+			iRxTransfers[i] = NULL;
+			}
+		}
+
+	inline HBuf8* GetRxBuffer(TInt index)
+		{
+		__ASSERT_DEBUG(index < Size, Kern::Fault("d_spi_client.h, line: %d", __LINE__));
+		return iRxBuffers[index];
+		}
+
+	// destructor - to clean up all the objects..
+	inline ~TTransactionWrapper()
+		{
+		// it is safe to call delete on a 'NULL' pointer
+		delete iHeader;
+		delete iCallback;
+		for(TUint i = 0; i < Size; ++i)
+			{
+			delete iTxBuffers[i];
+			delete iTxTransfers[i];
+			delete iRxBuffers[i];
+			delete iRxTransfers[i];
+			}
+		}
+
+	// store all object used by transaction
+	TConfigSpiBufV01* iHeader;
+	TIicBusCallback *iCallback;
+	HBuf8* iTxBuffers[Size];
+	HBuf8* iRxBuffers[Size];
+	TIicBusTransfer* iTxTransfers[Size];
+	TIicBusTransfer* iRxTransfers[Size];
+
+	// also store client and request information
+	DThread* iClient;
+	TRequestStatus* iReqStatus;
+	};
+
 
 // Below is additional stuff for testing with local loopback
 // the IsLoopbackAvailable function checks if McSPI3 is configured to use pins from extension header

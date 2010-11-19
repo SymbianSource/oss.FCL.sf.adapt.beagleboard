@@ -208,16 +208,6 @@ TInt DSpiClientChannel::DoControl(TInt aId, TAny* a1, TAny* a2)
 			r = FullDuplexMultiple();
 			break;
 			}
-		case RSpiClientTest::EHalfDuplexExtendable:
-			{
-			r = HalfDuplexExtendable();
-			break;
-			}
-		case RSpiClientTest::EFullDuplexExtendable:
-			{
-			r = FullDuplexExtendable();
-			break;
-			}
 
 		default:
 			{
@@ -242,47 +232,47 @@ TInt DSpiClientChannel::DoRequest(TInt aId, TRequestStatus* aStatus, TAny* a1, T
 		{
 		case RSpiClientTest::EAsyncHalfDuplexSingleWrite:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexSingleWrite(aStatus);
+			r = AsyncHalfDuplexSingleWrite(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncHalfDuplexMultipleWrite:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexMultipleWrite(aStatus);
+			r = AsyncHalfDuplexMultipleWrite(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncHalfDuplexSingleRead:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexSingleRead(aStatus);
+			r = AsyncHalfDuplexSingleRead(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncHalfDuplexMultipleRead:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexMultipleRead(aStatus);
+			r = AsyncHalfDuplexMultipleRead(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncHalfDuplexMultipleWriteRead:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexMultipleWriteRead(aStatus);
+			r = AsyncHalfDuplexMultipleWriteRead(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncFullDuplexSingle:
 			{
-			r = KErrNotSupported; // AsyncFullDuplexSingle(aStatus);
+			r = AsyncFullDuplexSingle(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncFullDuplexMultiple:
 			{
-			r = KErrNotSupported; // AsyncFullDuplexMultiple(aStatus);
+			r = AsyncFullDuplexMultiple(aStatus);
 			break;
 			}
 		case RSpiClientTest::EAsyncHalfDuplexExtendable:
 			{
-			r = KErrNotSupported; // AsyncHalfDuplexExtendable(aStatus);
+			r = KErrNotSupported; // AsyncHalfDuplexExtendable(aStatus);   TODO Not implemented yet..
 			break;
 			}
 		case RSpiClientTest::EAsyncFullDuplexExtendable:
 			{
-			r = KErrNotSupported; // AsyncFullDuplexExtendable(aStatus);
+			r = KErrNotSupported; // AsyncFullDuplexExtendable(aStatus);  TODO Not implemented yet..
 			break;
 			}
 		default:
@@ -356,6 +346,7 @@ TInt DSpiClientChannel::HalfDuplexSingleWrite()
 	LOG_FUNCTION_RETURN;
 	return r;
 	}
+
 
 // test half duplex write:
 // - one transaction with more write transfers
@@ -696,9 +687,10 @@ TInt DSpiClientChannel::FullDuplexSingle()
 	// initially filled with. (i.e. as nothing was driving the SOMI line - rx will count that as 0 sent over the bus)
 	// see top of this file and IsLoobackAvailable() function description for more details.
 	TBool checkReceivedMatchesSent = IsLoopbackAvailable();
-
 	if(!checkReceivedMatchesSent)
+		{
 		Kern::Printf("!Warning: %s (%d): not using local-loop for duplex test", __FILE__, __LINE__);
+		}
 
 	for (int i = 0; i < KBuffLength; i++)
 		{
@@ -861,13 +853,160 @@ TInt DSpiClientChannel::FullDuplexMultiple()
 	return r;
 	}
 
-TInt DSpiClientChannel::HalfDuplexExtendable()
+// test asynchronous transactions.
+// For these transactions - all objects: buffers, transfers and transactions have to be allocated on the heap.
+// At the momment there is no way of extracting pointers to these objects from the transaction
+// pointer by the client (this it TODO and it's currently being addressed as an architectural change).
+// For that reason pointers to these dynamic objects have to be stored by the client, so that
+// he could access these from the request, read the data (for RX request) and de-allocate/re-use them
+// in next transactions.
+// In order to achieve that (until the PIL will support above 'TODO') the templated wrapper class is used
+// to manage all these pointers, i.e.: TTransactionWrapper (see header file)
+
+
+// Callback for Master's asynchronous transactions - called when transaction has been finished
+void DSpiClientChannel::SingleHalfDuplexTransCallback(TIicBusTransaction* aTransaction,
+	                                                  TInt aBusId,
+	                                                  TInt aResult,
+	                                                  TAny* aParam)
+	{
+	LOG_FUNCTION_ENTRY;
+	TTransactionWrapper<1> *twr = (TTransactionWrapper<1>*)aParam;
+
+	if(aResult == KErrNone)
+		{
+		// if this was a read request (AsyncHalfDuplexSingleRead)- read received data:
+		HBuf8* rxBuffer = twr->GetRxBuffer(0);
+		if(rxBuffer)
+			{
+			HBuf8& buffer = *rxBuffer; // a reference to avoid writing:  "(*rxBuffer)[0]" below..
+			for(TInt i= 0; i < rxBuffer->Length(); i++)
+				{
+				// check if the data is correct..
+				if(buffer[i] == 0x55)
+					{
+					aResult = KErrCorrupt;
+					break;
+					}
+				}
+			}
+		}
+
+	// complete request.. informing the client on the result.
+	Kern::RequestComplete(twr->iClient, twr->iReqStatus, aResult);
+
+	// now can finally delete the wrapper- this will release all memory it holds
+	delete twr;
+
+	// and delete transaction
+    delete aTransaction;
+	}
+
+
+// Test Asynchronous Transaction
+TInt DSpiClientChannel::AsyncHalfDuplexSingleWrite(TRequestStatus* aStatus)
+	{
+	TInt r = KErrNoMemory;
+
+	// 0. prepare busId - i.e. select module / channel and bus type
+	TUint32 busId = 0;
+	SET_BUS_TYPE(busId, DIicBusChannel::ESpi);
+	SET_CHAN_NUM(busId, 2);   // THis is the ModuleNumber, i.e. McSPIx (minus one), e.g. 2 for McSPI3
+	SET_SLAVE_ADDR(busId, 0); // THis is the ChannelNumber (Slave number of the above McSPIx)
+
+	// 1. create header
+	const TConfigSpiV01 KHeader =
+		{
+		ESpiWordWidth_8, //iWordWidth
+		3000000, //iClkSpeed
+		ESpiPolarityLowRisingEdge, //iClkMode
+		5000, // iTimeoutPeriod
+		EBigEndian, // iEndianness
+		EMsbFirst, //iBitOrder
+		0, //iTransactionWaitCycles
+		ESpiCSPinActiveLow //iCsPinActiveMode
+		};
+	// TConfigSpiBufV01 is a TPckgBuf<TConfigSpiV01>
+	TConfigSpiBufV01* spiHeader = new TConfigSpiBufV01(KHeader);
+
+	const TInt KTrasferBufferLength = 64;
+	if(spiHeader)
+		{
+		// 2. create wrapper to store pointers to transfer buffers and objects..
+		TTransactionWrapper<1> *twr = new TTransactionWrapper<1>(iClient, aStatus, spiHeader);
+		if(twr)
+			{
+			// 3. Create the transaction callback object (here we are using this driver's dfcque but it could be any
+			// other one (providing thread synchronization etc..)
+			TIicBusCallback *callback = new TIicBusCallback(SingleHalfDuplexTransCallback, (TAny*)twr, iDfcQ, 5);
+
+			// 4. create buffer for transaction (and store it in a wrapper class)
+			HBuf8* txBuf = HBuf8::New(KTrasferBufferLength);
+			twr->iTxBuffers[0] = txBuf;
+			for(TInt i = 0; i < KTrasferBufferLength; i++)
+				{
+				txBuf->Append(i); // append some data to send..
+				}
+
+			// 5. create transfer (and store it in a wrapper class)
+			TIicBusTransfer* txTransfer = new TIicBusTransfer(TIicBusTransfer::EMasterWrite, 8, txBuf);
+			twr->iTxTransfers[0] = txTransfer;
+
+			// 6. create transaction (no need to store it in the wrapper - this pointer is always passed to the
+			// callback (TODO: and only this could be really used in the callback...it's annoying that it's not yet!)
+			TIicBusTransaction* transaction = new TIicBusTransaction(spiHeader, txTransfer);
+
+			// lazy approach - check result of all allocations here..
+			if(twr && callback && txBuf && txTransfer && transaction)
+				{
+				r = IicBus::QueueTransaction(busId, transaction, callback);
+				}
+			else // ..and cleanup on error..
+				{
+				r = KErrNoMemory;
+				}
+			}
+
+		if(r != KErrNone)
+			{
+			delete twr; // this will clean all that was allocated already..
+			}
+		}
+
+	LOG_FUNCTION_RETURN;
+	return r;
+	}
+
+TInt DSpiClientChannel::AsyncHalfDuplexSingleRead(TRequestStatus* aStatus)
 	{
 	return KErrNotSupported; // TODO: not implemented yet..
 	}
 
-TInt DSpiClientChannel::FullDuplexExtendable()
+TInt DSpiClientChannel::AsyncHalfDuplexMultipleWrite(TRequestStatus* aStatus)
 	{
 	return KErrNotSupported; // TODO: not implemented yet..
 	}
+
+
+TInt DSpiClientChannel::AsyncHalfDuplexMultipleRead(TRequestStatus* aStatus)
+	{
+	return KErrNotSupported; // TODO: not implemented yet..
+	}
+
+TInt DSpiClientChannel::AsyncHalfDuplexMultipleWriteRead(TRequestStatus* aStatus)
+	{
+	return KErrNotSupported; // TODO: not implemented yet..
+	}
+
+TInt DSpiClientChannel::AsyncFullDuplexSingle(TRequestStatus* aStatus)
+	{
+	return KErrNotSupported; // TODO: not implemented yet..
+	}
+
+TInt DSpiClientChannel::AsyncFullDuplexMultiple(TRequestStatus* aStatus)
+	{
+	return KErrNotSupported; // TODO: not implemented yet..
+	}
+
+
 

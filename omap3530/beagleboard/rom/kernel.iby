@@ -35,7 +35,7 @@ extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL         \sys
 extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL       \sys\bin\led.dll
 extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL          \sys\bin\i2c.DLL
 
-// Uncommnet to include West Bridge Astoria Symbian Storage driver 
+// Uncommnet to include West Bridge Astoria Symbian Storage driver
 //extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_WB.DLL      \sys\bin\wb.dll
 //extension[VARID]=\epoc32\release\ARMV5\##BUILD##\wb.dll                   \sys\bin\wb.dll
 
@@ -45,7 +45,9 @@ extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL          \sys
 #include <rom/omapshared/tps65950.iby>
 #include <rom/omap3530/spi.iby>
 
+#ifdef BYD_LCD
 extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_byd_xyin.dll  \sys\bin\byd_xyin.dll
+#endif
 
 device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD           \sys\bin\euart.pdd
 device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD                     \sys\bin\ecomm.ldd
@@ -78,7 +80,7 @@ extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_medstaticrd.p
 // Estart
 data=               	\epoc32\rom\beagle\estart.txt					    \sys\data\estart.txt
 
-// Uncommnet to include West Bridge Astoria Symbian Storage driver 
+// Uncommnet to include West Bridge Astoria Symbian Storage driver
 //extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD \sys\bin\medwb.pdd
 device[VARID]=\epoc32\release\##KMAIN##\##BUILD##\PIPELIB.LDD             \sys\bin\pipelib.ldd
 extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\EXSTART.DLL          \sys\bin\exstart.dll

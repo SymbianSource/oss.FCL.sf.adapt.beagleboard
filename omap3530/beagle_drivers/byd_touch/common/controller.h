@@ -44,9 +44,7 @@ const TUint KResetPin = 93; // This setting does not change (it goes through J4/
 const TUint KDataReadyPin = 133; // DAV connected to the GPIO133 (Expansion header pin 15)
 
 const TUint KSpiModule = 2; // McSPI3
-const TUint KSpiSlaveAddr0 = 2; // for data18-data23 pin functions slave address 2=>CS0..
-const TUint KSpiSlaveAddr1 = 3; // ..slave address 3=>CS1 (pref!)
-const TUint KSpiSlaveAddr = KSpiSlaveAddr1;
+const TUint KSpiSlaveAddr = 3; // ..slave address 3=> spi taken to 'dvi_data18-dvi_data_23' pins
 
 
 const TConfigSpiV01 KHeader =

@@ -15,14 +15,16 @@
 // Implementation of IIC master channel for a SPI bus.
 //
 
-#define DBGPRINT(x)
-#define DBG_ERR(x) x
 
 
 #ifdef _DEBUG
+#define DBGPRINT(x) //x
 #define DEBUG_ONLY(x) //x
+#define DBG_ERR(x) x
 #else
 #define DEBUG_ONLY(x)
+#define DBGPRINT(x)
+#define DBG_ERR(x)
 #endif
 
 
@@ -188,8 +190,9 @@ TInt DSpiMasterBeagle::PrepareConfiguration()
 	// reconfigure pins if needed..
 	if(slavePinSet != iCurrSlavePinSet)
 		{
+		DeactivateSpiPins(iChannelNumber, iCurrSlavePinSet);
+		SetupSpiPins(iChannelNumber, slavePinSet);
 		iCurrSlavePinSet = slavePinSet;
-		SetupSpiPins(iChannelNumber, iCurrSlavePinSet);
 		}
 
 	// store configuration parameters
@@ -410,9 +413,12 @@ TInt DSpiMasterBeagle::StartTransfer(TIicBusTransfer* aTransferPtr, TUint8 aType
 			// Store the current address and ending address for Transmission - they are required by the ISR and DFC
 			iTxData    = (TInt8*)  desBufPtr->Ptr();
 			iTxDataEnd = (TInt8*) (iTxData + desBufPtr->Length());
-			if ((TInt)iTxDataEnd % iWordSize)
+			if (((TInt)iTxDataEnd == (TInt)iTxData) ||  // buffer empty
+			     (TInt)iTxDataEnd % iWordSize) // or wrong size / word length combination
 				{
-				DBG_ERR(Kern::Printf("Wrong configuration - word size does not match buffer length"));
+				DBG_ERR(if ((TInt)iTxDataEnd == (TInt)iTxData) Kern::Printf("Zero-length buffer used for transfer.."));
+				DBG_ERR(if ((TInt)iTxDataEnd % iWordSize) Kern::Printf("Wrong configuration - word size does not match buffer length"));
+				ExitComplete(KErrArgument, EFalse);
 				return KErrArgument;
 				}
 
@@ -440,6 +446,14 @@ TInt DSpiMasterBeagle::StartTransfer(TIicBusTransfer* aTransferPtr, TUint8 aType
 			// Store the current address and ending address for Reception - they are required by the ISR and DFC
 			iRxData = (TInt8*) aBufPtr->Ptr();
 			iRxDataEnd = (TInt8*) (iRxData + aBufPtr->Length());
+			if (((TInt)iRxDataEnd == (TInt)iRxData) ||  // buffer empty
+			     (TInt)iRxDataEnd % iWordSize) // or wrong size / word length combination
+				{
+				DBG_ERR(if ((TInt)iRxDataEnd == (TInt)iRxData) Kern::Printf("Zero-length buffer used for transfer.."));
+				DBG_ERR(if ((TInt)iRxDataEnd % iWordSize) Kern::Printf("Wrong configuration - word size does not match buffer length"));
+				ExitComplete(KErrArgument, EFalse);
+				return KErrArgument;
+				}
 
 			DBGPRINT(Kern::Printf("Rx: Start: %x, End %x, bytes %d", iRxData, iRxDataEnd, aBufPtr->Length()));
 

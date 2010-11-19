@@ -69,10 +69,9 @@ inline void TestError(TInt r)
 
 void TestSynchronousOperation()
 	{
-	test.Next(_L("TestSynchronousOperation()"));
+	test.Next(_L("TestSynchronousOperations:"));
 
 	test.Next(_L("HalfDuplexSingleWrite()"));
-	while(1)
 	TestError(testLdd.HalfDuplexSingleWrite());
 
 	test.Next(_L("HalfDuplexMultipleWrite()"));
@@ -94,20 +93,34 @@ void TestSynchronousOperation()
 	TestError(testLdd.FullDuplexMultiple());
 	}
 
+void TestAsynchronousOperation()
+	{
+	test.Next(_L("Test_AsynchronousOperations:"));
+
+	TRequestStatus status;
+
+	test.Next(_L("HalfDuplexSingleWrite()"));
+	testLdd.HalfDuplexSingleWrite(status);
+	User::WaitForRequest(status); // wait for completion..
+	if(status != KErrNone)
+		{
+		test.Printf(_L("Error was %d"), status.Int());
+		test(EFalse);
+		}
+
+	}
 
 TInt E32Main()
 	{
 	test.Title();
 	test.Start(_L("Testing SPI.."));
-
 	PrepareDriver();
 
 	TestSynchronousOperation();
+	TestAsynchronousOperation();
 
 	ReleaseDriver();
-
 	test.End();
-
 	return KErrNone;
 	}
 
