@@ -19,7 +19,7 @@
 #define __USING_ASSP_INTERRUPT_API__
 
 #include			"assp/omap3530_assp/assp.mmh"
-#include			"../../../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/exmondebug.mmp"
+#include			"../../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/exmondebug.mmp"
 
 target				AsspTarget(exmondebug,dll)
 

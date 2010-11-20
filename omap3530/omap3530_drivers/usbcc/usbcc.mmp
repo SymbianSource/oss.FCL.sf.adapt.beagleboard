@@ -27,7 +27,7 @@ targettype			kext
 linkas				usbcc.dll
 noexportlibrary
 
-sourcepath			../../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/usbcc
+sourcepath			../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/usbcc
 source				chapter9.cpp
 source				descriptors.cpp
 source				misc.cpp
@@ -42,7 +42,7 @@ library				dma.lib
 library				AsspTarget(kaomap3530,lib)
 library				AsspTarget(usbv,lib)
 
-deffile				../../../../../../../sf/os/kernelhwsrv/kernel/eka/~/usbcc.def
+deffile				../../../../../../sf/os/kernelhwsrv/kernel/eka/~/usbcc.def
 
 epocallowdlldata
 
