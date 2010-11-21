@@ -43,9 +43,12 @@ extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL          \sys
 //extension[VARID]=\Epoc32\Release\##KMAIN##\##BUILD##\resman.ldd           \sys\bin\resman.ldd
 
 #include <rom/omapshared/tps65950.iby>
-#include <rom/omap3530/spi.iby>
 
-#ifdef BYD_LCD
+#ifdef USE_SPI
+#include <rom/omap3530/spi.iby>
+#endif
+
+#ifdef BYD_TOUCH
 extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_byd_xyin.dll  \sys\bin\byd_xyin.dll
 #endif
 
