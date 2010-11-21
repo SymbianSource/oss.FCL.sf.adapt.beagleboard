@@ -1,0 +1,31 @@
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// lukasz.forynski@gmail.com
+//
+// Contributors:
+//
+//
+// Description:
+// omap3530_drivers/spi/test/t_spi_client_m.mmp
+//
+
+target			t_spi_client_m.exe
+targettype		exe
+
+sourcepath      .
+source  		t_spi_client_m.cpp
+
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+SYMBIAN_BASE_SYSTEMINCLUDE(nkern)
+
+library 	euser.lib hal.lib
+
+capability 	all
+
+
+VENDORID 0x70000001
+

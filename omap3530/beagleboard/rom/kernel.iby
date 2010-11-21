@@ -19,55 +19,63 @@
 
 
 
-primary[VARID]=		\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EKERN.EXE              \sys\bin\ekern.exe
-extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_KAOMAP3530.DLL         \sys\bin\kaomap3530.dll
+primary[VARID]=  \Epoc32\Release\ARMV5\##BUILD##\_omap3530_EKERN.EXE        \sys\bin\ekern.exe
+extension[VARID]= \Epoc32\Release\ARMV5\##BUILD##\_omap3530_KAOMAP3530.DLL  \sys\bin\kaomap3530.dll
 #include <rom/omapshared/mstick.iby>
 
 // Removed BTRACEX
-//extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_BTRACEX.LDD            \sys\bin\btracex.ldd
+//extension[VARID]= \Epoc32\Release\ARMV5\##BUILD##\_omap3530_BTRACEX.LDD   \sys\bin\btracex.ldd
 
-extension[VARID]=   \Epoc32\Release\ARMV5\##BUILD##\_omap3530_prcm.dll               \sys\bin\prcm.dll
-extension[VARID]=   \Epoc32\Release\ARMV5\##BUILD##\_omap3530_uart.dll               \sys\bin\uart.dll
-variant[VARID]=		\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_ECUST.DLL              \sys\bin\ecust.dll
-extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONCOMMON.DLL        \sys\bin\exmoncommon.dll
-extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONDEBUG.DLL         \sys\bin\exmondebug.dll
-extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL            	\sys\bin\gpio.dll
-extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL		\sys\bin\led.dll
-extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL                \sys\bin\I2C.DLL
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_prcm.dll         \sys\bin\prcm.dll
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_uart.dll         \sys\bin\uart.dll
+variant[VARID]=  \Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_ECUST.DLL     \sys\bin\ecust.dll
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONCOMMON.DLL  \sys\bin\exmoncommon.dll
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EXMONDEBUG.DLL   \sys\bin\exmondebug.dll
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_GPIO.DLL         \sys\bin\gpio.dll
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_LED.DLL       \sys\bin\led.dll
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_I2C.DLL          \sys\bin\i2c.DLL
 
-// Uncommnet to include West Bridge Astoria Symbian Storage driver 
-//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_WB.DLL		\sys\bin\wb.dll
-//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\wb.dll		\sys\bin\wb.dll
+// Uncommnet to include West Bridge Astoria Symbian Storage driver
+//extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_WB.DLL      \sys\bin\wb.dll
+//extension[VARID]=\epoc32\release\ARMV5\##BUILD##\wb.dll                   \sys\bin\wb.dll
 
-//extension[VARID]=	\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_resman.pdd		\sys\bin\resman.pdd
-//extension[VARID]=	\Epoc32\Release\##KMAIN##\##BUILD##\resman.ldd				\sys\bin\resman.ldd
+//extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_resman.pdd  \sys\bin\resman.pdd
+//extension[VARID]=\Epoc32\Release\##KMAIN##\##BUILD##\resman.ldd           \sys\bin\resman.ldd
 
 #include <rom/omapshared/tps65950.iby>
 
-device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD				\sys\bin\euart.pdd
-device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD						\sys\bin\ecomm.ldd
+#ifdef USE_SPI
+#include <rom/omap3530/spi.iby>
+#endif
+
+#ifdef BYD_TOUCH
+extension[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_##VARIANT##_byd_xyin.dll  \sys\bin\byd_xyin.dll
+#endif
+
+device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\_omap3530_EUART.PDD           \sys\bin\euart.pdd
+device[VARID]=\Epoc32\Release\ARMV5\##BUILD##\ECOMM.LDD                     \sys\bin\ecomm.ldd
 
 #ifdef TSHELL_SERIAL
 //Use VT100 Over Serial
-#define EDISP_DRV	\EDISP_VT100.DLL
+#define EDISP_DRV \EDISP_VT100.DLL
 #else // not TSHELL_SERIAL
-	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_lcd.dll				\sys\bin\lcd.dll
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_lcd.dll         \sys\bin\lcd.dll
 #ifdef SERIALMOUSE
 #ifdef BASE_ROM
-	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse_tshell.DLL	\sys\bin\eserialmouse.dll
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse_tshell.DLL \sys\bin\eserialmouse.dll
 #else
-	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL		\sys\bin\eserialmouse.dll
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_serialmouse.DLL  \sys\bin\eserialmouse.dll
 #endif
 #else // not SERIALMOUSE
 #ifndef EXCLUDE_SERIALKEYBOARD
-	extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL	\sys\bin\ekeyb.dll
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_omap3530_serialkeyboard.DLL  \sys\bin\ekeyb.dll
 #endif
 #endif
 #endif
 
-file[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL				\sys\bin\ekdata.dll
-extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\ELOCD.LDD							\sys\bin\elocd.ldd
-extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDINT.PDD				\sys\bin\medint.pdd
+file[VARID]=\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_EKDATA.DLL   \sys\bin\ekdata.dll
+extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\ELOCD.LDD            \sys\bin\elocd.ldd
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDINT.PDD  \sys\bin\medint.pdd
 
 // Persistent storage
 extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_medstaticrd.pdd	    	\sys\bin\medstaticrd.pdd
@@ -75,18 +83,18 @@ extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\_##VARIANT##_medstaticrd.p
 // Estart
 data=               	\epoc32\rom\beagle\estart.txt					    \sys\data\estart.txt
 
-// Uncommnet to include West Bridge Astoria Symbian Storage driver 
-//extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD				\sys\bin\medwb.pdd
-device[VARID]=		\epoc32\release\##KMAIN##\##BUILD##\PIPELIB.LDD							\sys\bin\pipelib.ldd
-extension[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\EXSTART.DLL							\sys\bin\exstart.dll
+// Uncommnet to include West Bridge Astoria Symbian Storage driver
+//extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_MEDWB.PDD \sys\bin\medwb.pdd
+device[VARID]=\epoc32\release\##KMAIN##\##BUILD##\PIPELIB.LDD             \sys\bin\pipelib.ldd
+extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\EXSTART.DLL          \sys\bin\exstart.dll
 
 #ifdef INCLUDE_USB
-extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_omap3530_USBCC.DLL					\sys\bin\USBCC.DLL
-device[VARID]=	\epoc32\release\##KMAIN##\##BUILD##\USBC.LDD							\sys\bin\EUSBC.LDD
-extension[VARID]=	\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL				\sys\bin\usbv.DLL
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_omap3530_USBCC.DLL      \sys\bin\usbcc.DLL
+device[VARID]=\epoc32\release\##KMAIN##\##BUILD##\USBC.LDD                \sys\bin\eusbc.LDD
+extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL    \sys\bin\usbv.DLL
 #endif
 
-#define	EUSER_DLL	../../ARMV5/##BUILD##/_omap3530_euser.dll
+#define EUSER_DLL ../../ARMV5/##BUILD##/_omap3530_euser.dll
 
 // VFP support
 extension[VARID]= \Epoc32\Release\##KMAIN##\##BUILD##\EVFP.DLL \sys\bin\evfp.dll

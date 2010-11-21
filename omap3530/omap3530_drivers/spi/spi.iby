@@ -1,0 +1,29 @@
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// lukasz.forynski@gmail.com
+//
+// Contributors:
+//
+//
+// Description:
+// omap3530/omap3530_drivers/spi/spi.iby
+// this file defines components to be included in the rom image in order
+// to support IIC SPI implementation.
+
+
+
+#ifndef STANDALONE_CHANNEL 
+extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\iic.dll  \sys\bin\iic.dll
+#endif
+extension[VARID]=\epoc32\release\##KMAIN##\##BUILD##\_omap3530_spi.dll  \sys\bin\spi.dll
+
+#ifdef INCLUDE_SPI_TEST
+device[VARID]=\epoc32\release\##KMAIN##\##BUILD##\_beagle_d_spi_client_m.ldd  \sys\bin\d_spi_client_m.ldd
+file=\epoc32\release\##KMAIN##\##BUILD##\t_spi_client_m.exe  \sys\bin\t_spi_client_m.exe
+
+#endif
+

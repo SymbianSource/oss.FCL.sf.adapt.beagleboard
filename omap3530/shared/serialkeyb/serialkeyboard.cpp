@@ -378,7 +378,6 @@ TInt TSerialKeyboard::Create()
  			}
 
 		__KTRACE_OPT(KEXTENSION,Kern::Printf("+TSerialKeyboard::Create bound to interrupt" ));
-
 #ifdef USE_SYMBIAN_PRM
 		// Ask power resource manager to turn on clocks to the UART
 		// (this could take some time but we're not in any hurry)

@@ -41,7 +41,7 @@ TInt LedHeartBeat::DoCreate()
 		{
 		GPIO::SetPinMode(KGPIO_LED0, GPIO::EEnabled);
 		GPIO::SetOutputState(KGPIO_LED0, GPIO::ELow);
-		iTimer.OneShot(NKern::TimerTicks(KBeatTimeInSeconds * 1000));		
+		iTimer.OneShot(NKern::TimerTicks(KBeatTimeInSeconds * 1000));
 		}
 	else
 		{

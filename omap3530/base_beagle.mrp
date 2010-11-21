@@ -15,6 +15,7 @@ binary	kernel all
 binary	omap3530_drivers\gpio all
 binary	omap3530_drivers\i2c all
 binary	omap3530_drivers\prcm all
+# binary omap3530\omap3530_drivers\spi all
 # binary	omap3530_drivers\prm all
 binary	omap3530_drivers\uart all
 binary	omap3530_drivers\usbcc all
@@ -22,6 +23,7 @@ binary	shared\monitor all
 binary	shared\mstick all
 binary	shared\serialkeyb all
 binary	shared\tps65950 all
+
 
 exports	assp
 exports	beagleboard

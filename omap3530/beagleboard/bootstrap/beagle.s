@@ -25,7 +25,7 @@
 ;
 ; Platform specific constant definitions
 
-DRamBankBase		EQU		0x80000000 ; 256M of DRAM 
+DRamBankBase		EQU		0x80000000 ; 256M of DRAM
 DRamBankMaxSize		EQU		0x10000000
 
 ; HW used by bootstrap
@@ -415,7 +415,7 @@ ParameterTable
 	IF  :DEF: CFG_CPU_ARM1136 :LAND: (:LNOT: :DEF: CFG_CPU_ARM1136_ERRATUM_364296_FIXED)
         DCD     BPR_FinalMMUCRSet,      ExtraMMUCR + MMUCR_FI
         DCD     BPR_AuxCRSet,           DefaultAuxCRSet + 0x80000000
-	ENDIF		
+	ENDIF
 		DCD		-1								; terminator
 
 
@@ -577,7 +577,7 @@ InitDebugPort	ROUT ; Based on the OMAP3530TRM 17.5.1.1 Quick Start
 		MOV     r2, #KUART16XMode
 		STR     r2, [r1, #KHwUartMdr1]
 
-    
+
 		MOV     r1, #0x19000                    ; Set up delay loop to allow line to settle
 		SUBS	r1, r1, #1
 		SUBNE	pc, pc, #12
@@ -637,7 +637,7 @@ BootTable
 		DCD	ReservePhysicalMemory			; reserve physical RAM if required
 		DCD	GetParameters				; get platform dependent parameters
 		DCD	FinalInitialise				; Final initialisation before booting the kernel
-		DCD HandleAllocRequest				; allocate memory		
+		DCD HandleAllocRequest				; allocate memory
 		DCD	GetPdeValue				; usually in generic code
 		DCD	GetPteValue				; usually in generic code
 		DCD	PageTableUpdate				; usually in generic code
