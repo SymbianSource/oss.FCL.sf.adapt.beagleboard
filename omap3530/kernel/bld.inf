@@ -27,9 +27,10 @@ PRJ_MMPFILES
 //../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/trace/btracex
 //../../../../../../sf/os/kernelhwsrv/kernel/eka/euser/variant_euser
 
-../../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/ekern
-../../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/kc_exe
+../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/ekern
+../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/kc_exe
 //../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/medint/medint
-../../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/exmoncommon
-../../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/trace/btracex
-../../../../../../sf/os/kernelhwsrv/kernel/eka/euser/variant_euser
+../../../../../sf/os/kernelhwsrv/kernel/eka/kernel/exmoncommon
+../../../../../sf/os/kernelhwsrv/kernel/eka/drivers/trace/btracex
+../../../../../sf/os/kernelhwsrv/kernel/eka/euser/variant_euser
+

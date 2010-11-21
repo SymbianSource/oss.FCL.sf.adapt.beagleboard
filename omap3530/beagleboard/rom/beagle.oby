@@ -73,4 +73,9 @@ REM define BLUETOOTH_ESK bt_port2.esk
 REM Define whether or not to include USB client support:
 #define EUSBC
 
+#ifdef SYMBIAN_EXCLUDE_KEYMAP 
+#undef SYMBIAN_EXCLUDE_KEYMAP
+#warning("SYMBIAN_EXCLUDE_KEYMAP should not be defined for miniGUI")
+#endif
+
 #endif //__BEAGLE_OBY__

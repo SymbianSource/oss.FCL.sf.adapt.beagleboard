@@ -360,7 +360,7 @@ TInt TSerialKeyboard::Create()
 		// Register with the power resource manager
 		_LIT( KName, "serkey" );
 		r = PowerResourceManager::RegisterClient( iPrmClientId, KName );
-		__KTRACE_OPT(KBOOT,Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x, err=%d", iPrmClientId, r));
+		__KTRACE_OPT(KEXTENSION,Kern::Printf("+TSerialKeyboardl::Create:PRM client ID=%x, err=%d", iPrmClientId, r));
 		if( r != KErrNone )
 			{
 			return r;
@@ -373,10 +373,11 @@ TInt TSerialKeyboard::Create()
  		r = Interrupt::Bind( iUart.InterruptId(), UartIsr, this );
 		if ( r < 0 )
  			{
- 			Kern::Printf("TSerialKeyboard Bind r=%d", r);
+ 			__KTRACE_OPT(KBOOT,Kern::Printf("TSerialKeyboard Bind r=%d", r));
 			return r;
  			}
 
+		__KTRACE_OPT(KEXTENSION,Kern::Printf("+TSerialKeyboard::Create bound to interrupt" ));
 #ifdef USE_SYMBIAN_PRM
 		// Ask power resource manager to turn on clocks to the UART
 		// (this could take some time but we're not in any hurry)

@@ -16,7 +16,7 @@
 //
 
 #include <d32comm.h>
-#include <beagle\variant.h>
+#include <beagle/variant.h>
 #include "euart.h"
 
 #define TX_POLLING_HACK

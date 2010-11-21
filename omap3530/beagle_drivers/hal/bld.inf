@@ -21,7 +21,7 @@ ARMV5
 PRJ_EXTENSIONS
 start		extension		base/config
 
-option		HALPATH			$(EXTENSION_ROOT)/../../../../../../../sf/os/kernelhwsrv/halservices
+option		HALPATH			$(EXTENSION_ROOT)/../../../../../../sf/os/kernelhwsrv/halservices
 option		PREFIX			_beagle_
 option		SOURCE			$(EXTENSION_ROOT)/.
 
