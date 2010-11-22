@@ -104,7 +104,9 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_PLATFORM_NAME_medstaticrd.pdd	
 extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2c.dll
 
 #include <../omapshared/tps65950.iby>
-
+#ifdef USE_SPI
+#include <rom/omap3530/spi.iby>
+#endif
 #ifdef SYMBIAN_BASE_USE_GCE
 // Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll

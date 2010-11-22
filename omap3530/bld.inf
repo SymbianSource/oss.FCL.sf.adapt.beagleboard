@@ -30,6 +30,7 @@
 #include "omap3530_drivers/gpio/bld.inf"
 #include "omap3530_drivers/i2c/bld.inf"
 #include "omap3530_drivers/prcm/bld.inf"
+#include "omap3530_drivers/spi/bld.inf"
 // #include "omap3530_drivers/prm/bld.inf"
 #include "omap3530_drivers/uart/bld.inf"
 #include "omap3530_drivers/usbcc/bld.inf"

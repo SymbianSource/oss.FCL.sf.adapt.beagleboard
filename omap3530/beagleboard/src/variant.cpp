@@ -37,16 +37,16 @@ GLREF_C void ArmWaitForInterrupt();
 //These constants define Custom Restart Reasons in SuperPage::iHwStartupReason
 const TUint KHtCustomRestartMax	  = 0xff;
 const TUint KHtCustomRestartShift = 8;
-const TUint KHtCustomRestartMask  = KHtCustomRestartMax << KHtCustomRestartShift; 
+const TUint KHtCustomRestartMask  = KHtCustomRestartMax << KHtCustomRestartShift;
 
 //TODO: unncomment when referenced
-const TUint KHtRestartStartupModesMax = 0xf; // Variable, platform dependant 
-//const TUint KHtRestartStartupModesShift = 16; // Variable, platform dependant 
+const TUint KHtRestartStartupModesMax = 0xf; // Variable, platform dependant
+//const TUint KHtRestartStartupModesShift = 16; // Variable, platform dependant
 //const TUint KHtRestartStartupModesMask = KHtRestartStartupModesMax << KHtRestartStartupModesShift;
 
 void BeagleVariantFault(TInt aLine)
 	{
-	Kern::Fault("BeagleVariant",aLine);	
+	Kern::Fault("BeagleVariant",aLine);
 	}
 
 #define V_FAULT()	BeagleVariantFault(__LINE__)
@@ -78,15 +78,15 @@ Beagle::Beagle()
 //
 // Specify the RAM zone configuration.
 //
-// The lowest addressed zone must have the highest preference as the bootstrap 
+// The lowest addressed zone must have the highest preference as the bootstrap
 // will always allocate from the lowest address up.  Once the kernel has initialised
 // then the zone preferences will decide from which RAM zone memory is allocated.
 //
 // 	const TUint KVariantRamZoneCount = ?;
-//	static const SRamZone KRamZoneConfig[KVariantRamZoneCount+1] = 
+//	static const SRamZone KRamZoneConfig[KVariantRamZoneCount+1] =
 //				 			iBase      iSize   		iID	iPref	iFlags
 //				{
-//				__SRAM_ZONE(0x????????, 0x???????, 	?,	?, 		?), 
+//				__SRAM_ZONE(0x????????, 0x???????, 	?,	?, 		?),
 //				...
 //				__SRAM_ZONE(0x????????, 0x???????, 	?, 	?, 		?),
 //				__SRAM_ZONE_END, // end of zone list
@@ -117,10 +117,10 @@ TInt Beagle::DoRamZoneCallback(TRamZoneOp aOp, TUint aId, const TUint* aMasks)
 	//	ERamZoneOp_PowerUp:		A RAM zone changing from used to empty.
 	//	ERamZoneOp_PowerDown:	A RAM zone changing from empty to used.
 	//
- 
+
 	switch (aOp)
 		{
-		case ERamZoneOp_Init:	
+		case ERamZoneOp_Init:
 			break;
 		case ERamZoneOp_PowerUp:
 			break;
@@ -158,13 +158,13 @@ void Beagle::Init1()
 EXPORT_C TInt Variant::GetMsTickPeriod()
 	{
 	return TheVariant.MsTickPeriod();
-	
+
 	}
 
 void Beagle::Init3()
 	{
 	__KTRACE_OPT(KBOOT,Kern::Printf("Beagle::Init3()"));
-	
+
 	Omap3530Assp::Init3();
 
 	Variant::Init3();
@@ -197,13 +197,13 @@ EXPORT_C void Variant::UartInit()
 		if( portNumber >= 0 )
 			{
 			Omap3530Uart::TUart uart( portNumber );
-		
+
 			uart.Init();
 			uart.DefineMode( Omap3530Uart::TUart::EUart );
 			uart.SetBaud( Omap3530Uart::TUart::E115200 );
 			uart.SetDataFormat( Omap3530Uart::TUart::E8Data, Omap3530Uart::TUart::E1Stop, Omap3530Uart::TUart::ENone );
 			uart.Enable();
-			
+
 			TheVariant.iDebugInitialised=ETrue;
 			}
 		}
@@ -245,14 +245,14 @@ void Beagle::Idle()
 	//
 	// TO DO: (optional)
 	//
-	// Idle Tick supression: 
+	// Idle Tick supression:
 	// 1- obtain the number of idle Ticks before the next NTimer expiration (NTimerQ::IdleTime())
 	// 2- if the number of Ticks is large enough (criteria to be defined) reset the Hardware Timer
 	//    to only interrupt again when the corresponding time has expired.
-	//   2.1- the calculation of the new value to program the Hardware Timer with should take in 
+	//   2.1- the calculation of the new value to program the Hardware Timer with should take in
 	//		  consideration the rounding value (NTimerQ::iRounding)
 	//  3- call the low level Sleep function (e'g. Bootstrap: address in iIdleFunction)
-	//  4- on coming back from Idle need to read the Hardware Timer and determine if woken up due to 
+	//  4- on coming back from Idle need to read the Hardware Timer and determine if woken up due to
 	//     timer expiration (system time for new match<=current system time<system time for new match-tick period)
 	//     or some other Interrupt.
 	//	 4.1- if timer expiration, adjust System Time by adding the number of Ticks suppressed to NTimerQ::iMsCount
@@ -260,8 +260,8 @@ void Beagle::Idle()
 	//		  above
 	//
 	// Support for different Sleep Modes:
-	// Often the Sleep mode a platform can go to depends on how many resources such as clocks/voltages can be 
-	// turned Off or lowered to a suitable level. If different Sleep modes are supported this code may need 
+	// Often the Sleep mode a platform can go to depends on how many resources such as clocks/voltages can be
+	// turned Off or lowered to a suitable level. If different Sleep modes are supported this code may need
 	// to be able to find out what power resources are On or Off or used to what level. This could be achieved by
 	// enquiring the Resource Manager (see \beagle_variant\inc\beagle_power.h).
 	// Then a decision could be made to what Sleep level we go to.
@@ -269,7 +269,7 @@ void Beagle::Idle()
 	// Example calls:
 	// Obtain the number of Idle Ticks before the next NTimer expiration
 	// TInt aTicksLeft = NTimerQ::IdleTime();
-	// ... 
+	// ...
 	// Find out the deepest Sleep mode available for current resource usage and sleeping time
 	// TemplateResourceManager* aManager = TTemplatePowerController::ResourceManager();
 	// TemplateResourceManager::TSleepModes aMode = aManager -> MapSleepMode(aTicksLeft*MsTickPeriod());
@@ -368,24 +368,47 @@ TInt Beagle::VariantHal(TInt aFunction, TAny* a1, TAny* a2)
 			}
 		case EVariantHalLedMaskSet:
 			{
-			//
-			// TO DO: (optional)
-			//
 			// Set the state of any on-board LEDs, e.g:
-			// TUint32 aLedMask=(TUint32)a1;
-			// Variant::ModifyLedState(~aLedMask,aLedMask);
-			//
+			TUint aLedMask=(TUint)a1;
+			GPIO::TGpioState led_state;
+			if(aLedMask & 1)
+				led_state = GPIO::EHigh;
+			else
+				led_state = GPIO::ELow;
+
+			r = GPIO::SetOutputState(KGPIO_LED0, led_state);
+
+			if(r == KErrNone)
+				{
+				if(aLedMask & 2)
+					led_state = GPIO::EHigh;
+				else
+					led_state = GPIO::ELow;
+
+				r = GPIO::SetOutputState(KGPIO_LED1, led_state);
+				}
 			break;
 			}
 		case EVariantHalLedMaskGet:
 			{
-			//
-			// TO DO: (optional)
-			//
-			// Read the state of any on-board LEDs, e.g:
-			// TUint32 x = Variant::LedState();
-			// kumemput32(a1, &x, sizeof(x));
-			//
+			// Read the state of on-board LEDs
+			GPIO::TGpioState led_state;
+			TUint x = 0;
+			r = GPIO::GetOutputState(KGPIO_LED0, led_state);
+			if(r == KErrNone)
+				{
+				if(led_state == GPIO::EHigh)
+					x = 1;
+
+				r = GPIO::GetOutputState(KGPIO_LED1, led_state);
+				if(r == KErrNone)
+					{
+					if(led_state == GPIO::EHigh)
+						x |= 1 << 1;
+
+					kumemput32(a1, &x, sizeof(x));
+					}
+				}
 			break;
 			}
 
@@ -445,7 +468,7 @@ TInt Beagle::VariantHal(TInt aFunction, TAny* a1, TAny* a2)
 			// Read the restart startup mode, e.g:
 			// TInt startup = (Kern::SuperPage().iHwStartupReason & KHtRestartStartupModesMask) >> KHtRestartStartupModesShift;
 			// kumemput32(a1, &startup, sizeof(TInt));
-			break; 			
+			break;
 			}
 
 		case EVariantHalGetMaximumCustomRestartReasons:
@@ -468,7 +491,7 @@ TInt Beagle::VariantHal(TInt aFunction, TAny* a1, TAny* a2)
 			// kumemput32(a1, &KHtRestartStartupModesMax, sizeof(TUint));
 			break;
 			}
-		
+
 
 		default:
 			r=KErrNotSupported;
@@ -662,8 +685,8 @@ LOCAL_C void SecondsToYMD( const TInt aTime, TUint8& aYear, TUint8& aMonth, TUin
 	aDay=0;
 	aMonth=0;
 	TInt adjyear = aTime % KSecsDaysPer4Years;
-	
-	
+
+
 	if (adjyear<KSecsPerYr + KSecsPerDay)
 		{
 		GetMonthData(adjyear/KSecsPerDay, ETrue, aMonth, aDay);
@@ -679,7 +702,7 @@ LOCAL_C void SecondsToYMD( const TInt aTime, TUint8& aYear, TUint8& aMonth, TUin
 
 TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
 	{
-	
+
 	if(!TPS65950::Initialized())
 		{
 		return KErrNotSupported;
@@ -687,7 +710,7 @@ TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
 
 	TPS65950::TRtcTime  time;
 	TPS65950::GetRtcData( time );
-		 
+
 	aTime = time.iSecond;
 	aTime += time.iMinute * KSecsPerMin;
 	aTime += time.iHour * KSecsPerHour;
@@ -708,9 +731,9 @@ TInt  Beagle::SystemTimeInSecondsFrom2000(TInt& aTime)
 		{
 		aTime += mTab[isLeap][i] * KSecsPerDay;
 		}
-	
+
 	aTime += (yrs/4) * KSecsDaysPer4Years;
-	
+
 	if ( isLeap )
 		{
 		// Add KSecsPerDay, because first year is always a leap year
@@ -725,8 +748,8 @@ TInt Beagle::SetSystemTimeInSecondsFrom2000(TInt aTime)
 		{
 		return KErrNotSupported;
 		}
-		
-	TPS65950::TRtcTime  rtc;	
+
+	TPS65950::TRtcTime  rtc;
 	TInt secs = aTime % KSecsPerMin;
 	TInt mins_insecs = (aTime % KSecsPerHour) - secs;
 	TInt hours_insecs = (aTime % KSecsPerDay) - mins_insecs - secs;
@@ -736,7 +759,7 @@ TInt Beagle::SetSystemTimeInSecondsFrom2000(TInt aTime)
 	rtc.iHour = hours_insecs/KSecsPerHour;
 
 	SecondsToYMD( aTime, rtc.iYear, rtc.iMonth, rtc.iDay);
-	
+
 	TPS65950::SetRtcData( rtc );
 
 	return KErrNone;
