@@ -98,3 +98,4 @@ EMaximumRestartStartupModes = GetMaximumRestartStartupModes
 ECustomResourceDrive : set = 0
 EDisplayNumberOfScreens=0
 EHardwareFloatingPoint = GetHardwareFloatingPoint
+

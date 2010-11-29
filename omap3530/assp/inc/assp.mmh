@@ -139,7 +139,9 @@ macro __DEBUGGER_SUPPORT__
 library	AsspTarget(kaomap3530,lib)
 #endif
 
+#ifndef GCCE
 // Enable VFP3
 #define USE_VFP_MATH
 macro __CPU_HAS_VFP
 macro __VFP_V3
+#endif

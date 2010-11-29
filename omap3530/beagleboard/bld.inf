@@ -53,31 +53,6 @@ PRJ_EXTENSIONS
 // update regarding these are changes associated with introduction of bootstrap.flm - see Bug 2149
 // and bsptemplate/asspandvariant/template_variant/bld.inf for more info.
 
-start		extension		base.bootstrap bootstrap
-#ifdef SYMBIAN_OLD_EXPORT_LOCATION
-option INC_PATH   /epoc32/include
-#else
-option INC_PATH  /epoc32/include/platform
-#endif
-#ifdef GCCE
-option		GCCE			GCCE
-#endif
-#ifdef ARMCC
-option		ARMCC			ARMCC
-#endif
-option		NAME			_beagle_bootrom
-option		CPU				arm
-option		MEMMODEL		Multiple
-option		SOURCES			./bootstrap/beagle.s
-option		EXTRA_SRC_PATH		./bootstrap
-option		EXTRA_INC_PATH		./bootstrap
-option		INCLUDES		./bootstrap/config.inc
-option		E32PATH			../../../../os/kernelhwsrv/kernel
-
-end
-// Workaround end
-
-
 start		extension		base/bootstrap
 
 #ifdef SYMBIAN_OLD_EXPORT_LOCATION

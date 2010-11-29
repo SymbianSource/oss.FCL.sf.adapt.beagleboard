@@ -96,8 +96,10 @@ extension[VARID]=\epoc32\release\ARMV5\##BUILD##\_##VARIANT##_USBV.DLL    \sys\b
 
 #define EUSER_DLL ../../ARMV5/##BUILD##/_omap3530_euser.dll
 
+#ifndef GCCE
 // VFP support
 extension[VARID]= \Epoc32\Release\##KMAIN##\##BUILD##\EVFP.DLL \sys\bin\evfp.dll
+#endif
 
 #ifdef TEST_ROM
 #include <rom\##VARIANT##\test.iby>

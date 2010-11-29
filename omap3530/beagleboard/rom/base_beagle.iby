@@ -30,30 +30,30 @@ define BUILD_DIR urel
 #endif
 
 #ifndef _EABI
-#ifdef _ARM4
-#define _EABI ARM4
+#  ifdef _ARM4
+#    define _EABI ARM4
 	 ECHO Defaulting to ARM4
-#elif defined(_ARMV5)
-#define _EABI ARMV5
+#  elif defined(_ARMV5)
+#    define _EABI ARMV5
 	 ECHO Defaulting to ARMV5
-#elif defined _X86GCC
-#define _EABI x86gcc
-#endif
+#  elif defined _X86GCC
+#    define _EABI x86gcc
+#  endif
 #endif
 
-#ifdef _PLAT
-#undef _EABI
-#define _EABI _PLAT
+#  ifdef _PLAT
+#    undef _EABI
+#    define _EABI _PLAT
 	 ECHO Defaulting to _EABI
-#endif
+#  endif
 
-#ifdef _GCCE
-#undef _EABI
-#define _EABI GCCE
-#elif defined(ABIV2) || defined(ABIv2)
-#undef _EABI
-#define _EABI ARMV5_ABIV2
-#endif
+#  ifdef _GCCE
+#    undef _EABI
+#    define _EABI GCCE
+#  elif defined(ABIV2) || defined(ABIv2)
+#    undef _EABI
+#    define _EABI ARMV5_ABIV2
+#  endif
 
 #ifndef _KABI
 #define _KABI _EABI
@@ -108,7 +108,7 @@ extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_omap3530_i2c.dll			\sys\bin\i2
 #include <rom/omap3530/spi.iby>
 #endif
 #ifdef SYMBIAN_BASE_USE_GCE
-// Use the new GCE compliant display driver
+// Use the new GCE compliant display driver  
 	extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_lcd_gce.dll	\sys\bin\lcd.dll
 	device[VARID]=\epoc32\release\ARMV5\BUILD_DIR\display.ldd			\sys\bin\display0.ldd
 #ifndef EXCLUDE_SERIALKEYBOARD
@@ -150,7 +150,9 @@ extension[VARID]=	\epoc32\release\ARMV5\BUILD_DIR\_beagle_usbv.dll					\sys\bin\
 
 //extension[VARID]=\epoc32\release\ARMV5\BUILD_DIR\_beagle_ekeyb.dll	\sys\bin\ekeyb.dll
 
+#ifndef GCCE
 // VFP support
 extension[VARID]= \epoc32\release\ARMV5\BUILD_DIR\EVFP.DLL	\sys\bin\evfp.dll
+#endif
 
 #endif
